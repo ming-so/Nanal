@@ -20,7 +20,7 @@ public class CalendarDiaryModel implements Serializable {
     public String mDiaryLocation;
     public String mDiaryImg;
 
-    public DiaryColorCache mDiaryColorCache;
+    public EventColorCache mDiaryColorCache;
     public String mTimezone = null;
 
     public CalendarDiaryModel(Context context){
