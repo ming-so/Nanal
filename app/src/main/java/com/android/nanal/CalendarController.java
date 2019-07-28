@@ -81,6 +81,19 @@ public class CalendarController {
         }
     }
 
+    public static void removeInstance(Context context) {
+        /**
+         * Removes an instance when it is no longer needed. This should be called in
+         * an activity's onDestroy method.
+         * 더 이상 필요하지 않을 때 인스턴스를 제거함
+         * activity의 onDestroy 메소드로 호출되어야 함
+         *
+         * @param context The activity used to create the controller
+         *                컨트롤러를 생성하는 데 사용되는 Activity
+         */
+        instances.remove(context);
+    }
+
     public interface ViewType {
         // Agenda/일/주/월 view type 중 하나
         final int DETAIL = -1;
