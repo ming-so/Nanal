@@ -20,6 +20,8 @@ package com.android.nanal;
 import android.text.format.Time;
 import android.util.Log;
 
+import com.android.nanal.event.EventRecurrence;
+
 import java.util.TreeSet;
 
 public class RecurrenceProcessor
