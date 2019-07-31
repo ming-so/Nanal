@@ -8,6 +8,9 @@ import android.text.format.Time;
 import android.util.Log;
 import android.util.TimeFormatException;
 
+import com.android.nanal.event.EventRecurrence;
+import com.android.nanal.icalendar.ICalendar;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
