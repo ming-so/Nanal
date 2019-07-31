@@ -413,7 +413,7 @@ public class Utils {
         editor.apply();
     }
 
-    static void setSharedPreference(Context context, String key, int value) {
+    public static void setSharedPreference(Context context, String key, int value) {
         SharedPreferences prefs = GeneralPreferences.getSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putInt(key, value);
@@ -481,7 +481,7 @@ public class Utils {
      * @param context
      * @param viewId {@link ViewType}
      */
-    static void setDefaultView(Context context, int viewId) {
+    public static void setDefaultView(Context context, int viewId) {
         SharedPreferences prefs = GeneralPreferences.getSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
 

@@ -8,7 +8,6 @@
 
     <!-- Include our custom Toolbar -->
     <include layout="@layout/app_bar" />
-    <!-- app_bar 수정 안 함 -->
 
     <FrameLayout
         android:id="@+id/body_frame"

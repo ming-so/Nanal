@@ -72,7 +72,7 @@ public class GeneralPreferences extends PreferenceFragment {
     // 공유 Preference 파일의 이름
     // 이 이름은 파일이 처음 만들어졌을 때 PreferenceManager가 할당했던 것이기 때문에 역사적인
     // 이유로 유지되어야 함
-    static final String SHARED_PREFS_NAME = "com.android.calendar_preferences";
+    public static final String SHARED_PREFS_NAME = "com.android.calendar_preferences";
     static final String SHARED_PREFS_NAME_NO_BACKUP = "com.android.calendar_preferences_no_backup";
     static final String KEY_HOME_TZ_ENABLED = "preferences_home_tz_enabled";
     static final String KEY_HOME_TZ = "preferences_home_tz";
