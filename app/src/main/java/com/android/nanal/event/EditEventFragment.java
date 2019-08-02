@@ -1,11 +1,10 @@
 package com.android.nanal.event;
 
 import android.Manifest;
-import android.support.v7.app.ActionBar;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.AsyncQueryHandler;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
@@ -22,7 +21,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.provider.CalendarContract.Events;
+import android.provider.CalendarContract.Calendars;
+import android.provider.CalendarContract.Colors;
+import android.provider.CalendarContract.Attendees;
+import android.provider.CalendarContract.Reminders;
 import android.text.TextUtils;
 import android.text.format.Time;
 import android.util.Log;
@@ -38,11 +43,12 @@ import android.widget.Toast;
 
 import com.android.nanal.R;
 import com.android.nanal.calendar.CalendarController;
+import com.android.nanal.calendar.CalendarController.EventHandler;
 import com.android.nanal.calendar.CalendarController.EventInfo;
 import com.android.nanal.calendar.CalendarController.EventType;
-import com.android.nanal.calendar.CalendarController.EventHandler;
 import com.android.nanal.calendar.CalendarEventModel;
 import com.android.nanal.calendar.CalendarEventModel.ReminderEntry;
+import com.android.nanal.calendar.CalendarEventModel.Attendee;
 import com.android.nanal.color.ColorPickerSwatch.OnColorSelectedListener;
 import com.android.nanal.color.HsvColorComparator;
 import com.android.nanal.query.AsyncQueryService;
@@ -143,6 +149,7 @@ public class EditEventFragment extends Fragment implements EventHandler, OnColor
                 this(null, null, false, -1, false, null);
         }
 
+        @SuppressLint("ValidFragment")
         public EditEventFragment(EventInfo event, ArrayList<ReminderEntry> reminders,
                                  boolean eventColorInitialized, int eventColor, boolean readOnly, Intent intent) {
                 mEvent = event;

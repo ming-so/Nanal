@@ -49,6 +49,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.android.nanal.R;
+import com.android.nanal.activity.AlertActivity;
 import com.android.nanal.alerts.AlertService.NotificationWrapper;
 import com.android.nanal.event.Utils;
 

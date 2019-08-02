@@ -134,7 +134,7 @@ public class AlertService extends Service {
         });
     }
 
-    static boolean updateAlertNotification(Context context) {
+    public static boolean updateAlertNotification(Context context) {
         ContentResolver cr = context.getContentResolver();
         NotificationMgr nm = new NotificationMgrWrapper(
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE));

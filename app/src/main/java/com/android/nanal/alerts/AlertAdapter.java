@@ -28,6 +28,7 @@ import android.widget.ResourceCursorAdapter;
 import android.widget.TextView;
 
 import com.android.nanal.R;
+import com.android.nanal.activity.AlertActivity;
 import com.android.nanal.event.Utils;
 
 import java.util.Locale;

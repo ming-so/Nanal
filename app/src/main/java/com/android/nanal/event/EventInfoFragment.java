@@ -139,10 +139,10 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
     public static final int DIALOG_WINDOW_STYLE = 1;
     public static final int COLORS_INDEX_COLOR = 1;
     public static final int COLORS_INDEX_COLOR_KEY = 2;
-    protected static final String BUNDLE_KEY_EVENT_ID = "key_event_id";
-    protected static final String BUNDLE_KEY_START_MILLIS = "key_start_millis";
-    protected static final String BUNDLE_KEY_END_MILLIS = "key_end_millis";
-    protected static final String BUNDLE_KEY_IS_DIALOG = "key_fragment_is_dialog";
+    public static final String BUNDLE_KEY_EVENT_ID = "key_event_id";
+    public static final String BUNDLE_KEY_START_MILLIS = "key_start_millis";
+    public static final String BUNDLE_KEY_END_MILLIS = "key_end_millis";
+    public static final String BUNDLE_KEY_IS_DIALOG = "key_fragment_is_dialog";
     protected static final String BUNDLE_KEY_DELETE_DIALOG_VISIBLE = "key_delete_dialog_visible";
     protected static final String BUNDLE_KEY_WINDOW_STYLE = "key_window_style";
     protected static final String BUNDLE_KEY_CALENDAR_COLOR = "key_calendar_color";
@@ -152,7 +152,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
     protected static final String BUNDLE_KEY_CURRENT_COLOR_INIT = "key_current_color_init";
     protected static final String BUNDLE_KEY_ORIGINAL_COLOR = "key_original_color";
     protected static final String BUNDLE_KEY_ORIGINAL_COLOR_INIT = "key_original_color_init";
-    protected static final String BUNDLE_KEY_ATTENDEE_RESPONSE = "key_attendee_response";
+    public static final String BUNDLE_KEY_ATTENDEE_RESPONSE = "key_attendee_response";
     protected static final String BUNDLE_KEY_USER_SET_ATTENDEE_RESPONSE =
             "key_user_set_attendee_response";
     protected static final String BUNDLE_KEY_TENTATIVE_USER_RESPONSE =

@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 
+import com.android.nanal.event.Utils;
+
 /**
  * Created by Gitsaibot on 01.07.16.
  */
@@ -40,8 +42,7 @@ public class DynamicTheme {
     }
 
     private static String getTheme(Context context) {
-        return null;
-        //return Utils.getSharedPreference(context, THEME_PREF, LIGHT);
+        return Utils.getSharedPreference(context, THEME_PREF, LIGHT);
     }
 
     private static int getSelectedTheme(Activity activity) {
@@ -65,8 +66,7 @@ public class DynamicTheme {
     }
 
     private static String getPrimaryColor(Context context) {
-        return null;
-        //return Utils.getSharedPreference(context, COLOR_PREF, TEAL);
+        return Utils.getSharedPreference(context, COLOR_PREF, TEAL);
     }
 
     private static String getSuffix(String theme) {

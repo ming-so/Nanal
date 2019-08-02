@@ -67,32 +67,28 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
+import com.android.nanal.RecipientAdapter;
+import com.android.nanal.RecurrencePickerDialog;
+import com.android.nanal.EmailAddressAdapter;
+import com.android.nanal.R;
+import com.android.nanal.Rfc822InputFilter;
+import com.android.nanal.Rfc822Validator;
 import com.android.nanal.calendar.CalendarEventModel;
 import com.android.nanal.calendar.CalendarEventModel.Attendee;
 import com.android.nanal.calendar.CalendarEventModel.ReminderEntry;
-import com.android.calendar.EmailAddressAdapter;
-import com.android.calendar.EventInfoFragment;
-import com.android.calendar.EventRecurrenceFormatter;
-import com.android.calendar.GeneralPreferences;
-import com.android.calendar.RecipientAdapter;
-import com.android.calendar.Utils;
-import com.android.calendar.event.EditEventHelper.EditDoneRunnable;
-import com.android.calendar.recurrencepicker.RecurrencePickerDialog;
-import com.android.calendarcommon2.EventRecurrence;
-import com.android.common.Rfc822InputFilter;
-import com.android.common.Rfc822Validator;
-import com.android.datetimepicker.date.DatePickerDialog;
-import com.android.datetimepicker.date.DatePickerDialog.OnDateSetListener;
-import com.android.datetimepicker.time.RadialPickerLayout;
-import com.android.datetimepicker.time.TimePickerDialog;
-import com.android.datetimepicker.time.TimePickerDialog.OnTimeSetListener;
-import com.android.ex.chips.AccountSpecifier;
-import com.android.ex.chips.BaseRecipientAdapter;
-import com.android.ex.chips.ChipsUtil;
-import com.android.ex.chips.RecipientEditTextView;
-import com.android.timezonepicker.TimeZoneInfo;
-import com.android.timezonepicker.TimeZonePickerDialog;
-import com.android.timezonepicker.TimeZonePickerUtils;
+import com.android.nanal.chips.AccountSpecifier;
+import com.android.nanal.chips.BaseRecipientAdapter;
+import com.android.nanal.chips.ChipsUtil;
+import com.android.nanal.chips.RecipientEditTextView;
+import com.android.nanal.datetimepicker.date.DatePickerDialog;
+import com.android.nanal.datetimepicker.date.DatePickerDialog.OnDateSetListener;
+import com.android.nanal.datetimepicker.time.RadialPickerLayout;
+import com.android.nanal.datetimepicker.time.TimePickerDialog;
+import com.android.nanal.datetimepicker.time.TimePickerDialog.OnTimeSetListener;
+import com.android.nanal.event.EditEventHelper.EditDoneRunnable;
+import com.android.nanal.timezonepicker.TimeZoneInfo;
+import com.android.nanal.timezonepicker.TimeZonePickerDialog;
+import com.android.nanal.timezonepicker.TimeZonePickerUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -101,7 +97,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import ws.xsoh.etar.R;
 
 public class EditEventView implements View.OnClickListener, DialogInterface.OnCancelListener,
         DialogInterface.OnClickListener, OnItemSelectedListener,

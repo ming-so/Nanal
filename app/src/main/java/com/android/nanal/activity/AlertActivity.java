@@ -1,4 +1,4 @@
-package com.android.nanal.alerts;
+package com.android.nanal.activity;
 /*
  * Copyright (C) 2007 The Android Open Source Project
  *
@@ -37,7 +37,10 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.android.nanal.R;
-import com.android.nanal.activity.EventInfoActivity;
+import com.android.nanal.alerts.AlertAdapter;
+import com.android.nanal.alerts.AlertService;
+import com.android.nanal.alerts.AlertUtils;
+import com.android.nanal.alerts.GlobalDismissManager;
 import com.android.nanal.event.Utils;
 import com.android.nanal.query.AsyncQueryService;
 import com.android.nanal.alerts.GlobalDismissManager.AlarmId;
@@ -208,7 +211,7 @@ public class AlertActivity extends Activity implements OnClickListener {
         }
     }
 
-    void closeActivityIfEmpty() {
+    public void closeActivityIfEmpty() {
         if (mCursor != null && !mCursor.isClosed() && mCursor.getCount() == 0) {
             AlertActivity.this.finish();
         }

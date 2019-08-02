@@ -398,11 +398,11 @@ public class Utils {
     }
 
 
-    protected static void tardis() {
+    public static void tardis() {
         mTardis = System.currentTimeMillis();
     }
 
-    protected static long getTardis() {
+    public static long getTardis() {
         return mTardis;
     }
 
