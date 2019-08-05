@@ -200,7 +200,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     private boolean mIntentAllDay = false;
     private DrawerLayout mDrawerLayout;
     private Toolbar mToolbar;
-    private NavigationView mNavigationView;
+    //private NavigationView mNavigationView;
     private int mCurrentMenuItem;
     private CalendarToolbarHandler mCalendarToolbarHandler;
     // Action bar
@@ -383,7 +383,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         setContentView(R.layout.all_in_one_material);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
+        //mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
 
         mFab = (FloatingActionButton) findViewById(R.id.floating_action_button);
 
@@ -510,19 +510,15 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             mToolbar.setTitle(titleResource);
         }
         // mToolbar.setTitle(getTitle());
-        mToolbar.setNavigationIcon(R.drawable.ic_menu_navigator);
+        //mToolbar.setNavigationIcon(R.drawable.ic_menu_navigator);
         setSupportActionBar(mToolbar);
 
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AllInOneActivity.this.openDrawer();
-            }
-        });
-        mActionBar = getSupportActionBar();
-        if (mActionBar == null) return;
-        mActionBar.setDisplayHomeAsUpEnabled(true);
-        mActionBar.setHomeButtonEnabled(true);
+//        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                AllInOneActivity.this.openDrawer();
+//            }
+//        });
     }
 
     public void openDrawer() {
@@ -536,7 +532,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             }
             return;
         }
-        mNavigationView.setNavigationItemSelectedListener(this);
+        //mNavigationView.setNavigationItemSelectedListener(this);
         showActionBar();
     }
 
@@ -1112,21 +1108,21 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         Fragment secFrag = null;
         switch (viewType) {
             case ViewType.AGENDA:
-                mNavigationView.getMenu().findItem(R.id.agenda_menu_item).setChecked(true);
+                //mNavigationView.getMenu().findItem(R.id.agenda_menu_item).setChecked(true);
                 frag = new AgendaFragment(timeMillis, false);
                 if (mIsTabletConfig) {
                     mToolbar.setTitle(R.string.agenda_view);
                 }
                 break;
             case ViewType.DAY:
-                mNavigationView.getMenu().findItem(R.id.day_menu_item).setChecked(true);
+                //mNavigationView.getMenu().findItem(R.id.day_menu_item).setChecked(true);
                 frag = new DayFragment(timeMillis, 1);
                 if (mIsTabletConfig) {
                     mToolbar.setTitle(R.string.day_view);
                 }
                 break;
             case ViewType.MONTH:
-                mNavigationView.getMenu().findItem(R.id.month_menu_item).setChecked(true);
+                //mNavigationView.getMenu().findItem(R.id.month_menu_item).setChecked(true);
                 frag = new MonthByWeekFragment(timeMillis, false);
                 if (mShowAgendaWithMonth) {
                     secFrag = new AgendaFragment(timeMillis, false);
@@ -1137,7 +1133,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 break;
             case ViewType.WEEK:
             default:
-                mNavigationView.getMenu().findItem(R.id.week_menu_item).setChecked(true);
+                //mNavigationView.getMenu().findItem(R.id.week_menu_item).setChecked(true);
                 frag = new DayFragment(timeMillis, Utils.getDaysPerWeek(this));
                 if (mIsTabletConfig) {
                     mToolbar.setTitle(R.string.week_view);

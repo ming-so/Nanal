@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2006 The Android Open Source Project
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2006 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -14,6 +13,11 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- 하단 내비게이션 -->
+    <string name="menu_search">테스트1</string>
+    <string name="menu_settings">테스트1</string>
+    <string name="menu_navigation">테스트1</string>
+
     <!-- 타임존피커 -->
 
     <!-- Hint text to encourage the user to enter a country name to find a time zone
@@ -95,9 +99,9 @@
     <!-- Accessibility announcement for the year picker [CHAR LIMIT=NONE] -->
     <string name="select_year">연도 선택</string>
     <!-- Accessibility description for the item that is currently selected. -->
-    <string name="item_is_selected"><xliff:g id="item" example="2013">%1$s</xliff:g>이(가) 선택됨</string>
+    <string name="item_is_selected"><xliff:g example="2013" id="item">%1$s</xliff:g>이(가) 선택됨</string>
     <!-- Accessibility announcement when a number that had been typed in is deleted [CHAR_LIMIT=NONE] -->
-    <string name="deleted_key"><xliff:g id="key" example="4">%1$s</xliff:g> 삭제됨</string>
+    <string name="deleted_key"><xliff:g example="4" id="key">%1$s</xliff:g> 삭제됨</string>
 
     <!-- DO NOT TRANSLATE -->
     <string name="time_placeholder">--</string>
@@ -113,14 +117,13 @@
     <string name="day_of_week_label_typeface">sans-serif</string>
 
 
-
     <!-- 색상 관련 String -->
     <!-- Default title for color picker dialog [CHAR LIMIT=30] -->
     <string name="color_picker_default_title">Select a Color</string>
     <!-- Content description for a color square. -->
-    <string name="color_swatch_description">Color <xliff:g id="color_index" example="14">%1$d</xliff:g></string>
+    <string name="color_swatch_description">Color <xliff:g example="14" id="color_index">%1$d</xliff:g></string>
     <!-- Content description for a selected color square. -->
-    <string name="color_swatch_description_selected">Color <xliff:g id="color_index" example="14">%1$d</xliff:g> selected</string>
+    <string name="color_swatch_description_selected">Color <xliff:g example="14" id="color_index">%1$d</xliff:g> selected</string>
 
     <string name="starting_alert_service">StartingAlertService</string>
 
@@ -131,7 +134,7 @@
     <string name="app_label">캘린더</string>
 
     <!-- Shared Labels. These labels are shared among the activities. -->
-    <skip/>
+    <skip />
     <!-- This is the label for the title or name of an event -->
     <string name="what_label">내용</string>
     <!-- This is the label for the location of an event -->
@@ -209,7 +212,7 @@
     </plurals>
 
     <!-- Menu items: -->
-    <skip/>
+    <skip />
     <!-- This is a label on a context menu item. Pressing this menu item to initiate
         syncing of your Calendar data with the server. [CHAR LIMIT=11] -->
     <string name="calendar_refresh">"새로고침"</string>
@@ -276,10 +279,10 @@
 
 
     <!-- Month view -->
-    <skip/>
+    <skip />
 
     <!-- Select Visible Calendars activity -->
-    <skip/>
+    <skip />
     <!-- Title of "My calendars" screen -->
     <string name="select_visible_calendars_title">"표시할 캘린더"</string>
     <!-- Synced and visible status message -->
@@ -307,7 +310,7 @@
     <string name="select_synced_calendars_button">동기화할 캘린더</string>
 
     <!-- Event edit activity -->
-    <skip/>
+    <skip />
     <!-- The title of the screen where the user edits an event [CHAR LIMIT=17] -->
 
     <!-- Default value of What field (as a hint to the user) [CHAR LIMIT=15] -->
@@ -348,19 +351,19 @@
 
 
     <!-- Create event dialog -->
-    <skip/>
+    <skip />
     <!-- Create event dialog save button [CHAR LIMIT=10] -->
     <string name="create_event_dialog_save">저장</string>
 
     <!-- The alert toast is not actually being displayed for some reason. -->
-    <skip/>
+    <skip />
     <!-- the title of the alert/notification activity -->
     <string name="alert_title">캘린더 알림</string>
     <!-- Notification window messages: -->
-    <skip/>
+    <skip />
 
     <!-- Event info/edit screen labels:-->
-    <skip/>
+    <skip />
     <!-- This is the title of the screen used to view the details of an event -->
     <string name="event_info_title">일정 보기</string>
     <!-- This is the title of the screen used to view the details of an invitation
@@ -368,7 +371,7 @@
     <string name="event_info_title_invite">회의 초대</string>
 
     <!-- EditEventActivity specific strings: -->
-    <skip/>
+    <skip />
     <!-- Events have a start date/time and an end date/time. The display shows
          the start and end times like 'From start date To end date'. This is the
          label before the 'end date'. -->
@@ -403,7 +406,7 @@
     <string name="add_account">계정 추가</string>
 
     <!-- View Event -->
-    <skip/>
+    <skip />
     <!-- Label for which calendar an event is part of -->
     <string name="view_event_calendar_label">캘린더:</string>
     <!-- Label for the event organizer -->
@@ -484,7 +487,7 @@
     <string name="event_info_reminders_label">알림</string>
 
     <!-- Agenda View strings -->
-    <skip/>
+    <skip />
     <!-- This is shown as part of the heading at the top of a list of today's events. -->
     <string name="agenda_today">오늘, <xliff:g id="date">%1$s</xliff:g></string>
     <!-- This is shown as part of the heading at the top of a list of today's events. -->
@@ -499,12 +502,12 @@
     <string name="show_newer_events"><xliff:g id="newest_search_range">%1$s</xliff:g> 이후 일정을 보려면 터치하세요.</string>
 
     <!-- Search activity strings -->
-    <skip/>
+    <skip />
     <!-- Title of the search screen [CHAR LIMIT=30] -->
     <string name="search_title">내 캘린더 검색</string>
 
     <!-- Button labels: -->
-    <skip/>
+    <skip />
     <!-- This is the title of a popup window that is displayed when the user
          edits a repeating event. [CHAR LIMIT=20]-->
     <string name="edit_event_label">"세부정보"</string>
@@ -521,7 +524,7 @@
     <string name="discard_label">취소</string>
 
     <!-- Button labels on expanded notification reminders: -->
-    <skip/>
+    <skip />
     <!-- The button label for making the reminder alarms go away temporarily.
          The reminder alarms will fire off again in 5 minutes. -->
     <string name="snooze_all_label">"모두 알림 미루기"</string>
@@ -533,7 +536,7 @@
     <string name="snooze_label">"알림 미루기"</string>
 
     <!-- Repetition dialog options: -->
-    <skip/>
+    <skip />
     <!-- A label in a multiple-choice list for the specifying that an event does
          not repeat -->
     <string name="does_not_repeat">없음</string>
@@ -603,7 +606,7 @@
     <!-- This is the button to create a new event in a dialog window. [CHAR LIMIT=30] -->
     <string name="new_event_dialog_option">"새 일정"</string>
     <!-- Confirmation dialog message -->
-    <skip/>
+    <skip />
     <!-- This is a confirmation message in a popup dialog that appears when the
          user has asked to delete an event. The user still has a chance to cancel
          this operation. -->
@@ -735,14 +738,14 @@
     </string-array>
 
     <!-- The default vibrateWhen value, when none is set -->
-    <string translatable="false" name="prefDefault_alerts_vibrateWhen">안 함</string>
+    <string name="prefDefault_alerts_vibrateWhen" translatable="false">안 함</string>
     <!-- The value to use then migrating from old versions for a true vibrate setting -->
-    <string translatable="false" name="prefDefault_alerts_vibrate_true">항상</string>
+    <string name="prefDefault_alerts_vibrate_true" translatable="false">항상</string>
     <!-- The value to use then migrating from old versions for a false vibrate setting -->
-    <string translatable="false" name="prefDefault_alerts_vibrate_false">안 함</string>
+    <string name="prefDefault_alerts_vibrate_false" translatable="false">안 함</string>
 
     <!-- The vibrateWhen values -->
-    <string-array translatable="false" name="prefValues_alerts_vibrateWhen">
+    <string-array name="prefValues_alerts_vibrateWhen" translatable="false">
         <item>항상</item>
         <item>무음 모드에서만</item>
         <item>안 함</item>
@@ -750,7 +753,7 @@
 
 
     <!-- Widget -->
-    <skip/>
+    <skip />
     <!-- Title for calendar gadget when displayed in list of all other gadgets -->
     <string name="gadget_title">캘린더</string>
 

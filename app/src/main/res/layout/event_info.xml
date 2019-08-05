@@ -272,7 +272,7 @@
             </LinearLayout>
 
             <!-- GUEST LIST -->
-            <com.android.calendar.event.AttendeesView
+            <com.android.nanal.event.AttendeesView
                 android:id="@+id/long_attendee_list"
                 android:textColor="?attr/event_info_body_color"
                 android:orientation="vertical"
