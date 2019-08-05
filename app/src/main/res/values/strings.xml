@@ -14,6 +14,117 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- 타임존피커 -->
+
+    <!-- Hint text to encourage the user to enter a country name to find a time zone
+     [CHAR LIMIT=25] -->
+    <string name="hint_time_zone_search">국가 입력</string>
+
+    <!-- Description of clear icon in the search bar, for accessibility. [CHAR LIMIT=NONE]-->
+    <string name="searchview_description_clear">검색어 삭제</string>
+
+    <!-- Item to show when no timezones are found. [CHAR LIMIT=NONE]-->
+    <string name="no_results_found">검색결과 없음</string>
+
+    <!-- Name to be displayed for "Palestine". This will be used when searching for a country to
+         select a timezone. [CHAR LIMIT=NONE]
+         *NOTE*: Please be sure to translate this as "Palestine", specifically instead of
+                 "Palestinian Territories". This is for use following Google's updated policy on
+                 this matter.
+                  -->
+    <string name="palestine_display_name">팔레스타인</string>
+
+
+    <!-- 칩스 -->
+    <!-- Text displayed when the recipientedittextview is not focused. Displays the total number of recipients since the field is shrunk to just display a portion -->
+    <string name="more_string"><xliff:g id="count">%1$d</xliff:g>명 이상</string>
+    <!-- Text displayed when the user long presses on a chip to copy the recipients email address [CHAR LIMIT=200] -->
+    <string name="copy_email">이메일 주소 복사</string>
+    <!-- Text displayed when the user long presses on a chip to copy the recipient's phone number [CHAR LIMIT=200] -->
+    <string name="copy_number">전화번호 복사</string>
+    <!-- Text displayed in the enter key slot when the recipientedittextview has focus [CHAR LIMIT=12] -->
+    <string name="action_label">Return</string>
+    <!-- Announce the number of possible recipient entries that the user can select from for accessibility purposes [CHAR LIMIT=200] -->
+    <string name="accessbility_suggestion_dropdown_opened">추천 연락처 열림</string>
+    <!-- Announce that there are no possible recipient entries that the user can select from for accessibility purposes [CHAR LIMIT=200] -->
+    <string name="accessbility_suggestion_dropdown_closed">제안사항이 없습니다.</string>
+    <!-- Description for the delete button that removes the selected contact from the recipients [CHAR LIMIT=100] -->
+    <string name="dropdown_delete_button_desc">수신자에서 <xliff:g id="contact">%s</xliff:g> 삭제</string>
+    <!-- Text displayed as the primary action for a dialog to copy text. [CHAR LIMIT=25] -->
+    <string name="chips_action_copy">복사</string>
+    <!-- Text displayed as the secondary action for a dialog to cancel. [CHAR LIMIT=25] -->
+    <string name="chips_action_cancel">취소</string>
+    <!-- Text displayed on the drop down item that is shown when app doesn't have Contact permission. This item will open dialog to request permission. [CHAR LIMIT=50] -->
+    <string name="chips_permission_text">주소록 제안 허용</string>
+
+
+    <!-- 데이터 타임 피커 -->
+    <!-- Label for button to confirm chosen date or time [CHAR LIMIT=30] -->
+    <string name="done_label">완료</string>
+    <!--
+         Content description for the hour selector in the time picker, which displays
+         selectable hours of the day along the inside edge of a circle, as in an analog clock.
+         [CHAR LIMIT=50]
+    -->
+    <string name="hour_picker_description">시간 원형 슬라이더</string>
+    <!--
+         Content description for the minute selector in the time picker, which displays
+         selectable five-minute intervals along the inside edge of a circle, as in an analog clock.
+         [CHAR LIMIT=50]
+    -->
+    <string name="minute_picker_description">분 원형 슬라이더</string>
+    <!-- Accessibility announcement for hour circular picker [CHAR LIMIT=NONE] -->
+    <string name="select_hours">시간 선택</string>
+    <!-- Accessibility announcement for minute circular picker [CHAR LIMIT=NONE] -->
+    <string name="select_minutes">분 선택</string>
+
+    <!--
+        Content description for the month and day selector in the date picker, which displays
+        a selectable grid of days laid out by month.
+        [CHAR LIMIT=50]
+     -->
+    <string name="day_picker_description">월별 바둑판식 날짜 표시</string>
+    <!--
+        Content description for the year selector in the date picker, which displays
+        a scrolling, vertical list of years.
+        [CHAR LIMIT=50]
+     -->
+    <string name="year_picker_description">년</string>
+    <!-- Accessibility announcement for the day picker [CHAR LIMIT=NONE] -->
+    <string name="select_day">월/일 선택</string>
+    <!-- Accessibility announcement for the year picker [CHAR LIMIT=NONE] -->
+    <string name="select_year">연도 선택</string>
+    <!-- Accessibility description for the item that is currently selected. -->
+    <string name="item_is_selected"><xliff:g id="item" example="2013">%1$s</xliff:g>이(가) 선택됨</string>
+    <!-- Accessibility announcement when a number that had been typed in is deleted [CHAR_LIMIT=NONE] -->
+    <string name="deleted_key"><xliff:g id="key" example="4">%1$s</xliff:g> 삭제됨</string>
+
+    <!-- DO NOT TRANSLATE -->
+    <string name="time_placeholder">--</string>
+    <!-- DO NOT TRANSLATE -->
+    <string name="time_separator">:</string>
+
+    <!-- DO NOT TRANSLATE -->
+    <string name="radial_numbers_typeface">sans-serif</string>
+    <!-- DO NOT TRANSLATE -->
+    <string name="sans_serif">sans-serif</string>
+
+    <!-- DO NOT TRANSLATE -->
+    <string name="day_of_week_label_typeface">sans-serif</string>
+
+
+
+    <!-- 색상 관련 String -->
+    <!-- Default title for color picker dialog [CHAR LIMIT=30] -->
+    <string name="color_picker_default_title">Select a Color</string>
+    <!-- Content description for a color square. -->
+    <string name="color_swatch_description">Color <xliff:g id="color_index" example="14">%1$d</xliff:g></string>
+    <!-- Content description for a selected color square. -->
+    <string name="color_swatch_description_selected">Color <xliff:g id="color_index" example="14">%1$d</xliff:g> selected</string>
+
+    <string name="starting_alert_service">StartingAlertService</string>
+
+    <!-- 캘린더 관련 String -->
     <!-- This is the app label used for alert notifications -->
     <string name="standalone_app_label" translatable="false">나날</string>
     <!-- This is the label underneath the icon for Calendar -->

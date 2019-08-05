@@ -435,7 +435,7 @@ public class Event implements Cloneable {
      *                              각 이벤트 직사각형의 셀 높이로 허용되는 최소 지속 시간(밀리초)
      *                              결정되지 않은 경우 0이어야 함
      */
-    /* package */ static void computePositions(ArrayList<Event> eventsList,
+    /* package */ public static void computePositions(ArrayList<Event> eventsList,
                                                long minimumDurationMillis) {
         if (eventsList == null) {
             return;
