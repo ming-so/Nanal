@@ -14,10 +14,10 @@
      limitations under the License.
 -->
 
-<menu
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/action_add_account"
         android:alphabeticShortcut="a"
         android:title="@string/add_account"
-        android:showAsAction="withText|always" />
+        app:showAsAction="withText|always" />
 </menu>

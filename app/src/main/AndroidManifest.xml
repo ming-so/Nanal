@@ -3,17 +3,20 @@
     package="com.android.nanal"
     android:installLocation="auto">
 
+    <uses-permission
+        android:name="android.permission.MANAGE_ACCOUNTS"
+        android:maxSdkVersion="22" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <!--<uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />-->
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.READ_CALENDAR" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <!--<uses-permission android:name="android.permission.USE_CREDENTIALS" />-->
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
-    <uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH.mail" />
+    <!--<uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH.mail" />-->
 
     <application
         android:name=".CalendarApplication"
@@ -43,7 +46,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data android:mimeType="time/epoch" />
-                <data android:host="com.android.calendar" />
+                <data android:host="com.android.nanal" />
                 <data android:scheme="content" />
             </intent-filter>
         </activity>
@@ -78,7 +81,7 @@
             android:theme="@style/Base.CalendarAppThemeWithActionBar"></activity>
 
         <activity-alias
-            android:name="com.android.calendar.EditEventActivity"
+            android:name="com.android.nanal.activity.EditEventActivity"
             android:exported="true"
             android:targetActivity=".activity.EditEventActivity">
             <intent-filter>
@@ -145,7 +148,7 @@
         <!-- Make all activities a searchable context -->
         <meta-data
             android:name="android.app.default_searchable"
-            android:value="com.android.calendar.SearchActivity" />
+            android:value="com.android.nanal.activity.SearchActivity" />
 
         <activity
             android:name=".activity.SearchActivity"
@@ -188,11 +191,9 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <!--
-            <provider android:name="com.android.calendar.CalendarRecentSuggestionsProvider"
+            <provider android:name="com.android.nanal.CalendarRecentSuggestionsProvider"
             android:exported="false"
-            android:authorities="com.android.calendar.CalendarRecentSuggestionsProvider" />
-        -->
+            android:authorities="com.android.nanal.CalendarRecentSuggestionsProvider" />
 
 
         <!-- Declarations for alerts/reminders -->
@@ -227,7 +228,7 @@
                 <action android:name="android.intent.action.PROVIDER_CHANGED" />
 
                 <data android:scheme="content" />
-                <data android:host="com.android.calendar" />
+                <data android:host="com.nanal" />
             </intent-filter>
         </receiver>
         <receiver
@@ -239,16 +240,15 @@
         <service android:name=".alerts.SnoozeAlarmsService" />
 
         <!-- Declarations for the widget -->
-        <!--
-        receiver android:name="com.android.calendar.widget.CalendarAppWidgetProvider" android:label="@string/gadget_title">
+        <receiver android:name="com.android.nanal.widget.CalendarAppWidgetProvider" android:label="@string/gadget_title">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-                <action android:name="com.android.calendar.APPWIDGET_UPDATE" />
+                <action android:name="com.android.nanal.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/appwidget_info" />
         </receiver>
 
-        <receiver android:name="com.android.calendar.widget.CalendarAppWidgetService$CalendarFactory">
+        <receiver android:name="com.android.nanal.widget.CalendarAppWidgetService$CalendarFactory">
             <intent-filter>
                 <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
                 <action android:name="android.intent.action.DATE_CHANGED"/>
@@ -258,21 +258,20 @@
             <intent-filter>
                 <action android:name="android.intent.action.PROVIDER_CHANGED"/>
                 <data android:scheme="content"/>
-                <data android:host="com.android.calendar"/>
+                <data android:host="com.android.nanal"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="com.android.calendar.APPWIDGET_SCHEDULED_UPDATE"/>
+                <action android:name="com.android.nanal.APPWIDGET_SCHEDULED_UPDATE"/>
                 <data android:scheme="content"/>
-                <data android:host="com.android.calendar"/>
+                <data android:host="com.android.nanal"/>
                 <data android:mimeType="vnd.android.data/update" />
             </intent-filter>
         </receiver>
 
-        <service android:name="com.android.calendar.widget.CalendarAppWidgetService"
+        <service android:name="com.android.nanal.widget.CalendarAppWidgetService"
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS">
-        </service
-        -->
+        </service>
 
         <service android:name=".query.AsyncQueryServiceHelper" />
 

@@ -20,15 +20,15 @@ import android.text.util.Rfc822Tokenizer;
 import android.util.Log;
 import android.view.View;
 
-import com.android.nanal.activity.AbstractCalendarActivity;
-import com.android.nanal.query.AsyncQueryService;
-import com.android.nanal.calendar.CalendarEventModel;
-import com.android.nanal.calendar.CalendarEventModel.Attendee;
-import com.android.nanal.calendar.CalendarEventModel.ReminderEntry;
 import com.android.nanal.DateException;
 import com.android.nanal.RecurrenceProcessor;
 import com.android.nanal.RecurrenceSet;
 import com.android.nanal.Rfc822Validator;
+import com.android.nanal.activity.AbstractCalendarActivity;
+import com.android.nanal.calendar.CalendarEventModel;
+import com.android.nanal.calendar.CalendarEventModel.Attendee;
+import com.android.nanal.calendar.CalendarEventModel.ReminderEntry;
+import com.android.nanal.query.AsyncQueryService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
