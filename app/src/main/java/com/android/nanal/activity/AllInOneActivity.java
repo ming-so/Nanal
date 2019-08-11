@@ -61,6 +61,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.nanal.CreateNanalCalendar;
 import com.android.nanal.DayFragment;
 import com.android.nanal.DayOfMonthDrawable;
 import com.android.nanal.DynamicTheme;
@@ -240,6 +241,9 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     private AllInOneMenuExtensionsInterface mExtensions = ExtensionsFactory
             .getAllInOneMenuExtensions();
 
+    public String connectID = "test";
+    public String connectNick = "테스트";
+
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -271,6 +275,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         }
         super.onCreate(icicle);
         dynamicTheme.onCreate(this);
+
 
 
 //        if (icicle != null && icicle.containsKey(BUNDLE_KEY_CHECK_ACCOUNTS)) {
@@ -462,7 +467,8 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
                     // permission was granted, yay!
                     // 퍼미션 받음!
-
+                    // todo: 회원가입 & 로그인 들어오면 로그인 때 처리하는 걸로 수정하기!!
+                    CreateNanalCalendar.CreateCalendar(this, connectID, connectID);
                 } else {
                     Toast.makeText(getApplicationContext(), R.string.user_rejected_calendar_write_permission, Toast.LENGTH_LONG).show();
                 }
@@ -481,7 +487,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
 
     private void setupToolbar(int viewType) {
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar = findViewById(R.id.toolbar);
         if (mToolbar == null) {
             if (DEBUG) {
                 Log.d(TAG, "Didn't find a toolbar");

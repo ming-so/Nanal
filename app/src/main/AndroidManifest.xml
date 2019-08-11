@@ -8,16 +8,16 @@
         android:maxSdkVersion="22" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <!--<uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />-->
+    <!-- <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" /> -->
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.READ_CALENDAR" />
     <uses-permission android:name="android.permission.WRITE_CALENDAR" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <!--<uses-permission android:name="android.permission.USE_CREDENTIALS" />-->
+    <!-- <uses-permission android:name="android.permission.USE_CREDENTIALS" /> -->
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
-    <!--<uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH.mail" />-->
 
+    <!-- <uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH.mail" /> -->
     <application
         android:name=".CalendarApplication"
         android:hardwareAccelerated="true"
@@ -34,10 +34,10 @@
             android:theme="@style/CalendarTheme.WithoutActionBar"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
                 <category android:name="android.intent.category.APP_CALENDAR" />
             </intent-filter>
             <intent-filter>
@@ -54,7 +54,7 @@
         <activity-alias
             android:name=".LaunchActivity"
             android:exported="true"
-            android:targetActivity=".activity.AllInOneActivity"></activity-alias>
+            android:targetActivity=".activity.AllInOneActivity" />
 
         <activity
             android:name=".activity.EventInfoActivity"
@@ -78,10 +78,10 @@
         </activity>
         <activity
             android:name=".activity.EditEventActivity"
-            android:theme="@style/Base.CalendarAppThemeWithActionBar"></activity>
+            android:theme="@style/Base.CalendarAppThemeWithActionBar" />
 
         <activity-alias
-            android:name="com.android.nanal.activity.EditEventActivity"
+            android:name=".activity.EditEventActivity"
             android:exported="true"
             android:targetActivity=".activity.EditEventActivity">
             <intent-filter>
@@ -190,11 +190,10 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths" />
         </provider>
-
-            <provider android:name="com.android.nanal.CalendarRecentSuggestionsProvider"
-            android:exported="false"
-            android:authorities="com.android.nanal.CalendarRecentSuggestionsProvider" />
-
+        <provider
+            android:name=".CalendarRecentSuggestionsProvider"
+            android:authorities="com.android.nanal.CalendarRecentSuggestionsProvider"
+            android:exported="false" />
 
         <!-- Declarations for alerts/reminders -->
         <activity
@@ -240,42 +239,56 @@
         <service android:name=".alerts.SnoozeAlarmsService" />
 
         <!-- Declarations for the widget -->
-        <receiver android:name="com.android.nanal.widget.CalendarAppWidgetProvider" android:label="@string/gadget_title">
+        <receiver
+            android:name=".widget.CalendarAppWidgetProvider"
+            android:label="@string/gadget_title">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="com.android.nanal.APPWIDGET_UPDATE" />
             </intent-filter>
-            <meta-data android:name="android.appwidget.provider" android:resource="@xml/appwidget_info" />
-        </receiver>
 
-        <receiver android:name="com.android.nanal.widget.CalendarAppWidgetService$CalendarFactory">
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/appwidget_info" />
+        </receiver>
+        <receiver android:name=".widget.CalendarAppWidgetService$CalendarFactory">
             <intent-filter>
-                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
-                <action android:name="android.intent.action.DATE_CHANGED"/>
-                <action android:name="android.intent.action.TIME_SET"/>
-                <action android:name="android.intent.action.LOCALE_CHANGED"/>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.DATE_CHANGED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.LOCALE_CHANGED" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.PROVIDER_CHANGED"/>
-                <data android:scheme="content"/>
-                <data android:host="com.android.nanal"/>
+                <action android:name="android.intent.action.PROVIDER_CHANGED" />
+
+                <data android:scheme="content" />
+                <data android:host="com.android.nanal" />
             </intent-filter>
             <intent-filter>
-                <action android:name="com.android.nanal.APPWIDGET_SCHEDULED_UPDATE"/>
-                <data android:scheme="content"/>
-                <data android:host="com.android.nanal"/>
+                <action android:name="com.android.nanal.APPWIDGET_SCHEDULED_UPDATE" />
+
+                <data android:scheme="content" />
+                <data android:host="com.android.nanal" />
                 <data android:mimeType="vnd.android.data/update" />
             </intent-filter>
         </receiver>
 
-        <service android:name="com.android.nanal.widget.CalendarAppWidgetService"
+        <service
+            android:name=".widget.CalendarAppWidgetService"
             android:exported="false"
-            android:permission="android.permission.BIND_REMOTEVIEWS">
-        </service>
-
+            android:permission="android.permission.BIND_REMOTEVIEWS"></service>
         <service android:name=".query.AsyncQueryServiceHelper" />
 
-        <activity android:name=".activity.MainActivity"></activity>
+        <activity android:name=".activity.MainActivity" />
+        <activity android:name=".WelcomeActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.APP_CALENDAR" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
