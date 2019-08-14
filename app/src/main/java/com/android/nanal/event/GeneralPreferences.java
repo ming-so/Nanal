@@ -144,7 +144,7 @@ public class GeneralPreferences extends PreferenceFragment implements
     CheckBoxPreference mHideDeclined;
     Preference mHomeTZ;
     TimeZonePickerUtils mTzPickerUtils;
-    ListPreference mTheme;
+//    ListPreference mTheme;
     Preference mColor;
     ListPreference mWeekStart;
     ListPreference mDayWeek;
@@ -228,7 +228,7 @@ public class GeneralPreferences extends PreferenceFragment implements
 
         mPopup = (CheckBoxPreference) preferenceScreen.findPreference(KEY_ALERTS_POPUP);
         mUseHomeTZ = (CheckBoxPreference) preferenceScreen.findPreference(KEY_HOME_TZ_ENABLED);
-        mTheme = (ListPreference) preferenceScreen.findPreference(KEY_THEME_PREF);
+        //mTheme = (ListPreference) preferenceScreen.findPreference(KEY_THEME_PREF);
         mColor = preferenceScreen.findPreference(KEY_COLOR_PREF);
         mDefaultStart = (ListPreference) preferenceScreen.findPreference(KEY_DEFAULT_START);
         mHideDeclined = (CheckBoxPreference) preferenceScreen.findPreference(KEY_HIDE_DECLINED);
@@ -240,7 +240,7 @@ public class GeneralPreferences extends PreferenceFragment implements
         mHomeTZ = preferenceScreen.findPreference(KEY_HOME_TZ);
         mSnoozeDelay = (ListPreference) preferenceScreen.findPreference(KEY_DEFAULT_SNOOZE_DELAY);
         buildSnoozeDelayEntries();
-        mTheme.setSummary(mTheme.getEntry());
+//        mTheme.setSummary(mTheme.getEntry());
         mWeekStart.setSummary(mWeekStart.getEntry());
         mDayWeek.setSummary(mDayWeek.getEntry());
         mDefaultReminder.setSummary(mDefaultReminder.getEntry());
@@ -371,7 +371,7 @@ public class GeneralPreferences extends PreferenceFragment implements
     private void setPreferenceListeners(OnPreferenceChangeListener listener) {
         mUseHomeTZ.setOnPreferenceChangeListener(listener);
         mHomeTZ.setOnPreferenceChangeListener(listener);
-        mTheme.setOnPreferenceChangeListener(listener);
+//        mTheme.setOnPreferenceChangeListener(listener);
         mColor.setOnPreferenceChangeListener(listener);
         mDefaultStart.setOnPreferenceChangeListener(listener);
         mWeekStart.setOnPreferenceChangeListener(listener);
@@ -436,9 +436,9 @@ public class GeneralPreferences extends PreferenceFragment implements
             }
             Utils.setTimeZone(activity, tz);
             return true;
-        } else if (preference == mTheme) {
-            mTheme.setValue((String) newValue);
-            mTheme.setSummary(mTheme.getEntry());
+//        } else if (preference == mTheme) {
+//            mTheme.setValue((String) newValue);
+//            mTheme.setSummary(mTheme.getEntry());
         } else if (preference == mHideDeclined) {
             mHideDeclined.setChecked((Boolean) newValue);
             Intent intent = new Intent(Utils.getWidgetScheduledUpdateAction(activity));

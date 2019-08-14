@@ -40,7 +40,17 @@ import java.util.PriorityQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
+
 public class AsyncQueryServiceHelper extends IntentService {
+    /*
+        IntentService: 액티비티와 프래그먼트 수명 주기에 의존하지 않고 백그라운드에서 처리할 때 사용함
+                       오래 걸리지만 메인 스레드와 관련 없는 작업을 할 때 주로 이용함
+                       메인 스레드와 관련된 작업을 하려면 메인 스레드의 Handler나 Broadcast Intent 이용
+                       Intent 사용에 의해서 실행됨, 새로운 스레드가 생성되고, onHandleIntent() 호출됨
+                       onHandleIntent() 내의 모든 동작이 수행되면 멈춤, 멈추는 메소드 호출 불필요
+                       여러 번 실행되었을 때는 Queue로 처리됨(처리 중인 IntentService가 있다면 차례를 기다림)
+                       Queue에 들어 있는 IntentService가 모두 종료되면 onDestroy() 호출됨
+     */
     private static final String TAG = "AsyncQuery";
 
     private static final PriorityQueue<OperationInfo> sWorkQueue =
@@ -71,6 +81,7 @@ public class AsyncQueryServiceHelper extends IntentService {
 
         synchronized (sWorkQueue) {
             sWorkQueue.add(args);
+            // Object.notify(): 잠들어 있던 스레드 중 임의로 하나를 골라 깨움
             sWorkQueue.notify();
         }
 
@@ -159,21 +170,23 @@ public class AsyncQueryServiceHelper extends IntentService {
                 /*
                  * This method can be called with no work because of
                  * cancellations
-                 * 이 메소드는 취소로 인해 작업 없이 호출될 수 있음
+                 * 이 메소드는 취소cancellations로 인해 작업work 없이 호출될 수 있음
                  */
                 if (sWorkQueue.size() == 0) {
                     return;
                 } else if (sWorkQueue.size() == 1) {
                     OperationInfo first = sWorkQueue.peek();
+                    // SystemClock.elapsedRealtime() sleep 시간을 포함한 부팅 이후 시간(밀리초 단위) 리턴
                     long waitTime = first.mScheduledTimeMillis - SystemClock.elapsedRealtime();
                     if (waitTime > 0) {
                         try {
+                            // 아직 남았다면 기다림
                             sWorkQueue.wait(waitTime);
                         } catch (InterruptedException e) {
                         }
                     }
                 }
-
+                // poll(): Queue에서 값을 꺼냄
                 args = sWorkQueue.poll();
                 if (args != null) {
                     // Got work to do. Break out of waiting loop

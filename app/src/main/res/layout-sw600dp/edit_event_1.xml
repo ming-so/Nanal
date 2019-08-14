@@ -363,7 +363,7 @@
             android:id="@+id/add_attendees_label"
             style="@style/TextAppearance.EditEvent_Label"
             android:text="@string/attendees_label" />
-        <com.android.ex.chips.RecipientEditTextView
+        <com.android.nanal.chips.RecipientEditTextView
             android:id="@+id/attendees"
             style="@style/TextAppearance.EditEvent_Value"
             android:layout_width="0dip"

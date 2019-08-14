@@ -40,11 +40,11 @@
         android:layout_height="match_parent"
         android:paddingStart="8dip"
         android:paddingEnd="8dip"
-        android:maxLines="1"
         android:textSize="12sp"
         android:textStyle="bold"
         android:ellipsize="marquee"
         android:textColor="@color/appwidget_title"
         android:gravity="center_vertical|start"
-        style="?android:attr/textAppearanceMediumInverse" />
+        style="?android:attr/textAppearanceMediumInverse"
+        android:singleLine="true" />
 </FrameLayout>

@@ -35,9 +35,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceActivity;
 import android.provider.CalendarContract;
-import android.provider.CalendarContract.Events;
 import android.provider.CalendarContract.Attendees;
-import android.provider.CalendarContract.Calendars;
+import android.provider.CalendarContract.Events;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -62,6 +61,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.nanal.CreateNanalCalendar;
 import com.android.nanal.DayFragment;
 import com.android.nanal.DayOfMonthDrawable;
 import com.android.nanal.DynamicTheme;
@@ -107,7 +107,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     private static final String BUNDLE_KEY_RESTORE_TIME = "key_restore_time";
     private static final String BUNDLE_KEY_EVENT_ID = "key_event_id";
     private static final String BUNDLE_KEY_RESTORE_VIEW = "key_restore_view";
-    private static final String BUNDLE_KEY_CHECK_ACCOUNTS = "key_check_for_accounts";
+    //private static final String BUNDLE_KEY_CHECK_ACCOUNTS = "key_check_for_accounts";
     private static final int HANDLER_KEY = 0;
     private static final int PERMISSIONS_REQUEST_WRITE_CALENDAR = 0;
 
@@ -200,7 +200,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     private boolean mIntentAllDay = false;
     private DrawerLayout mDrawerLayout;
     private Toolbar mToolbar;
-    //private NavigationView mNavigationView;
+    private NavigationView mNavigationView;
     private int mCurrentMenuItem;
     private CalendarToolbarHandler mCalendarToolbarHandler;
     // Action bar
@@ -231,7 +231,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             Utils.setMidnightUpdater(mHandler, mTimeChangesUpdater, mTimeZone);
         }
     };
-    private boolean mCheckForAccounts = true;
+    //private boolean mCheckForAccounts = true;
     private String mHideString;
     private String mShowString;
     // Params for animating the controls on the right
@@ -240,6 +240,9 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     private LinearLayout.LayoutParams mVerticalControlsParams;
     private AllInOneMenuExtensionsInterface mExtensions = ExtensionsFactory
             .getAllInOneMenuExtensions();
+
+    public String connectID = "test";
+    public String connectNick = "테스트";
 
 
     @Override
@@ -273,20 +276,23 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         super.onCreate(icicle);
         dynamicTheme.onCreate(this);
 
-        if (icicle != null && icicle.containsKey(BUNDLE_KEY_CHECK_ACCOUNTS)) {
-            mCheckForAccounts = icicle.getBoolean(BUNDLE_KEY_CHECK_ACCOUNTS);
-        }
-        // Launch add google account if this is first time and there are no
-        // accounts yet
-        // 처음이고 아직 계정이 없는 경우 google 계정 추가
-        if (mCheckForAccounts
-                && !Utils.getSharedPreference(this, GeneralPreferences.KEY_SKIP_SETUP, false)) {
 
-            mHandler = new QueryHandler(this.getContentResolver());
-            mHandler.startQuery(0, null, Calendars.CONTENT_URI, new String[]{
-                    Calendars._ID
-            }, null, null /* selection args */, null /* sort order */);
-        }
+
+//        if (icicle != null && icicle.containsKey(BUNDLE_KEY_CHECK_ACCOUNTS)) {
+//            mCheckForAccounts = icicle.getBoolean(BUNDLE_KEY_CHECK_ACCOUNTS);
+//        }
+//        // Launch add google account if this is first time and there are no
+//        // accounts yet
+//        // 처음이고 아직 계정이 없는 경우 google 계정 추가
+//        if (mCheckForAccounts
+//                && !Utils.getSharedPreference(this, GeneralPreferences.KEY_SKIP_SETUP, false)) {
+//
+//            mHandler = new QueryHandler(this.getContentResolver());
+//            mHandler.startQuery(0, null, Calendars.CONTENT_URI, new String[]{
+//                    Calendars._ID
+//            }, null, null /* selection args */, null /* sort order */);
+//        }
+
 
         // This needs to be created before setContentView
         // setContentView 이전에 생성해야 함
@@ -383,7 +389,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         setContentView(R.layout.all_in_one_material);
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        //mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
+        mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
 
         mFab = (FloatingActionButton) findViewById(R.id.floating_action_button);
 
@@ -461,7 +467,8 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
                     // permission was granted, yay!
                     // 퍼미션 받음!
-
+                    // todo: 회원가입 & 로그인 들어오면 로그인 때 처리하는 걸로 수정하기!!
+                    CreateNanalCalendar.CreateCalendar(this, connectID, connectID);
                 } else {
                     Toast.makeText(getApplicationContext(), R.string.user_rejected_calendar_write_permission, Toast.LENGTH_LONG).show();
                 }
@@ -480,7 +487,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
 
     private void setupToolbar(int viewType) {
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar = findViewById(R.id.toolbar);
         if (mToolbar == null) {
             if (DEBUG) {
                 Log.d(TAG, "Didn't find a toolbar");
@@ -509,16 +516,20 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             }
             mToolbar.setTitle(titleResource);
         }
-        // mToolbar.setTitle(getTitle());
-        //mToolbar.setNavigationIcon(R.drawable.ic_menu_navigator);
+        mToolbar.setTitle(getTitle());
+        mToolbar.setNavigationIcon(R.drawable.ic_menu_navigator);
         setSupportActionBar(mToolbar);
 
-//        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                AllInOneActivity.this.openDrawer();
-//            }
-//        });
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AllInOneActivity.this.openDrawer();
+            }
+        });
+        mActionBar = getSupportActionBar();
+        if (mActionBar == null) return;
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+        mActionBar.setHomeButtonEnabled(true);
     }
 
     public void openDrawer() {
@@ -532,7 +543,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             }
             return;
         }
-        //mNavigationView.setNavigationItemSelectedListener(this);
+        mNavigationView.setNavigationItemSelectedListener(this);
         showActionBar();
     }
 
@@ -721,7 +732,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 outState.putLong(BUNDLE_KEY_EVENT_ID, ((AgendaFragment) f).getLastShowEventId());
             }
         }
-        outState.putBoolean(BUNDLE_KEY_CHECK_ACCOUNTS, mCheckForAccounts);
+        //outState.putBoolean(BUNDLE_KEY_CHECK_ACCOUNTS, mCheckForAccounts);
     }
 
     @Override
@@ -1539,7 +1550,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
         @Override
         protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-            mCheckForAccounts = false;
+            //mCheckForAccounts = false;
             try {
                 // If the query didn't return a cursor for some reason return
                 // 쿼리가 어떤 이유로 인해 커서를 반환하지 않은 경우
