@@ -20,13 +20,13 @@ import android.text.format.Time;
 import android.util.Log;
 import android.util.Pair;
 
-import com.android.nanal.event.DeleteEventHelper;
-import com.android.nanal.event.GeneralPreferences;
-import com.android.nanal.event.Utils;
 import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.activity.CalendarSettingsActivity;
 import com.android.nanal.activity.EditEventActivity;
 import com.android.nanal.activity.SelectVisibleCalendarsActivity;
+import com.android.nanal.event.DeleteEventHelper;
+import com.android.nanal.event.GeneralPreferences;
+import com.android.nanal.event.Utils;
 
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
@@ -680,6 +680,7 @@ public class CalendarController {
 //        mContext.startActivity(intent);
 //    }
 
+
     private void launchSearch(long eventId, String query, ComponentName componentName) {
         final SearchManager searchManager =
                 (SearchManager) mContext.getSystemService(Context.SEARCH_SERVICE);
@@ -797,6 +798,8 @@ public class CalendarController {
         // select which calendars to display
         // 표시할 캘린더 선택
         final long LAUNCH_SELECT_VISIBLE_CALENDARS = 1L << 11;
+
+        final long LAUNCH_HOME = 1L << 12;
     }
 
     /**

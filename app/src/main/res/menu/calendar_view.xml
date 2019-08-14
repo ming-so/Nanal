@@ -32,5 +32,10 @@
             android:icon="@drawable/ic_menu_settings"
             android:title="@string/menu_preferences" />
 
+        <item
+            android:id="@+id/test"
+            android:icon="@drawable/ic_action_accept"
+            android:title="테스트" />
+
     </group>
 </menu>
