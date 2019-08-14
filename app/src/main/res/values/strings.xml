@@ -13,6 +13,30 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <!-- 로그인/회원가입 화면 -->
+    <string name="pw_hint1">비밀번호</string>
+    <string name="pw_hint2">비밀번호(8자 이상)</string>
+    <string name="button_login">로그인</string>
+    <string name="button_sign">회원가입</string>
+    <string name="sign">아직 회원이 아니신가요?</string>
+    <string name="login">이미 회원이신가요?</string>
+    <string name="complete">완료(테스트)</string>
+    <string name="error">오류!</string>
+    <string name="pw">비밀번호 찾기</string>
+
+    <string name="email_error">이메일을 바르게 입력하세요.</string>
+    <string name="pw_error">비밀번호를 바르게 입력하세요.</string>
+    <string name="login_error">이메일 또는 비밀번호가 맞지 않습니다.</string>
+
+    <string name="TEAL">#388d7f</string>
+    <string name="ORANGE">#b36f28</string>
+    <string name="BLUE">#365db7</string>
+    <string name="GREEN">#30a320</string>
+    <string name="RED">#9c2513</string>
+    <string name="PURPLE">#862297</string>
+
+
     <!-- 설명 화면 테스트 -->
     <string name="title_activity_welcome">Home Screen</string>
     <string name="next">NEXT</string>
