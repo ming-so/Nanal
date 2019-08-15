@@ -37,6 +37,9 @@ import android.preference.PreferenceActivity;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Attendees;
 import android.provider.CalendarContract.Events;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -212,6 +215,10 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     private MenuItem mViewSettings;
     private Menu mOptionsMenu;
     private QueryHandler mHandler;
+
+    private BottomNavigationView mBottomNavi;
+
+    private CoordinatorLayout coordinator_layout;
 
     private final Runnable mHomeTimeUpdater = new Runnable() {
         @Override
@@ -432,6 +439,25 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         prefs.registerOnSharedPreferenceChangeListener(this);
 
         mContentResolver = getContentResolver();
+
+        mBottomNavi = findViewById(R.id.bottom_navigation);
+
+        mBottomNavi.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_calendar:
+                        break;
+                    case R.id.action_today:
+                        break;
+                    case R.id.action_group:
+                        break;
+                    case R.id.action_settings:
+                        break;
+                }
+                return true;
+            }
+        });
     }
 
     private void checkAppPermissions() {
