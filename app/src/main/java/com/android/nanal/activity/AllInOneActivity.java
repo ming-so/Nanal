@@ -66,6 +66,7 @@ import com.android.nanal.DayFragment;
 import com.android.nanal.DayOfMonthDrawable;
 import com.android.nanal.DynamicTheme;
 import com.android.nanal.ExtensionsFactory;
+import com.android.nanal.LoginActivity;
 import com.android.nanal.R;
 import com.android.nanal.ViewDetailsPreferences;
 import com.android.nanal.agenda.AgendaFragment;
@@ -1036,6 +1037,11 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 break;
             case R.id.action_settings:
                 mController.sendEvent(this, EventType.LAUNCH_SETTINGS, null, null, 0, 0);
+                break;
+            case R.id.test:
+                Intent intent = new Intent(AllInOneActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
                 break;
         }
         mDrawerLayout.closeDrawers();

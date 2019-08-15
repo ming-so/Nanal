@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="white">#ffffff</color>
     <!-- 설명 화면 테스트 -->
     <!-- Screens background color-->
     <color name="bg_screen1">#f64c73</color>

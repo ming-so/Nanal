@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.android.nanal"
     android:installLocation="auto">
 
@@ -26,7 +27,8 @@
         android:requiredAccountType="*"
         android:taskAffinity="ws.xsoh.etar.task"
         android:theme="@style/CalendarAppTheme"
-        android:usesCleartextTraffic="false">
+        android:usesCleartextTraffic="false"
+        tools:replace="android:label">
         <activity
             android:name=".activity.AllInOneActivity"
             android:exported="true"
@@ -289,6 +291,7 @@
                 <category android:name="android.intent.category.APP_CALENDAR" />
             </intent-filter>
         </activity>
+        <activity android:name=".LoginActivity" />
     </application>
 
 </manifest>

@@ -95,7 +95,28 @@ public class DynamicTheme {
             case PURPLE:
                 return R.color.colorPurplePrimary;
             default:
-                throw new UnsupportedOperationException("Unknown color name : " + name);
+                return R.color.colorPrimary;
+                //throw new UnsupportedOperationException("Unknown color name : " + name);
+        }
+    }
+
+    public static int getColorString(int id) {
+        switch (id) {
+            case R.color.colorPrimary :
+                return R.string.TEAL;
+            case R.color.colorBluePrimary:
+                return R.string.BLUE;
+            case R.color.colorOrangePrimary:
+                return R.string.ORANGE;
+            case R.color.colorGreenPrimary:
+                return R.string.GREEN;
+            case R.color.colorRedPrimary:
+                return R.string.RED;
+            case R.color.colorPurplePrimary:
+                return R.string.PURPLE;
+            default:
+                return R.color.colorPrimary;
+                //throw new UnsupportedOperationException("Unknown color id : " + id);
         }
     }
 
@@ -114,7 +135,8 @@ public class DynamicTheme {
             case R.color.colorPurplePrimary:
                 return PURPLE;
             default:
-                throw new UnsupportedOperationException("Unknown color id : " + id);
+                return TEAL;
+                //throw new UnsupportedOperationException("Unknown color id : " + id);
         }
     }
 
