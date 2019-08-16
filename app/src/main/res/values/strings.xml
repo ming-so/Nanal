@@ -60,9 +60,10 @@
 
 
     <!-- 하단 내비게이션 -->
-    <string name="menu_search">테스트1</string>
-    <string name="menu_settings">테스트1</string>
-    <string name="menu_navigation">테스트1</string>
+    <string name="menu_calendar">캘린더</string>
+    <string name="menu_today">오늘</string>
+    <string name="menu_group">그룹</string>
+    <string name="menu_settings">설정</string>
 
     <!-- 타임존피커 -->
 
