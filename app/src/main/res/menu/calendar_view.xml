@@ -34,7 +34,7 @@
 
         <item
             android:id="@+id/test"
-            android:icon="@drawable/ic_action_accept"
+            android:icon="@drawable/ic_action_name"
             android:title="테스트" />
 
     </group>

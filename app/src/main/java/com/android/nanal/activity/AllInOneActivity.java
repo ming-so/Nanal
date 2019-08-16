@@ -442,6 +442,10 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
         mBottomNavi = findViewById(R.id.bottom_navigation);
 
+        MenuItem menuItem = mBottomNavi.getMenu().findItem(R.id.action_calendar);
+        LayerDrawable icon = (LayerDrawable) menuItem.getIcon();
+        Utils.setTodayIcon(icon, this, mTimeZone);
+
         mBottomNavi.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
