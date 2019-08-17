@@ -35,7 +35,7 @@ import android.widget.Toast;
 import com.android.nanal.CalendarRecentSuggestionsProvider;
 import com.android.nanal.DynamicTheme;
 import com.android.nanal.R;
-import com.android.nanal.activity.CalendarSettingsActivity;
+import com.android.nanal.activity.SettingsActivity;
 import com.android.nanal.alerts.AlertReceiver;
 import com.android.nanal.calendar.CalendarController;
 import com.android.nanal.calendar.CalendarUtils;
@@ -416,7 +416,8 @@ public class GeneralPreferences extends PreferenceFragment implements
         }
 
         if (key.equals(KEY_THEME_PREF) || key.equals(KEY_COLOR_PREF)) {
-            ((CalendarSettingsActivity)getActivity()).restartActivity();
+            //((CalendarSettingsActivity)getActivity()).restartActivity();
+            ((SettingsActivity)getActivity()).restartActivity();
         }
     }
 

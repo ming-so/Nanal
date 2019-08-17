@@ -20,10 +20,12 @@ import android.text.format.Time;
 import android.util.Log;
 import android.util.Pair;
 
+import com.android.nanal.activity.AlertActivity;
 import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.activity.CalendarSettingsActivity;
 import com.android.nanal.activity.EditEventActivity;
 import com.android.nanal.activity.SelectVisibleCalendarsActivity;
+import com.android.nanal.activity.SettingsActivity;
 import com.android.nanal.event.DeleteEventHelper;
 import com.android.nanal.event.GeneralPreferences;
 import com.android.nanal.event.Utils;
@@ -447,6 +449,11 @@ public class CalendarController {
                 return;
             }
 
+            if(event.eventType == EventType.LAUNCH_SETTINGS_DIRECT) {
+                launchSettingsDirectly();
+                return;
+            }
+
             // Launch Calendar Visible Selector
             // Calendar Visible Selector 실행
             if (event.eventType == EventType.LAUNCH_SELECT_VISIBLE_CALENDARS) {
@@ -614,8 +621,17 @@ public class CalendarController {
 
     private void launchSettings() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
+        //todo: GeneralPreferences(fragment)로 이동
         intent.setClass(mContext, CalendarSettingsActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        mContext.startActivity(intent);
+    }
+
+    private void launchSettingsDirectly() {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        //todo: GeneralPreferences(fragment)로 이동
+        intent.setClass(mContext, SettingsActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         mContext.startActivity(intent);
     }
 
@@ -673,12 +689,12 @@ public class CalendarController {
         deleteEventHelper.delete(startMillis, endMillis, eventId, deleteWhich);
     }
 
-//    private void launchAlerts() {
-//        Intent intent = new Intent();
-//        intent.setClass(mContext, AlertActivity.class);
-//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        mContext.startActivity(intent);
-//    }
+    private void launchAlerts() {
+        Intent intent = new Intent();
+        intent.setClass(mContext, AlertActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mContext.startActivity(intent);
+    }
 
 
     private void launchSearch(long eventId, String query, ComponentName componentName) {
@@ -800,6 +816,9 @@ public class CalendarController {
         final long LAUNCH_SELECT_VISIBLE_CALENDARS = 1L << 11;
 
         final long LAUNCH_HOME = 1L << 12;
+
+        final long LAUNCH_SETTINGS_DIRECT = 1L << 13;
+
     }
 
     /**

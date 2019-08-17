@@ -17,13 +17,13 @@
 <menu
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/action_today"
-        android:alphabeticShortcut="t"
-        android:icon="@drawable/today_icon"
-        android:orderInCategory="1"
-        android:title="@string/goto_today"
-        app:showAsAction="ifRoom" />
+    <!--<item-->
+        <!--android:id="@+id/action_today"-->
+        <!--android:alphabeticShortcut="t"-->
+        <!--android:icon="@drawable/today_icon"-->
+        <!--android:orderInCategory="1"-->
+        <!--android:title="@string/goto_today"-->
+        <!--app:showAsAction="ifRoom" />-->
     <item
         android:id="@+id/action_goto"
         android:alphabeticShortcut="g"
