@@ -39,7 +39,6 @@ import android.provider.CalendarContract.Attendees;
 import android.provider.CalendarContract.Events;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -218,8 +217,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
     private BottomNavigationView mBottomNavi;
 
-    private CoordinatorLayout coordinator_layout;
-
     private final Runnable mHomeTimeUpdater = new Runnable() {
         @Override
         public void run() {
@@ -251,6 +248,8 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
     public String connectID = "test";
     public String connectNick = "테스트";
+
+    public int selectedMode = 1;
 
 
     @Override
@@ -400,6 +399,15 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
 
         mFab = (FloatingActionButton) findViewById(R.id.floating_action_button);
+        mBottomNavi = findViewById(R.id.bottom_navigation);
+
+        MenuItem menuItem = mBottomNavi.getMenu().findItem(R.id.action_calendar);
+        LayerDrawable icon = (LayerDrawable) menuItem.getIcon();
+        Utils.setTodayIcon(icon, this, mTimeZone);
+
+        mBottomNavi.setSelectedItemId(R.id.action_today);
+        mBottomNavi.setSelectedItemId(R.id.action_calendar);
+
 
         if (mIsTabletConfig) {
             mDateRange = (TextView) findViewById(R.id.date_bar);
@@ -440,23 +448,40 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
         mContentResolver = getContentResolver();
 
-        mBottomNavi = findViewById(R.id.bottom_navigation);
-
-        MenuItem menuItem = mBottomNavi.getMenu().findItem(R.id.action_calendar);
-        LayerDrawable icon = (LayerDrawable) menuItem.getIcon();
-        Utils.setTodayIcon(icon, this, mTimeZone);
 
         mBottomNavi.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.action_calendar:
+                        // mode 1
+                        if(selectedMode == 1) {
+                            // 오늘 날짜로 갱신
+                            Time t = new Time(mTimeZone);
+                            t.setToNow();
+                            int viewType = ViewType.CURRENT;
+                            long extras = CalendarController.EXTRA_GOTO_TIME;
+                            extras |= CalendarController.EXTRA_GOTO_TODAY;
+                            mController.sendEvent(this, EventType.GO_TO, t, null, t, -1, viewType, extras, null, null);
+                        } else {
+                            // 캘린더 화면으로 이동
+                            mController.sendEvent(this, EventType.GO_TO, null, null, -1, ViewType.MONTH);
+                            selectedMode = 1;
+                        }
                         break;
                     case R.id.action_today:
+                        // mode 2
+                        mController.sendEvent(this, EventType.GO_TO, null, null, -1, ViewType.DAY);
+                        selectedMode = 2;
                         break;
                     case R.id.action_group:
+                        // mode 3
+                        selectedMode = 3;
                         break;
                     case R.id.action_settings:
+                        // mode 4
+                        mController.sendEvent(this, EventType.LAUNCH_SETTINGS_DIRECT, null, null, 0, 0);
+                        selectedMode = 4;
                         break;
                 }
                 return true;
@@ -956,13 +981,13 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         updateViewSettingsVisiblility();
 
 
-        MenuItem menuItem = menu.findItem(R.id.action_today);
+//        MenuItem menuItem = menu.findItem(R.id.action_today);
 
         // replace the default top layer drawable of the today icon with a
         // custom drawable that shows the day of the month of today
         // 오늘 아이콘의 기본 상단 레이어 drawable을 오늘이 속한 달의 일자를 표시하는? 커스텀 drawable로 교체
-        LayerDrawable icon = (LayerDrawable) menuItem.getIcon();
-        Utils.setTodayIcon(icon, this, mTimeZone);
+//        LayerDrawable icon = (LayerDrawable) menuItem.getIcon();
+//        Utils.setTodayIcon(icon, this, mTimeZone);
 
         return true;
     }

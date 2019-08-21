@@ -280,8 +280,6 @@
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS"></service>
         <service android:name=".query.AsyncQueryServiceHelper" />
-
-        <activity android:name=".activity.MainActivity" />
         <activity android:name=".WelcomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -292,6 +290,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".LoginActivity" />
+        <activity android:name=".activity.SettingsActivity"
+            android:label="@string/preferences_title"
+            android:parentActivityName=".activity.AllInOneActivity" />
     </application>
 
 </manifest>
