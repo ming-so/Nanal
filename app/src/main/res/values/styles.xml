@@ -18,6 +18,12 @@
 */
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+    <style name="menu_labels_style">
+        <item name="android:background">@drawable/fab_label</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:padding">5dp</item>
+    </style>
+
     <style name="LoginEditTextStyle" parent="Widget.AppCompat.EditText">
         <item name="android:colorControlNormal">@color/white</item>
         <item name="android:colorControlActivated">@color/white</item>

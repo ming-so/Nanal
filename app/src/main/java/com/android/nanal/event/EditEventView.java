@@ -67,10 +67,10 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
-import com.android.nanal.RecipientAdapter;
-import com.android.nanal.RecurrencePickerDialog;
 import com.android.nanal.EmailAddressAdapter;
 import com.android.nanal.R;
+import com.android.nanal.RecipientAdapter;
+import com.android.nanal.RecurrencePickerDialog;
 import com.android.nanal.Rfc822InputFilter;
 import com.android.nanal.Rfc822Validator;
 import com.android.nanal.calendar.CalendarEventModel;
@@ -220,6 +220,8 @@ public class EditEventView implements View.OnClickListener, DialogInterface.OnCa
     private ArrayList<LinearLayout> mReminderItems = new ArrayList<LinearLayout>(0);
     private ArrayList<ReminderEntry> mUnsupportedReminders = new ArrayList<ReminderEntry>();
     private String mRrule;
+
+    public String connectID = "test";
 
     public EditEventView(Activity activity, View view, EditDoneRunnable done,
                          boolean timeSelectedWasStartTime, boolean dateSelectedWasStartDate) {
@@ -619,7 +621,7 @@ public class EditEventView implements View.OnClickListener, DialogInterface.OnCa
             mDone.run();
             if (which == DialogInterface.BUTTON_POSITIVE) {
                 Intent nextIntent = new Intent(Settings.ACTION_ADD_ACCOUNT);
-                final String[] array = {"com.android.calendar"};
+                final String[] array = {"com.android.nanal"};
                 nextIntent.putExtra(Settings.EXTRA_AUTHORITIES, array);
                 nextIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 mActivity.startActivity(nextIntent);
@@ -1123,6 +1125,7 @@ public class EditEventView implements View.OnClickListener, DialogInterface.OnCa
                     .setPositiveButton(R.string.add_account, this)
                     .setNegativeButton(android.R.string.no, this).setOnCancelListener(this);
             mNoCalendarsDialog = builder.show();
+//            CreateNanalCalendar.CreateCalendar(this.mActivity.getApplicationContext(), connectID, connectID);
             return;
         }
 

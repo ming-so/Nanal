@@ -449,6 +449,10 @@ public class CalendarController {
                 return;
             }
 
+            if(event.eventType == EventType.LAUNCH_GROUP) {
+                return;
+            }
+
             if(event.eventType == EventType.LAUNCH_SETTINGS_DIRECT) {
                 launchSettingsDirectly();
                 return;
@@ -819,6 +823,8 @@ public class CalendarController {
 
         final long LAUNCH_SETTINGS_DIRECT = 1L << 13;
 
+        final long LAUNCH_GROUP = 1L << 14;
+
     }
 
     /**
@@ -833,7 +839,9 @@ public class CalendarController {
         final int WEEK = 3;
         final int MONTH = 4;
         final int EDIT = 5;
-        final int MAX_VALUE = 5;
+        final int TODAY = 6;
+        final int MAX_VALUE = 6;
+
     }
 
     public interface EventHandler {

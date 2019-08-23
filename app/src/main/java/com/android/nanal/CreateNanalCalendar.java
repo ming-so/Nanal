@@ -28,9 +28,19 @@ public class CreateNanalCalendar {
         values.put(Calendars.CALENDAR_TIME_ZONE, TimeZone.getDefault().getID());
         values.put(Calendars.CAN_PARTIALLY_UPDATE, 1);
         values.put(Calendars.DIRTY, 1);
+//        values.put(Calendars.CALENDAR_COLOR, Color.parseColor());
 
         Uri newCalendar = context.getContentResolver().insert(target, values);
 
         return newCalendar;
+    }
+
+    public static void DeleteCalendar(Context context, String name, String accountName) {
+        Uri target = Uri.parse(CalendarContract.Calendars.CONTENT_URI.toString());
+        target = target.buildUpon().appendQueryParameter(CalendarContract.CALLER_IS_SYNCADAPTER, "true")
+                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_NAME, accountName)
+                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, "NANAL").build();
+
+        context.getContentResolver().delete(target, null,null);
     }
 }

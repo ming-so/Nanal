@@ -27,6 +27,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.graphics.Rect;
 import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
 import android.os.Build;
@@ -39,7 +40,6 @@ import android.provider.CalendarContract.Attendees;
 import android.provider.CalendarContract.Events;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -56,20 +56,22 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewStub;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.nanal.CreateNanalCalendar;
 import com.android.nanal.DayFragment;
 import com.android.nanal.DayOfMonthDrawable;
 import com.android.nanal.DynamicTheme;
 import com.android.nanal.ExtensionsFactory;
 import com.android.nanal.LoginActivity;
 import com.android.nanal.R;
+import com.android.nanal.TodayFragment;
 import com.android.nanal.ViewDetailsPreferences;
 import com.android.nanal.agenda.AgendaFragment;
 import com.android.nanal.alerts.AlertService;
@@ -89,6 +91,8 @@ import com.android.nanal.event.GeneralPreferences;
 import com.android.nanal.event.Utils;
 import com.android.nanal.interfaces.AllInOneMenuExtensionsInterface;
 import com.android.nanal.month.MonthByWeekFragment;
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
 import java.io.File;
 import java.io.IOException;
@@ -186,7 +190,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         }
     };
 
-    private FloatingActionButton mFab;
     private View mSecondaryPane;
     private String mTimeZone;
     private boolean mShowCalendarControls;
@@ -216,6 +219,9 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     private QueryHandler mHandler;
 
     private BottomNavigationView mBottomNavi;
+    private FloatingActionsMenu mFAB;
+    private FloatingActionButton mAddCalendar, mAddDiary;
+    private ViewStub mViewStub;
 
     private final Runnable mHomeTimeUpdater = new Runnable() {
         @Override
@@ -398,7 +404,10 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mNavigationView = (NavigationView) findViewById(R.id.navigation_view);
 
-        mFab = (FloatingActionButton) findViewById(R.id.floating_action_button);
+        mViewStub = findViewById(R.id.stub_import);
+        mViewStub.setVisibility(View.VISIBLE);
+
+        //mFab = (FloatingActionButton) findViewById(R.id.floating_action_button);
         mBottomNavi = findViewById(R.id.bottom_navigation);
 
         MenuItem menuItem = mBottomNavi.getMenu().findItem(R.id.action_calendar);
@@ -407,6 +416,10 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
         mBottomNavi.setSelectedItemId(R.id.action_today);
         mBottomNavi.setSelectedItemId(R.id.action_calendar);
+
+        mFAB = findViewById(R.id.floating_action_button2);
+        mAddCalendar = findViewById(R.id.action_add_event);
+        mAddDiary = findViewById(R.id.action_add_diary);
 
 
         if (mIsTabletConfig) {
@@ -471,11 +484,13 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                         break;
                     case R.id.action_today:
                         // mode 2
-                        mController.sendEvent(this, EventType.GO_TO, null, null, -1, ViewType.DAY);
+                        mController.sendEvent(this, EventType.GO_TO, null, null, -1, ViewType.TODAY);
+                        //mViewStub.setLayoutResource();
                         selectedMode = 2;
                         break;
                     case R.id.action_group:
                         // mode 3
+                        mController.sendEvent(this, EventType.LAUNCH_GROUP, null, null, 0, 0);
                         selectedMode = 3;
                         break;
                     case R.id.action_settings:
@@ -524,7 +539,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                     // permission was granted, yay!
                     // 퍼미션 받음!
                     // todo: 회원가입 & 로그인 들어오면 로그인 때 처리하는 걸로 수정하기!!
-                    CreateNanalCalendar.CreateCalendar(this, connectID, connectID);
+                    //CreateNanalCalendar.CreateCalendar(this, connectID, connectID);
                 } else {
                     Toast.makeText(getApplicationContext(), R.string.user_rejected_calendar_write_permission, Toast.LENGTH_LONG).show();
                 }
@@ -565,6 +580,9 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 case ViewType.MONTH:
                     titleResource = R.string.month_view;
                     break;
+                case ViewType.TODAY:
+                    titleResource = R.string.today_view;
+                    break;
                 case ViewType.WEEK:
                 default:
                     titleResource = R.string.week_view;
@@ -603,8 +621,41 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         showActionBar();
     }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            if (mFAB.isExpanded()) {
+
+                Rect outRect = new Rect();
+                mFAB.getGlobalVisibleRect(outRect);
+
+                if(!outRect.contains((int)event.getRawX(), (int)event.getRawY()))
+                    mFAB.collapse();
+            }
+        }
+
+        return super.dispatchTouchEvent(event);
+    }
+
     public void setupFloatingActionButton() {
-        mFab.setOnClickListener(new View.OnClickListener() {
+//        mFab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                //Create new Event
+//                Time t = new Time();
+//                t.set(mController.getTime());
+//                t.second = 0;
+//                if (t.minute > 30) {
+//                    t.hour++;
+//                    t.minute = 0;
+//                } else if (t.minute > 0 && t.minute < 30) {
+//                    t.minute = 30;
+//                }
+//                mController.sendEventRelatedEvent(
+//                        this, EventType.CREATE_EVENT, -1, t.toMillis(true), 0, 0, 0, -1);
+//            }
+//        });
+        mAddCalendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Create new Event
@@ -621,6 +672,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                         this, EventType.CREATE_EVENT, -1, t.toMillis(true), 0, 0, 0, -1);
             }
         });
+        //todo: 다이어리 추가
     }
 
 
@@ -1140,6 +1192,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         }
     }
 
+    // 월-주-일 화면 전환 메소드인 듯!!
     private void setMainPane(
             FragmentTransaction ft, int viewId, int viewType, long timeMillis, boolean force) {
         if (mOnSaveInstanceStateCalled) {
@@ -1185,6 +1238,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 if (mIsTabletConfig) {
                     mToolbar.setTitle(R.string.agenda_view);
                 }
+                mFAB.setVisibility(View.VISIBLE);
                 break;
             case ViewType.DAY:
                 //mNavigationView.getMenu().findItem(R.id.day_menu_item).setChecked(true);
@@ -1192,6 +1246,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 if (mIsTabletConfig) {
                     mToolbar.setTitle(R.string.day_view);
                 }
+                mFAB.setVisibility(View.VISIBLE);
                 break;
             case ViewType.MONTH:
                 //mNavigationView.getMenu().findItem(R.id.month_menu_item).setChecked(true);
@@ -1202,6 +1257,11 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 if (mIsTabletConfig) {
                     mToolbar.setTitle(R.string.month_view);
                 }
+                mFAB.setVisibility(View.VISIBLE);
+                break;
+            case ViewType.TODAY:
+                frag = new TodayFragment(timeMillis);
+                mFAB.setVisibility(View.GONE);
                 break;
             case ViewType.WEEK:
             default:
@@ -1210,6 +1270,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 if (mIsTabletConfig) {
                     mToolbar.setTitle(R.string.week_view);
                 }
+                mFAB.setVisibility(View.VISIBLE);
                 break;
         }
         // Update the current view so that the menu can update its look according to the

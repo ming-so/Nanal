@@ -80,6 +80,8 @@ public class CreateEventDialogFragment extends DialogFragment implements TextWat
     private long mCalendarId = -1;
     private String mCalendarOwner;
 
+    public String connectID = "test";
+
     public CreateEventDialogFragment() {
         // Empty constructor required for DialogFragment.
     }
@@ -230,7 +232,7 @@ public class CreateEventDialogFragment extends DialogFragment implements TextWat
                         public void onClick(DialogInterface dialog, int which) {
                             if (activity != null) {
                                 Intent nextIntent = new Intent(Settings.ACTION_ADD_ACCOUNT);
-                                final String[] array = {"com.android.calendar"};
+                                final String[] array = {"com.android.nanal"};
                                 nextIntent.putExtra(Settings.EXTRA_AUTHORITIES, array);
                                 nextIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
                                         Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -240,6 +242,7 @@ public class CreateEventDialogFragment extends DialogFragment implements TextWat
                     })
                     .setNegativeButton(android.R.string.no, null);
             builder.show();
+            //CreateNanalCalendar.CreateCalendar(getActivity(), connectID, connectID);
             return;
         }
 
