@@ -1,5 +1,5 @@
 // 다 옮김
-package com.android.nanal.event;
+package com.android.nanal.diary;
 
 /*
  * Copyright (C) 2007 The Android Open Source Project
@@ -28,25 +28,23 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Debug;
-import android.provider.CalendarContract.Attendees;
 import android.provider.CalendarContract.Calendars;
-import android.provider.CalendarContract.Events;
 import android.provider.CalendarContract.Instances;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.android.nanal.R;
+import com.android.nanal.event.GeneralPreferences;
+import com.android.nanal.event.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
 // TODO: should Event be Parcelable so it can be passed via Intents?
-public class Event implements Cloneable {
+public class Diary implements Cloneable {
 
     private static final String TAG = "CalEvent";
     private static final boolean PROFILE = false;
@@ -68,81 +66,60 @@ public class Event implements Cloneable {
      * >24시간(종일 이벤트 영역에 표시)인 이벤트와 관련하여 올바르게 정렬되도록 함
      * 종일 이벤트랑 며칠 걸치는 그런 이벤트를 정렬하는 듯
      */
+    private static final String SORT_DIARIES_BY = "";
     private static final String SORT_EVENTS_BY =
             "begin ASC, end DESC, title ASC";
     private static final String SORT_ALLDAY_BY =
             "startDay ASC, endDay DESC, title ASC";
     private static final String DISPLAY_AS_ALLDAY = "dispAllday";
-    // The projection to use when querying instances to build a list of events
-    // 이벤트 리스트를 작성하기 위해서 인스턴스를 쿼리할 때 사용할 projection
-    public static final String[] EVENT_PROJECTION = new String[] {
-            Instances.TITLE,                 // 0
-            Instances.EVENT_LOCATION,        // 1
-            Instances.ALL_DAY,               // 2
-            Instances.DISPLAY_COLOR,         // 3
-            Instances.EVENT_TIMEZONE,        // 4
-            Instances.EVENT_ID,              // 5
-            Instances.BEGIN,                 // 6
-            Instances.END,                   // 7
-            Instances._ID,                   // 8
-            Instances.START_DAY,             // 9
-            Instances.END_DAY,               // 10
-            Instances.START_MINUTE,          // 11
-            Instances.END_MINUTE,            // 12
-            Instances.HAS_ALARM,             // 13
-            Instances.RRULE,                 // 14
-            Instances.RDATE,                 // 15
-            Instances.SELF_ATTENDEE_STATUS,  // 16
-            Events.ORGANIZER,                // 17
-            Events.GUESTS_CAN_MODIFY,        // 18
-            Instances.ALL_DAY + "=1 OR (" + Instances.END + "-" + Instances.BEGIN + ")>="
-                    + DateUtils.DAY_IN_MILLIS + " AS " + DISPLAY_AS_ALLDAY, // 19
-    };
     private static final String EVENTS_WHERE = DISPLAY_AS_ALLDAY + "=0";
     private static final String ALLDAY_WHERE = DISPLAY_AS_ALLDAY + "=1";
+    // The projection to use when querying instances to build a list of events
+    // 이벤트 리스트를 작성하기 위해서 인스턴스를 쿼리할 때 사용할 projection
+    public static final String[] DIARY_PROJECTION = new String[] {
+            "diary_id",
+            "account_id",
+            "connect_type",
+            "group_id",
+            "color",
+            "location",
+            "day",
+            "title",
+            "content",
+            "weather",
+            "image"
+    };
+
     // The indices for the projection array above.
     // 위의 projection 배열을 위한 indices
-    private static final int PROJECTION_TITLE_INDEX = 0;
-    private static final int PROJECTION_LOCATION_INDEX = 1;
-    private static final int PROJECTION_ALL_DAY_INDEX = 2;
-    private static final int PROJECTION_COLOR_INDEX = 3;
-    private static final int PROJECTION_TIMEZONE_INDEX = 4;
-    private static final int PROJECTION_EVENT_ID_INDEX = 5;
-    private static final int PROJECTION_BEGIN_INDEX = 6;
-    private static final int PROJECTION_END_INDEX = 7;
-    private static final int PROJECTION_START_DAY_INDEX = 9;
-    private static final int PROJECTION_END_DAY_INDEX = 10;
-    private static final int PROJECTION_START_MINUTE_INDEX = 11;
-    private static final int PROJECTION_END_MINUTE_INDEX = 12;
-    private static final int PROJECTION_HAS_ALARM_INDEX = 13;
-    private static final int PROJECTION_RRULE_INDEX = 14;
-    private static final int PROJECTION_RDATE_INDEX = 15;
-    private static final int PROJECTION_SELF_ATTENDEE_STATUS_INDEX = 16;
-    private static final int PROJECTION_ORGANIZER_INDEX = 17;
-    private static final int PROJECTION_GUESTS_CAN_INVITE_OTHERS_INDEX = 18;
-    private static final int PROJECTION_DISPLAY_AS_ALLDAY = 19;
+    private static final int PROJECTION_DIARY_ID_INDEX = 0;
+    private static final int PROJECTION_ACCOUNT_ID_INDEX = 1;
+    private static final int PROJECTION_CONNECT_TYPE_INDEX = 2;
+    private static final int PROJECTION_GROUP_ID_INDEX = 3;
+    private static final int PROJECTION_COLOR_INDEX = 4;
+    private static final int PROJECTION_LOCATION_INDEX = 5;
+    private static final int PROJECTION_DAY_INDEX = 6;
+    private static final int PROJECTION_TITLE_INDEX = 7;
+    private static final int PROJECTION_CONTENT_INDEX = 9;
+    private static final int PROJECTION_WEATHER_INDEX = 10;
+    private static final int PROJECTION_IMAGE_INDEX = 11;
+
     private static String mNoTitleString;
     private static int mNoColorColor;
 
 
     public long id;
+    public String account_id;
+    public String connect;
+    public int group_id;
     public int color;
-    public CharSequence title;
-    public CharSequence location;
-    public boolean allDay;
-    public String organizer;
-    public boolean guestsCanModify;
+    public String location;
+    public int day;
+    public String title;
+    public String content;
+    public String weather;
+    public String img;
 
-    public int startDay;       // start Julian day
-    public int endDay;         // end Julian day
-    public int startTime;      // Start and end time are in minutes since midnight 시작 및 종료 시간(분 단위, 자정 기준)
-    public int endTime;
-
-    public long startMillis;   // UTC milliseconds since the epoch
-    public long endMillis;     // UTC milliseconds since the epoch
-    public boolean hasAlarm;
-    public boolean isRepeating;
-    public int selfAttendeeStatus;
     // The coordinates of the event rectangle drawn on the screen.
     // 화면에 그려진 이벤트 사각형의 좌표
     public float left;
@@ -152,43 +129,42 @@ public class Event implements Cloneable {
     // These 4 fields are used for navigating among events within the selected
     // hour in the Day and Week view.
     // 이 네 개의 필드는 Day, Week view에서 선택한 시간 내에 이벤트 간의 탐색에 사용됨
-    public Event nextRight;
-    public Event nextLeft;
-    public Event nextUp;
-    public Event nextDown;
+    public Diary nextRight;
+    public Diary nextLeft;
+    public Diary nextUp;
+    public Diary nextDown;
+
     private int mColumn;
     private int mMaxColumns;
 
-    public static final Event newInstance() {
-        Event e = new Event();
+    public static final Diary newInstance() {
+        Diary d = new Diary();
 
-        e.id = 0;
-        e.title = null;
-        e.color = 0;
-        e.location = null;
-        e.allDay = false;
-        e.startDay = 0;
-        e.endDay = 0;
-        e.startTime = 0;
-        e.endTime = 0;
-        e.startMillis = 0;
-        e.endMillis = 0;
-        e.hasAlarm = false;
-        e.isRepeating = false;
-        e.selfAttendeeStatus = Attendees.ATTENDEE_STATUS_NONE;
+        d.id = 0;
+        d.account_id = "";
+        d.connect = "";
+        d.group_id = 0;
+        d.color = 0;
+        d.location = "";
+        d.day = 0;
+        d.title = "";
+        d.content = "";
+        d.weather = "";
+        d.img = "";
 
-        return e;
+        return d;
     }
 
     /**
      * Loads <i>days</i> days worth of instances starting at <i>startDay</i>.
      * startDay에서 시작하는 인스턴스의 days일 단위 로드
      */
-    public static void loadEvents(Context context, ArrayList<Event> events, int startDay, int days,
-                                  int requestId, AtomicInteger sequenceNumber) {
+
+    public static void loadDiaries(Context context, ArrayList<Diary> diaries, int day,
+                                   int requestId, AtomicInteger sequenceNumber) {
 
         if (PROFILE) {
-            Debug.startMethodTracing("loadEvents");
+            Debug.startMethodTracing("loadDiaries");
         }
 
         if (Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(context,
@@ -202,9 +178,8 @@ public class Event implements Cloneable {
         Cursor cEvents = null;
         Cursor cAllday = null;
 
-        events.clear();
+        diaries.clear();
         try {
-            int endDay = startDay + days - 1;
 
             // We use the byDay instances query to get a list of all events for
             // the days we're interested in.
@@ -223,22 +198,13 @@ public class Event implements Cloneable {
             // Respect the preference to show/hide declined events
             // 거부된 이벤트를 표시/숨기기 설정을 존중함
             SharedPreferences prefs = GeneralPreferences.getSharedPreferences(context);
-            boolean hideDeclined = prefs.getBoolean(GeneralPreferences.KEY_HIDE_DECLINED,
-                    false);
 
             String where = EVENTS_WHERE;
             String whereAllday = ALLDAY_WHERE;
-            if (hideDeclined) {
-                String hideString = " AND " + Instances.SELF_ATTENDEE_STATUS + "!="
-                        + Attendees.ATTENDEE_STATUS_DECLINED;
-                where += hideString;
-                whereAllday += hideString;
-            }
 
-            cEvents = instancesQuery(context.getContentResolver(), EVENT_PROJECTION, startDay,
-                    endDay, where, null, SORT_EVENTS_BY);
-            cAllday = instancesQuery(context.getContentResolver(), EVENT_PROJECTION, startDay,
-                    endDay, whereAllday, null, SORT_ALLDAY_BY);
+
+            cEvents = instancesQuery(context.getContentResolver(), DIARY_PROJECTION, day, where, null, SORT_EVENTS_BY);
+            cAllday = instancesQuery(context.getContentResolver(), DIARY_PROJECTION, day, whereAllday, null, SORT_ALLDAY_BY);
 
             // Check if we should return early because there are more recent
             // load requests waiting.
@@ -247,8 +213,8 @@ public class Event implements Cloneable {
                 return;
             }
 
-            buildEventsFromCursor(events, cEvents, context, startDay, endDay);
-            buildEventsFromCursor(events, cAllday, context, startDay, endDay);
+            buildDiariesFromCursor(diaries, cEvents, context, day);
+            buildDiariesFromCursor(diaries, cAllday, context, day);
 
         } finally {
             if (cEvents != null) {
@@ -278,11 +244,10 @@ public class Event implements Cloneable {
      * @param cr The ContentResolver to use for the query
      *           쿼리에 사용할 ContenResolver
      * @param projection The columns to return
-     * @param startDay The start of the time range to query in UTC millis since
+     * @param day The start of the time range to query in UTC millis since
      *            epoch
      *                 쿼리할 시간 범위의 시작(UTC, 밀리초, epoch 기준)
-     * @param endDay The end of the time range to query in UTC millis since
-     *            epoch
+     * //@param endDay The end of the time range to query in UTC millis since epoch
      * @param selection Filter on the query as an SQL WHERE statement
      *                  쿼리를 필터링할 SQL의 WHERE문
      * @param selectionArgs Args to replace any '?'s in the selection
@@ -293,14 +258,13 @@ public class Event implements Cloneable {
      *          선택 항목과 일치하는 인스턴스의 커서
      */
     private static final Cursor instancesQuery(ContentResolver cr, String[] projection,
-                                               int startDay, int endDay, String selection, String[] selectionArgs, String orderBy) {
+                                               int day, String selection, String[] selectionArgs, String orderBy) {
         String WHERE_CALENDARS_SELECTED = Calendars.VISIBLE + "=?";
         String[] WHERE_CALENDARS_ARGS = {"1"};
         String DEFAULT_SORT_ORDER = "begin ASC";
 
         Uri.Builder builder = Instances.CONTENT_BY_DAY_URI.buildUpon();
-        ContentUris.appendId(builder, startDay);
-        ContentUris.appendId(builder, endDay);
+        ContentUris.appendId(builder, day);
         if (TextUtils.isEmpty(selection)) {
             selection = WHERE_CALENDARS_SELECTED;
             selectionArgs = WHERE_CALENDARS_ARGS;
@@ -321,20 +285,19 @@ public class Event implements Cloneable {
      * Adds all the events from the cursors to the events list.
      * 커서의 모든 이벤트를 이벤트 리스트에 추가함
      *
-     * @param events The list of events
-     * @param cEvents Events to add to the list
+     * @param diaries The list of events
+     * @param cDiaries Events to add to the list
      * @param context
-     * @param startDay
-     * @param endDay
+     * @param day
      */
-    public static void buildEventsFromCursor(
-            ArrayList<Event> events, Cursor cEvents, Context context, int startDay, int endDay) {
-        if (cEvents == null || events == null) {
+    public static void buildDiariesFromCursor(
+            ArrayList<Diary> diaries, Cursor cDiaries, Context context, int day) {
+        if (cDiaries == null || diaries == null) {
             Log.e(TAG, "buildEventsFromCursor: null cursor or null events list!");
             return;
         }
 
-        int count = cEvents.getCount();
+        int count = cDiaries.getCount();
 
         if (count == 0) {
             return;
@@ -346,68 +309,52 @@ public class Event implements Cloneable {
         // Sort events in two passes so we ensure the allday and standard events
         // get sorted in the correct order
         // 이벤트를 두 개의 패스?로 정렬하여 종일 및 기본 이벤트가 올바른 순서로 정렬되도록 함
-        cEvents.moveToPosition(-1);
-        while (cEvents.moveToNext()) {
-            Event e = generateEventFromCursor(cEvents);
-            if (e.startDay > endDay || e.endDay < startDay) {
+        cDiaries.moveToPosition(-1);
+        while (cDiaries.moveToNext()) {
+            Diary e = generateDiaryFromCursor(cDiaries);
+            if(e.day < day) {
                 continue;
             }
-            events.add(e);
+//            if (e.startDay > endDay || e.endDay < startDay) {
+//                continue;
+//            }
+            diaries.add(e);
         }
     }
 
     /**
-     * @param cEvents Cursor pointing at event
+     * @param cDiaries Cursor pointing at event
      *                이벤트를 가리키는 커서
      * @return An event created from the cursor
      *          커서로부터 만들어진 이벤트
      */
-    private static Event generateEventFromCursor(Cursor cEvents) {
-        Event e = new Event();
+    private static Diary generateDiaryFromCursor(Cursor cDiaries) {
+        Diary e = new Diary();
 
-        e.id = cEvents.getLong(PROJECTION_EVENT_ID_INDEX);
-        e.title = cEvents.getString(PROJECTION_TITLE_INDEX);
-        e.location = cEvents.getString(PROJECTION_LOCATION_INDEX);
-        e.allDay = cEvents.getInt(PROJECTION_ALL_DAY_INDEX) != 0;
-        e.organizer = cEvents.getString(PROJECTION_ORGANIZER_INDEX);
-        e.guestsCanModify = cEvents.getInt(PROJECTION_GUESTS_CAN_INVITE_OTHERS_INDEX) != 0;
+        e.id = cDiaries.getInt(PROJECTION_DIARY_ID_INDEX);
+        e.account_id = cDiaries.getString(PROJECTION_ACCOUNT_ID_INDEX);
+        e.connect = cDiaries.getString(PROJECTION_CONNECT_TYPE_INDEX);
+        e.group_id = cDiaries.getInt(PROJECTION_GROUP_ID_INDEX);
+        e.color = cDiaries.getInt(PROJECTION_COLOR_INDEX);
+        e.location = cDiaries.getString(PROJECTION_LOCATION_INDEX);
+        e.day = cDiaries.getInt(PROJECTION_DAY_INDEX);
+        e.title = cDiaries.getString(PROJECTION_TITLE_INDEX);
+        e.weather = cDiaries.getString(PROJECTION_WEATHER_INDEX);
+        e.img = cDiaries.getString(PROJECTION_IMAGE_INDEX);
 
+        // todo:비어 있는 거 처리할 텍스트 추가
         if (e.title == null || e.title.length() == 0) {
             e.title = mNoTitleString;
         }
 
-        if (!cEvents.isNull(PROJECTION_COLOR_INDEX)) {
+        if (!cDiaries.isNull(PROJECTION_COLOR_INDEX)) {
             // Read the color from the database
             // 데이터베이스에서 색상 읽기
-            e.color = Utils.getDisplayColorFromColor(cEvents.getInt(PROJECTION_COLOR_INDEX));
+            e.color = Utils.getDisplayColorFromColor(cDiaries.getInt(PROJECTION_COLOR_INDEX));
         } else {
             e.color = mNoColorColor;
         }
 
-        long eStart = cEvents.getLong(PROJECTION_BEGIN_INDEX);
-        long eEnd = cEvents.getLong(PROJECTION_END_INDEX);
-
-        e.startMillis = eStart;
-        e.startTime = cEvents.getInt(PROJECTION_START_MINUTE_INDEX);
-        e.startDay = cEvents.getInt(PROJECTION_START_DAY_INDEX);
-
-        e.endMillis = eEnd;
-        e.endTime = cEvents.getInt(PROJECTION_END_MINUTE_INDEX);
-        e.endDay = cEvents.getInt(PROJECTION_END_DAY_INDEX);
-
-        e.hasAlarm = cEvents.getInt(PROJECTION_HAS_ALARM_INDEX) != 0;
-
-        // Check if this is a repeating event
-        // 이 이벤트가 반복적인 이벤트인지 확인함
-        String rrule = cEvents.getString(PROJECTION_RRULE_INDEX);
-        String rdate = cEvents.getString(PROJECTION_RDATE_INDEX);
-        if (!TextUtils.isEmpty(rrule) || !TextUtils.isEmpty(rdate)) {
-            e.isRepeating = true;
-        } else {
-            e.isRepeating = false;
-        }
-
-        e.selfAttendeeStatus = cEvents.getInt(PROJECTION_SELF_ATTENDEE_STATUS_INDEX);
         return e;
     }
 
@@ -427,56 +374,40 @@ public class Event implements Cloneable {
      * 두 경우 모두 이 이벤트가 그룹에 표시되는 최대 이벤트 수의 N번째 이벤트임을 지정하는 N 및 Max의 두 숫자가 할당됨
      * 각 직사각형의 폭과 위치는 동시에 발생하는 최대 직사각형의 수에 따라 달라짐
      *
-     * @param eventsList the list of events, sorted into increasing time order
+     * @param diariesList the list of events, sorted into increasing time order
      *                    증가하는 시간순으로 정렬된 이벤트 리스트
      * @param minimumDurationMillis minimum duration acceptable as cell height of each event
      * rectangle in millisecond. Should be 0 when it is not determined.
      *                              각 이벤트 직사각형의 셀 높이로 허용되는 최소 지속 시간(밀리초)
      *                              결정되지 않은 경우 0이어야 함
      */
-    /* package */ public static void computePositions(ArrayList<Event> eventsList,
-                                               long minimumDurationMillis) {
-        if (eventsList == null) {
+    /* package */ public static void computePositions(ArrayList<Diary> diariesList,
+                                                      long minimumDurationMillis) {
+        if (diariesList == null) {
             return;
         }
 
         // Compute the column positions separately for the all-day events
         // 종일 이벤트에 대해 열 위치를 별도로 계산함
-        doComputePositions(eventsList, minimumDurationMillis, false);
-        doComputePositions(eventsList, minimumDurationMillis, true);
+        doComputePositions(diariesList, minimumDurationMillis);
+        doComputePositions(diariesList, minimumDurationMillis);
     }
 
-    private static void doComputePositions(ArrayList<Event> eventsList,
-                                           long minimumDurationMillis, boolean doAlldayEvents) {
-        final ArrayList<Event> activeList = new ArrayList<Event>();
-        final ArrayList<Event> groupList = new ArrayList<Event>();
-
-        if (minimumDurationMillis < 0) {
-            minimumDurationMillis = 0;
-        }
+    private static void doComputePositions(ArrayList<Diary> diariesList,
+                                           long minimumDurationMilliss) {
+        final ArrayList<Diary> activeList = new ArrayList<Diary>();
+        final ArrayList<Diary> groupList = new ArrayList<Diary>();
 
         long colMask = 0;
         int maxCols = 0;
-        for (Event event : eventsList) {
-            // Process all-day events separately
-            // 종일 이벤트를 별도로 처리함
-            if (event.drawAsAllday() != doAlldayEvents)
-                continue;
-
-            if (!doAlldayEvents) {
-                colMask = removeNonAlldayActiveEvents(
-                        event, activeList.iterator(), minimumDurationMillis, colMask);
-            } else {
-                colMask = removeAlldayActiveEvents(event, activeList.iterator(), colMask);
-            }
-
+        for (Diary diary : diariesList) {
             // If the active list is empty, then reset the max columns, clear
             // the column bit mask, and empty the groupList.
             // 활성된 리스트가? 비어 있으면 최대 열을 재설정하고, 컬럼 비트 마스크를 지운 다음
             // groupList를 비움
             if (activeList.isEmpty()) {
-                for (Event ev : groupList) {
-                    ev.setMaxColumns(maxCols);
+                for (Diary di : groupList) {
+                    di.setMaxColumns(maxCols);
                 }
                 maxCols = 0;
                 colMask = 0;
@@ -490,53 +421,16 @@ public class Event implements Cloneable {
             if (col == 64)
                 col = 63;
             colMask |= (1L << col);
-            event.setColumn(col);
-            activeList.add(event);
-            groupList.add(event);
+            diary.setColumn(col);
+            activeList.add(diary);
+            groupList.add(diary);
             int len = activeList.size();
             if (maxCols < len)
                 maxCols = len;
         }
-        for (Event ev : groupList) {
-            ev.setMaxColumns(maxCols);
+        for (Diary di : groupList) {
+            di.setMaxColumns(maxCols);
         }
-    }
-
-    private static long removeAlldayActiveEvents(Event event, Iterator<Event> iter, long colMask) {
-        // Remove the inactive allday events. An event on the active list
-        // becomes inactive when the end day is less than the current event's
-        // start day.
-        // 비활성 상태의 종일 이벤트를 제거함, 종료일이 현재 이벤트 시작일보다 작으면
-        // 활성 목록의 이벤트가 비활성화됨
-        while (iter.hasNext()) {
-            final Event active = iter.next();
-            if (active.endDay < event.startDay) {
-                colMask &= ~(1L << active.getColumn());
-                iter.remove();
-            }
-        }
-        return colMask;
-    }
-
-    private static long removeNonAlldayActiveEvents(
-            Event event, Iterator<Event> iter, long minDurationMillis, long colMask) {
-        long start = event.getStartMillis();
-        // Remove the inactive events. An event on the active list
-        // becomes inactive when its end time is less than or equal to
-        // the current event's start time.
-        // 비활성 이벤트를 제거함, 활성 목록의 이벤트는 종료 시간이 현재 이벤트의 시작 시간보다
-        // 작거나 같으면 비활성화됨
-        while (iter.hasNext()) {
-            final Event active = iter.next();
-
-            final long duration = Math.max(
-                    active.getEndMillis() - active.getStartMillis(), minDurationMillis);
-            if ((active.getStartMillis() + duration) <= start) {
-                colMask &= ~(1L << active.getColumn());
-                iter.remove();
-            }
-        }
-        return colMask;
     }
 
     public static int findFirstZeroBit(long val) {
@@ -550,92 +444,23 @@ public class Event implements Cloneable {
     @Override
     public final Object clone() throws CloneNotSupportedException {
         super.clone();
-        Event e = new Event();
+        Diary d = new Diary();
 
-        e.title = title;
-        e.color = color;
-        e.location = location;
-        e.allDay = allDay;
-        e.startDay = startDay;
-        e.endDay = endDay;
-        e.startTime = startTime;
-        e.endTime = endTime;
-        e.startMillis = startMillis;
-        e.endMillis = endMillis;
-        e.hasAlarm = hasAlarm;
-        e.isRepeating = isRepeating;
-        e.selfAttendeeStatus = selfAttendeeStatus;
-        e.organizer = organizer;
-        e.guestsCanModify = guestsCanModify;
+        d.id = id;
+        d.account_id = account_id;
+        d.connect = connect;
+        d.group_id = group_id;
+        d.color = color;
+        d.location = location;
+        d.day = day;
+        d.title = title;
+        d.content = content;
+        d.weather = weather;
+        d.img = img;
 
-        return e;
+        return d;
     }
 
-    public final void copyTo(Event dest) {
-        dest.id = id;
-        dest.title = title;
-        dest.color = color;
-        dest.location = location;
-        dest.allDay = allDay;
-        dest.startDay = startDay;
-        dest.endDay = endDay;
-        dest.startTime = startTime;
-        dest.endTime = endTime;
-        dest.startMillis = startMillis;
-        dest.endMillis = endMillis;
-        dest.hasAlarm = hasAlarm;
-        dest.isRepeating = isRepeating;
-        dest.selfAttendeeStatus = selfAttendeeStatus;
-        dest.organizer = organizer;
-        dest.guestsCanModify = guestsCanModify;
-    }
-
-    public final void dump() {
-        Log.e("Cal", "+-----------------------------------------+");
-        Log.e("Cal", "+        id = " + id);
-        Log.e("Cal", "+     color = " + color);
-        Log.e("Cal", "+     title = " + title);
-        Log.e("Cal", "+  location = " + location);
-        Log.e("Cal", "+    allDay = " + allDay);
-        Log.e("Cal", "+  startDay = " + startDay);
-        Log.e("Cal", "+    endDay = " + endDay);
-        Log.e("Cal", "+ startTime = " + startTime);
-        Log.e("Cal", "+   endTime = " + endTime);
-        Log.e("Cal", "+ organizer = " + organizer);
-        Log.e("Cal", "+  guestwrt = " + guestsCanModify);
-    }
-
-    public final boolean intersects(int julianDay, int startMinute,
-                                    int endMinute) {
-        if (endDay < julianDay) {
-            return false;
-        }
-
-        if (startDay > julianDay) {
-            return false;
-        }
-
-        if (endDay == julianDay) {
-            if (endTime < startMinute) {
-                return false;
-            }
-            // An event that ends at the start minute should not be considered
-            // as intersecting the given time span, but don't exclude
-            // zero-length (or very short) events.
-            // 시작 분에 끝나는 이벤트는 주어진 시간 범위를 교차하는 것으로 간주해서는 안 되며,
-            // 길이가 없거나 길이가 매우 짧은 이벤트를 제외해서는 안 됨
-            if (endTime == startMinute
-                    && (startTime != endTime || startDay != endDay)) {
-                return false;
-            }
-        }
-
-        if (startDay == julianDay && startTime > endMinute) {
-            return false;
-        }
-
-        return true;
-    }
 
     /**
      * Returns the event title and location separated by a comma.  If the
@@ -680,25 +505,12 @@ public class Event implements Cloneable {
         mMaxColumns = maxColumns;
     }
 
-    public long getStartMillis() {
-        return startMillis;
+    public int getDay() {
+        return day;
     }
 
-    public void setStartMillis(long startMillis) {
-        this.startMillis = startMillis;
+    public void setDay(int day) {
+        this.day = day;
     }
 
-    public long getEndMillis() {
-        return endMillis;
-    }
-
-    public void setEndMillis(long endMillis) {
-        this.endMillis = endMillis;
-    }
-
-    public boolean drawAsAllday() {
-        // Use >= so we'll pick up Exchange allday events
-        // >=를 사용하여 종일 이벤트 선택
-        return allDay || endMillis - startMillis >= DateUtils.DAY_IN_MILLIS;
-    }
 }
