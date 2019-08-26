@@ -16,7 +16,7 @@
 
     <!-- 로그인/회원가입 화면 -->
     <string name="pw_hint1">비밀번호</string>
-    <string name="pw_hint2">비밀번호(8자 이상)</string>
+    <string name="pw_hint2">비밀번호(8자 이상 20자 이하)</string>
     <string name="button_login">로그인</string>
     <string name="button_sign">회원가입</string>
     <string name="sign">아직 회원이 아니신가요?</string>
@@ -28,6 +28,11 @@
     <string name="email_error">이메일을 바르게 입력하세요.</string>
     <string name="pw_error">비밀번호를 바르게 입력하세요.</string>
     <string name="login_error">이메일 또는 비밀번호가 맞지 않습니다.</string>
+    <string name="signup_error">회원가입 중 문제가 발생했습니다.</string>
+    <string name="email_exist">이미 가입된 이메일입니다.</string>
+    <string name="email_diff">가입되지 않은 이메일입니다.</string>
+    <string name="pw_diff">비밀번호가 맞지 않습니다.</string>
+    <string name="pw_out">로그인을 5회 실패하여 계정이 잠겼습니다.\n이메일 인증 후 다시 로그인 해주세요.</string>
 
     <string name="TEAL">#388d7f</string>
     <string name="ORANGE">#b36f28</string>
