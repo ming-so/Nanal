@@ -17,6 +17,8 @@ import com.android.nanal.event.Utils;
 
 import net.cryptobrewery.androidprocessingbutton.ProcessButton;
 
+import java.util.concurrent.ExecutionException;
+
 
 public class LoginActivity extends Activity {
     ConstraintLayout ll_login;
@@ -29,7 +31,7 @@ public class LoginActivity extends Activity {
     boolean isSignup = false;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_activity);
 
@@ -70,7 +72,7 @@ public class LoginActivity extends Activity {
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        if (et_email.getText().toString().length() == 0) {
+                        if (et_email.getText().toString().length() == 0 || !et_email.getText().toString().contains("@") || !et_email.getText().toString().contains(".")) {
                             Toast.makeText(LoginActivity.this, R.string.email_error, Toast.LENGTH_LONG).show();
                             btn_login.setButtonState(ProcessButton.state.FAILURE);
                             btn_login.stopProgress();
@@ -85,14 +87,70 @@ public class LoginActivity extends Activity {
                         if (isSignup) {
                             // 회원가입 처리
                             // SignUpHelper 클래스에서 처리하고 switch문으로 return값 처리도 괜찮을 것 같음
-                            btn_login.setButtonState(ProcessButton.state.SUCCESS);
-                            btn_login.stopProgress();
-                            goHome();
+                            String id = et_email.getText().toString();
+                            String password = et_pw.getText().toString();
+                            String result = "false";
+
+                            try {
+                                SignUpHelper signUpHelper = new SignUpHelper();
+                                result = (String) signUpHelper.execute(id, password).get();
+
+                                if (result.equals("true")) {
+                                    // 회원가입 성공했을 경우
+                                    btn_login.setButtonState(ProcessButton.state.SUCCESS);
+                                    btn_login.stopProgress();
+                                } else if(result.equals("false")) {
+                                    // 이미 존재하는 아이디인 경우
+                                    Toast.makeText(LoginActivity.this, R.string.email_exist, Toast.LENGTH_LONG).show();
+                                    btn_login.setButtonState(ProcessButton.state.FAILURE);
+                                    btn_login.stopProgress();
+                                } else {
+                                    // 회원가입 실패했을 경우
+                                    Toast.makeText(LoginActivity.this, R.string.signup_error, Toast.LENGTH_LONG).show();
+                                    btn_login.setButtonState(ProcessButton.state.FAILURE);
+                                    btn_login.stopProgress();
+                                }
+                            } catch (ExecutionException e) {
+                                e.printStackTrace();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         } else {
                             // 로그인 처리
-                            btn_login.setButtonState(ProcessButton.state.SUCCESS);
-                            btn_login.stopProgress();
-                            goHome();
+                            String id = et_email.getText().toString();
+                            String password = et_pw.getText().toString();
+                            String result = "false";
+
+                            try {
+                                LoginHelper loginHelper = new LoginHelper();
+                                result = (String) loginHelper.execute(id, password).get();
+
+                                if (result.equals("true")) {
+                                    // 로그인 성공했을 경우
+                                    btn_login.setButtonState(ProcessButton.state.SUCCESS);
+                                    btn_login.stopProgress();
+                                    goHome();
+                                } else if(result.equals("iderr")) {
+                                    // 아이디 틀린 경우
+                                    Toast.makeText(LoginActivity.this, R.string.email_diff, Toast.LENGTH_LONG).show();
+                                    btn_login.setButtonState(ProcessButton.state.FAILURE);
+                                    btn_login.stopProgress();
+                                } else if(result.equals("passerr")) {
+                                    // 비밀번호 틀린 경우
+                                    Toast.makeText(LoginActivity.this, R.string.pw_diff, Toast.LENGTH_LONG).show();
+                                    btn_login.setButtonState(ProcessButton.state.FAILURE);
+                                    btn_login.stopProgress();
+                                } else {
+                                    // 로그인 실패 횟수가 5 이상인 경우
+                                    Toast.makeText(LoginActivity.this, R.string.pw_out, Toast.LENGTH_LONG).show();
+                                    btn_login.setButtonState(ProcessButton.state.FAILURE);
+                                    btn_login.stopProgress();
+                                }
+                            } catch (ExecutionException e) {
+                                e.printStackTrace();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }, 1000);

@@ -25,6 +25,7 @@ import java.util.Map;
 
 /**
  * A cache for event colors and event color keys stored based upon calendar account name and type.
+ * 캘린더 계정 이름 및 타입에 따라 저장된 이벤트 색상과 이벤트 색 키의 캐시
  */
 public class EventColorCache implements Serializable {
 
@@ -42,6 +43,7 @@ public class EventColorCache implements Serializable {
 
     /**
      * Inserts a color into the cache.
+     * 색상을 캐시에 삽입
      */
     public void insertColor(String accountName, String accountType, int displayColor,
                             String colorKey) {
@@ -57,6 +59,7 @@ public class EventColorCache implements Serializable {
 
     /**
      * Retrieve an array of colors for a specific account name and type.
+     * 특정 계정 이름 및 타입에 대한 색 배열 검색
      */
     public int[] getColorArray(String accountName, String accountType) {
         ArrayList<Integer> colors = mColorPaletteMap.get(createKey(accountName, accountType));
@@ -72,6 +75,7 @@ public class EventColorCache implements Serializable {
 
     /**
      * Retrieve an event color's unique key based on account name, type, and color.
+     * 계정 이름, 타입 및 색상을 기준으로 이벤트 색상의 고유 키 검색
      */
     public String getColorKey(String accountName, String accountType, int displayColor) {
         return mColorKeyMap.get(createKey(accountName, accountType, displayColor));
@@ -79,6 +83,7 @@ public class EventColorCache implements Serializable {
 
     /**
      * Sorts the arrays of colors based on a comparator.
+     * 대조군에 따라 색상 배열 정렬
      */
     public void sortPalettes(Comparator<Integer> comparator) {
         for (String key : mColorPaletteMap.keySet()) {
