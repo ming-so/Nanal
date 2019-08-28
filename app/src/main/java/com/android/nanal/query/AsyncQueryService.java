@@ -401,6 +401,9 @@ public class AsyncQueryService extends Handler {
      *               삭제 실행에서 반환된 result
      */
     protected void onDeleteComplete(int token, Object cookie, int result) {
+        if(cookie.equals(1)) {
+            //todo:그룹 일기 삭제 때 해야 할 것 있으면 이쪽에서 호출하면 될 것 같음
+        }
         if (localLOGV) {
             Log.d(TAG, "########## default onDeleteComplete");
         }

@@ -212,6 +212,7 @@
     <string name="repeats_label">반복</string>
     <!-- Title of event when no explicit title is specified by the user -->
     <string name="no_title_label">(제목 없음)</string>
+    <string name="no_content_label">(내용 없음)</string>
 
     <!-- Reminder format strings -->
     <plurals name="Nminutes">
@@ -294,6 +295,9 @@
     <!-- This is a label on a menu item in a popup window. Pressing this menu
          item allows the user to delete an existing event. -->
     <string name="event_delete">"일정 삭제"</string>
+    <string name="diary_create">"일기 작성"</string>
+    <string name="diary_edit">"일기 수정"</string>
+    <string name="diary_delete">"일기 삭제"</string>
     <string name="share_label">공유</string>
     <!-- This is a label on a menu item. Pressing this menu
          item takes the user to the current day (today) in whatever view
@@ -369,6 +373,9 @@
     <string name="hint_description">"일정 설명"</string>
     <!-- Default value of Attendees/Guests field (as a hint to the user) [CHAR LIMIT=10] -->
     <string name="hint_attendees">"참석자 추가"</string>
+    <string name="hint_title">"일기 제목"</string>
+    <string name="hint_content">"일기 내용"</string>
+
     <!-- Toast message displayed when a new event is created -->
     <string name="creating_event">"일정을 만들었습니다."</string>
     <!-- Toast message displayed when an existing event is saved after being modified -->
@@ -379,6 +386,10 @@
     <string name="creating_event_with_guest">"초대장이 전송됩니다."</string>
     <!-- Toast message displayed when an existing event with guests is saved after being modified -->
     <string name="saving_event_with_guest">"업데이트가 전송됩니다."</string>
+
+    <string name="creating_diary">"일기를 작성했습니다."</string>
+    <string name="saving_diary">"일기를 저장했습니다."</string>
+    <string name="empty_diary">"빈 일기는 만들 수 없습니다."</string>
 
     <!-- Toast message displayed responding to an event from an email as accepted
      [CHAR LIMIT=50] -->
@@ -467,6 +478,10 @@
     <string name="event_color_picker_dialog_title">일정 색상</string>
     <!-- Label for button which sets event color to default calendar color -->
     <string name="event_color_set_to_default">기본 일정 색상으로 설정</string>
+
+    <string name="choose_diary_color_label">일기 색상 선택</string>
+    <string name="diary_color_picker_dialog_title">일기 색상</string>
+    <string name="diary_color_set_to_default">기본 일기 색상으로 설정</string>
 
     <!-- Title for calendar color picker dialog -->
     <string name="calendar_color_picker_dialog_title">캘린더 색상</string>
@@ -663,6 +678,8 @@
          user has asked to delete an event that is recurring. The user still has a chance to cancel
          this operation. -->
     <string name="delete_recurring_event_title">"<xliff:g id="eventtitle">%s</xliff:g>을(를) 삭제하시겠습니까?"</string>
+    <string name="delete_this_diary_title">해당 일기를 삭제하시겠습니까?</string>
+    <string name="delete_recurring_diary_title">"<xliff:g id="diarytitle">%s</xliff:g>을(를) 삭제하시겠습니까?</string>
     <!-- This is the title of a popup dialog that asks for confirmation before
          changing the response to an invitation. -->
     <string name="change_response_title">회신 변경</string>

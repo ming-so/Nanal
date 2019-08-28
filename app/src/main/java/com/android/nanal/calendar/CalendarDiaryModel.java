@@ -3,7 +3,8 @@ package com.android.nanal.calendar;
 import android.content.Context;
 import android.content.Intent;
 
-import com.android.nanal.event.EventColorCache;
+import com.android.nanal.diary.DiaryColorCache;
+import com.android.nanal.event.Utils;
 
 import java.io.Serializable;
 import java.util.Calendar;
@@ -11,23 +12,39 @@ import java.util.Calendar;
 public class CalendarDiaryModel implements Serializable {
     private static final String TAG = "CalendarDiaryModel";
     public String mUri = null;
-    public long mId = -1;
+
+    public String mCalendarDisplayName = ""; // Make sure this is in sync with the mCalendarId, mCalendarId와 동기화되었는지 확인
+    public String mCalendarAccountName;
+    public String mCalendarAccountType;
 
     public int mDiaryId;
     public String mDiaryUserId;
-    public int mDiaryGroupId;
-    public String mDiaryContents;
+    public String mConnectType;
     public int mDiaryColor;
-    public String mDiaryWeather;
     public String mDiaryLocation;
+    public long mDiaryDay;
+    public String mDiaryTitle;
+    public String mDiaryWeather;
+    public String mDiaryContent;
     public String mDiaryImg;
+    public int mDiaryGroupId;
 
-    public EventColorCache mDiaryColorCache;
+    public String mSyncId = null;
+    public String mSyncAccount = null;
+    public String mSyncAccountType = null;
+
+    public String mGroupName;
+    public int mGroupColor;
+
+    public DiaryColorCache mDiaryColorCache;
+    public boolean mModelUpdatedWithDiaryCursor;
     public String mTimezone = null;
+
+    public boolean mDiaryColorInitialized = false;
 
     public CalendarDiaryModel(Context context){
         this();
-        //mTimezone = Utils.getTimeZone(context, null);
+        mTimezone = Utils.getTimeZone(context, null);
         // Preference 불필요할 것 같음
 
     }
@@ -50,9 +67,18 @@ public class CalendarDiaryModel implements Serializable {
     }
 
     public boolean isEmpty() {
-        // 검사 조건 추가하기
-        if(mDiaryContents != null && mDiaryContents.trim().length() > 0)
+        if(mDiaryId > 0) {
             return false;
+        }
+        if(mDiaryUserId != null && mDiaryUserId.trim().length() > 0) {
+            return false;
+        }
+        if(mConnectType != null && mConnectType.trim().length() > 0) {
+            return false;
+        }
+        if(mDiaryDay > 0) {
+            return false;
+        }
         return true;
     }
 
@@ -63,17 +89,30 @@ public class CalendarDiaryModel implements Serializable {
 
     public void clear() {
         mUri = null;
-        mId = -1;
 
         mDiaryId = -1;
         mDiaryUserId = null;
-        mDiaryGroupId = -1;
-        mDiaryContents = null;
+        mConnectType = null;
         mDiaryColor = -1;
-        mDiaryWeather = null;
         mDiaryLocation = null;
+        mDiaryDay = -1;
+        mDiaryTitle = null;
+        mDiaryContent = null;
+        mDiaryWeather = null;
         mDiaryImg = null;
+        mDiaryGroupId = -1;
         mTimezone = null;
+
+        mSyncId = null;
+        mSyncAccount = null;
+        mSyncAccountType = null;
+
+        mDiaryColorCache = null;
+        mModelUpdatedWithDiaryCursor = false;
+        mDiaryColorInitialized = false;
+
+        mGroupName = null;
+        mGroupColor = -1;
     }
 
     @Override
@@ -105,7 +144,6 @@ public class CalendarDiaryModel implements Serializable {
         if(!checkOriginalModelFields(originalModel)) {
             return false;
         }
-
         if(isEmpty(mDiaryWeather)) {
             if(!isEmpty(originalModel.mDiaryWeather)) {
                 return false;
@@ -140,7 +178,46 @@ public class CalendarDiaryModel implements Serializable {
         if(mDiaryGroupId != originalModel.mDiaryGroupId) {
             return false;
         }
-        // 조건 추가
         return true;
+    }
+
+    public int[] getGroupColors() {
+        if(mDiaryColorCache != null) {
+            return mDiaryColorCache.getColorArray(mGroupName, mDiaryGroupId);
+        }
+        return null;
+    }
+
+    public int getGroupColor() {
+        if(mGroupName == null || mGroupColor == -1) {
+          return mDiaryColor;
+        }
+        return mGroupColor;
+    }
+
+    public String getDiaryColorKey() {
+        if (mDiaryColorCache != null) {
+            if(isInGroup()) {
+                return mDiaryColorCache.getColorKey(mGroupName, mDiaryGroupId, mGroupColor);
+            }
+            return mDiaryColorCache.getColorKey(mDiaryUserId, mDiaryColor);
+        }
+        return "";
+    }
+
+    public int getDiaryColor() {
+        return mDiaryColor;
+    }
+
+    public void setDiaryColor(int color) {
+        mDiaryColor = color;
+        mDiaryColorInitialized = true;
+    }
+
+    public boolean isInGroup() {
+        if(mDiaryGroupId > 0) {
+            return true;
+        }
+        return false;
     }
 }

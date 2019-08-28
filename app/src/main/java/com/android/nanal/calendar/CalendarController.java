@@ -23,6 +23,7 @@ import android.util.Pair;
 import com.android.nanal.activity.AlertActivity;
 import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.activity.CalendarSettingsActivity;
+import com.android.nanal.activity.EditDiaryActivity;
 import com.android.nanal.activity.EditEventActivity;
 import com.android.nanal.activity.SelectVisibleCalendarsActivity;
 import com.android.nanal.activity.SettingsActivity;
@@ -85,6 +86,8 @@ public class CalendarController {
     private long mEventId = -1;
     private long mDiaryId = -1;
     private long mDateFlags = 0;
+
+    public Uri DUri = Uri.parse("content://" + "com.android.nanal" + "/diary");
 
     private CalendarController(Context context) {
         mContext = context;
@@ -473,6 +476,9 @@ public class CalendarController {
                         event.extraLong == EXTRA_CREATE_ALL_DAY, event.eventTitle,
                         event.calendarId);
                 return;
+            } else if(event.eventType == EventType.CREATE_DIARY) {
+                launchCreateDiary(event.startTime.toMillis(false), event.eventTitle);
+                return;
             } else if (event.eventType == EventType.VIEW_EVENT) {
                 launchViewEvent(event.id, event.startTime.toMillis(false), endTime,
                         event.getResponse());
@@ -647,6 +653,12 @@ public class CalendarController {
         mContext.startActivity(intent);
     }
 
+    private void launchCreateDiary(long startMillis, String title) {
+        Intent intent = generateCreateDiaryIntent(startMillis, title);
+        mDiaryId = -1;
+        mContext.startActivity(intent);
+    }
+
     public Intent generateCreateEventIntent(long startMillis, long endMillis,
                                             boolean allDayEvent, String title, long calendarId) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -659,6 +671,14 @@ public class CalendarController {
         return intent;
     }
 
+    public Intent generateCreateDiaryIntent(long startMillis, String title) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setClass(mContext, EditDiaryActivity.class);
+        intent.putExtra("mStart", startMillis);
+        intent.putExtra("mtitle", title);
+        return intent;
+    }
+
     public void launchViewEvent(long eventId, long startMillis, long endMillis, int response) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         Uri eventUri = ContentUris.withAppendedId(Events.CONTENT_URI, eventId);
@@ -667,6 +687,16 @@ public class CalendarController {
         intent.putExtra(EXTRA_EVENT_BEGIN_TIME, startMillis);
         intent.putExtra(EXTRA_EVENT_END_TIME, endMillis);
         intent.putExtra(ATTENDEE_STATUS, response);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        mContext.startActivity(intent);
+    }
+
+    public void launchViewDiary(long eventId, long day, int response) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        Uri diaryUri = ContentUris.withAppendedId(DUri, eventId);
+        intent.setData(diaryUri);
+        intent.setClass(mContext, AllInOneActivity.class);
+        intent.putExtra("day", day);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         mContext.startActivity(intent);
     }
@@ -784,6 +814,7 @@ public class CalendarController {
      */
     public interface EventType {
         final long CREATE_EVENT = 1L;
+        final long CREATE_DIARY = 1L << 15;
 
         // Simple view of an event
         // 이벤트 심플 view
@@ -855,6 +886,12 @@ public class CalendarController {
          * 데이터베이스가 변경되었음을 핸들러에게 알리고, view를 업데이트해야 함
          */
         void eventsChanged();
+    }
+
+    public interface DiaryHandler {
+        long getSupportedDiaryTypes();
+        void handleEvent(DiaryInfo diary);
+        void diariesChanged();
     }
 
     public static class EventInfo {
@@ -982,18 +1019,23 @@ public class CalendarController {
     }
 
     public static class DiaryInfo {
-        public long id; // 일기 ID
-        public long userId; // 유저 ID
-        public long groupId;
+        public int id; // 일기 ID
+        public int userId; // 유저 ID
+        public int groupId;
+
+        public long eventType;
 
         public int x;
         public int y;
-        public Time createTime;
+        public long day;
         public String query;
         public ComponentName componentName;
 
+//        public String connect;
+        public int color;
+        public String title;
         public String img;
-        public String contents;
+        public String content;
         public String weather;
         public String location;
 

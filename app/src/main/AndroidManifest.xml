@@ -294,6 +294,7 @@
             android:label="@string/preferences_title"
             android:parentActivityName=".activity.AllInOneActivity"
             />
+        <activity android:name=".activity.EditDiaryActivity"/>
     </application>
 
 </manifest>

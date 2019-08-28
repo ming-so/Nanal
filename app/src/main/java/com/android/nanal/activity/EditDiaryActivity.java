@@ -1,16 +1,21 @@
 package com.android.nanal.activity;
 
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.format.Time;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
-import com.android.nanal.calendar.CalendarController.DiaryInfo;
 import com.android.nanal.DynamicTheme;
-import com.android.nanal.diary.EditDiaryFragment;
 import com.android.nanal.R;
+import com.android.nanal.calendar.CalendarController;
+import com.android.nanal.calendar.CalendarController.DiaryInfo;
+import com.android.nanal.diary.EditDiaryFragment;
+
+import java.sql.Date;
 
 public class EditDiaryActivity extends AbstractCalendarActivity {
     public static final String EXTRA_DIARY_COLOR = "diary_color";
@@ -46,34 +51,33 @@ public class EditDiaryActivity extends AbstractCalendarActivity {
         mDiaryInfo = getmDiaryInfoFromIntent(icicle);
         mDiaryColorInitialized = getIntent().hasExtra(EXTRA_DIARY_COLOR);
         mDiaryColor = getIntent().getIntExtra(EXTRA_DIARY_COLOR, -1);
-        //Toolbar myToolbar = findViewById(R.id.toolbar);
-        //setSupportActionBar(myToolbar);
+        Toolbar myToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(myToolbar);
 
-        //mEditFragment = (EditDiaryFragment) getFragmentManager().findFragmentById(R.id.body_frame);
-        /*
-        if(mIsMultipane) {
+        mEditFragment = (EditDiaryFragment) getFragmentManager().findFragmentById(R.id.body_frame);
+
+        if (mIsMultipane) {
             getSupportActionBar().setDisplayOptions(
                     ActionBar.DISPLAY_SHOW_TITLE,
                     ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_HOME
                             | ActionBar.DISPLAY_SHOW_TITLE);
             getSupportActionBar().setTitle(
-                    mEventInfo.id == -1 ? R.string.event_create : R.string.event_edit);
-        }
-        else {
+                    mDiaryInfo.id == -1 ? R.string.diary_create : R.string.diary_edit);
+        } else {
             getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM,
-                    ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_HOME|
+                    ActionBar.DISPLAY_HOME_AS_UP | ActionBar.DISPLAY_SHOW_HOME |
                             ActionBar.DISPLAY_SHOW_TITLE | ActionBar.DISPLAY_SHOW_CUSTOM);
         }
 
         if (mEditFragment == null) {
             Intent intent = null;
             boolean readOnly = false;
-            if (mEventInfo.id == -1) {
+            if (mDiaryInfo.id == -1) {
                 intent = getIntent();
                 readOnly = intent.getBooleanExtra(EXTRA_READ_ONLY, false);
             }
 
-            mEditFragment = new EditDiaryFragment(mDiaryInfo, mReminders, mDiaryColorInitialized,
+            mEditFragment = new EditDiaryFragment(mDiaryInfo, mDiaryColorInitialized,
                     mDiaryColor, readOnly, intent);
 
             mEditFragment.mShowModifyDialogOnLaunch = getIntent().getBooleanExtra(
@@ -83,44 +87,46 @@ public class EditDiaryActivity extends AbstractCalendarActivity {
             ft.replace(R.id.body_frame, mEditFragment);
             ft.show(mEditFragment);
             ft.commit();
-        */
+        }
     }
 
     private DiaryInfo getmDiaryInfoFromIntent(Bundle icicle) {
         DiaryInfo info = new DiaryInfo();
-        long diaryId = -1;
+        int diaryId = -1;
         long qroupId = -1;
         Intent intent = getIntent();
         Uri data = intent.getData();
-        if(data != null) {
+        if (data != null) {
             try {
-                diaryId = Long.parseLong(data.getLastPathSegment());
+                diaryId = Integer.parseInt(data.getLastPathSegment());
             } catch (NumberFormatException e) {
-                if(DEBUG) {
+                if (DEBUG) {
                     Log.d(TAG, "새 일기 작성하기");
                 }
             }
-        } else if(icicle != null && icicle.containsKey(BUNDLE_KEY_DIARY_ID)) {
-            diaryId = icicle.getLong(BUNDLE_KEY_DIARY_ID);
+        } else if (icicle != null && icicle.containsKey(BUNDLE_KEY_DIARY_ID)) {
+            diaryId = icicle.getInt(BUNDLE_KEY_DIARY_ID);
         }
-        long userId = intent.getLongExtra(EXTRA_USER_ID, -1);
+        int userId = intent.getIntExtra(EXTRA_USER_ID, -1);
         long time = intent.getLongExtra(EXTRA_DIARY_TIME, -1);
-        if(time != -1) {
-            info.createTime = new Time();
-            info.createTime.set(time);
+        if (time != -1) {
+            Date d = new Date(System.currentTimeMillis());
+            info.day = d.getTime();
         }
         info.id = diaryId;
         info.userId = userId;
+        info.color = intent.getIntExtra(EXTRA_DIARY_COLOR, -1);
         info.img = intent.getStringExtra(EXTRA_IMG);
-        info.contents = intent.getStringExtra(EXTRA_CONTENTS);
+        info.content = intent.getStringExtra(EXTRA_CONTENTS);
         info.weather = intent.getStringExtra(EXTRA_WEATHER);
         info.location = intent.getStringExtra(EXTRA_LOCATION);
 
         return info;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == android.R.id.home) {
+        if (item.getItemId() == android.R.id.home) {
             //Utils.returnToCalendarHome(this);
             return true;
         }

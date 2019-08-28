@@ -87,6 +87,8 @@ import com.android.nanal.calendar.CalendarController.ViewType;
 import com.android.nanal.calendar.CalendarData;
 import com.android.nanal.calendar.LunarUtils;
 import com.android.nanal.calendar.OtherPreferences;
+import com.android.nanal.diary.Diary;
+import com.android.nanal.diary.DiaryGeometry;
 import com.android.nanal.event.DeleteEventHelper;
 import com.android.nanal.event.Event;
 import com.android.nanal.event.EventGeometry;
@@ -345,6 +347,7 @@ public class DayView extends View implements View.OnCreateContextMenuListener,
     private static boolean mShowAllAllDayEvents = false;
     private static int sCounter = 0;
     protected final EventGeometry mEventGeometry;
+    protected final DiaryGeometry mDiaryGeometry;
     protected final Resources mResources;
     protected final Drawable mCurrentTimeLine;
     protected final Drawable mCurrentTimeAnimateLine;
@@ -371,6 +374,7 @@ public class DayView extends View implements View.OnCreateContextMenuListener,
     private final DismissPopup mDismissPopup = new DismissPopup();
     private final EventLoader mEventLoader;
     private final ArrayList<Event> mSelectedEvents = new ArrayList<Event>();
+    private final ArrayList<Diary> mSelectedDiaries = new ArrayList<>();
     private final Rect mPrevBox = new Rect();
     private final DeleteEventHelper mDeleteEventHelper;
     private final ContextMenuHandler mContextMenuHandler = new ContextMenuHandler();
@@ -446,6 +450,8 @@ public class DayView extends View implements View.OnCreateContextMenuListener,
     private String mLongPressTitle;
     private Event mClickedEvent;           // The event the user clicked on
     private Event mSavedClickedEvent;
+    private Diary mClickedDiary;
+    private Diary mSavedClickedDiary;
     // Sets the "clicked" color from the clicked event
     // 클릭된 이벤트에서 "클릭된" 색상 설정
     private final Runnable mSetClick = new Runnable() {
@@ -479,6 +485,7 @@ public class DayView extends View implements View.OnCreateContextMenuListener,
     };
     private ArrayList<Event> mEvents = new ArrayList<Event>();
     private ArrayList<Event> mAllDayEvents = new ArrayList<Event>();
+    private ArrayList<Diary> mDiaries = new ArrayList<Diary>();
     private StaticLayout[] mLayouts = null;
     private StaticLayout[] mAllDayLayouts = null;
     private int mSelectionDay;        // Julian day
@@ -595,9 +602,12 @@ public class DayView extends View implements View.OnCreateContextMenuListener,
     private String[] mDayStrs2Letter;
     private boolean mIs24HourFormat;
     private boolean mComputeSelectedEvents;
+    private boolean mComputeSelectedDiaries;
     private boolean mUpdateToast;
     private Event mSelectedEvent;
     private Event mPrevSelectedEvent;
+    private Diary mSelectedDiary;
+    private Diary mPrevSelectedDiary;
     private int mTouchMode = TOUCH_MODE_INITIAL_STATE;
     private int mSelectionMode = SELECTION_HIDDEN;
     private boolean mScrolling = false;
@@ -737,6 +747,10 @@ public class DayView extends View implements View.OnCreateContextMenuListener,
         mEventGeometry.setMinEventHeight(MIN_EVENT_HEIGHT);
         mEventGeometry.setHourGap(HOUR_GAP);
         mEventGeometry.setCellMargin(DAY_GAP);
+        mDiaryGeometry = new DiaryGeometry();
+        mDiaryGeometry.setMinDiaryHeight(MIN_EVENT_HEIGHT);
+        mDiaryGeometry.setHourGap(HOUR_GAP);
+        mDiaryGeometry.setCellMargin(DAY_GAP);
         mLongPressItems = new CharSequence[] {
                 mResources.getString(R.string.new_event_dialog_option)
         };
@@ -2444,6 +2458,35 @@ public class DayView extends View implements View.OnCreateContextMenuListener,
         }
     }
 
+    private void doDrawDiary(Canvas canvas) {
+        Paint p = mPaint;
+        Rect r = mRect;
+
+        int cell = mFirstJulianDay;
+        p.setAntiAlias(false);
+        int alpha = p.getAlpha();
+        p.setAlpha(mEventsAlpha);
+        for (int day = 0; day < mNumDays; day++, cell++) {
+            // TODO Wow, this needs cleanup. drawEvents loop through all the
+            // events on every call.
+            drawEvents(cell, day, HOUR_GAP, canvas, p);
+            // If this is today
+            if (cell == mTodayJulianDay) {
+                int lineY = mCurrentTime.hour * (mCellHeight + HOUR_GAP)
+                        + ((mCurrentTime.minute * mCellHeight) / 60) + 1;
+
+                // And the current time shows up somewhere on the screen
+                if (lineY >= mViewStartY && lineY < mViewStartY + mViewHeight - 2) {
+                    drawCurrentTimeLine(r, day, lineY, canvas, p);
+                }
+            }
+        }
+        p.setAntiAlias(true);
+        p.setAlpha(alpha);
+
+        drawSelectedRect(r, canvas, p);
+    }
+
     private void doDraw(Canvas canvas) {
         Paint p = mPaint;
         Rect r = mRect;
@@ -2820,6 +2863,39 @@ public class DayView extends View implements View.OnCreateContextMenuListener,
         }
     }
 
+    private StaticLayout getDiaryLayout(StaticLayout[] layouts, int i, Diary diary, Paint paint, Rect r) {
+        if (i < 0 || i >= layouts.length) {
+            return null;
+        }
+
+        StaticLayout layout = layouts[i];
+        // Check if we have already initialized the StaticLayout and that
+        // the width hasn't changed (due to vertical resizing which causes
+        // re-layout of events at min height)
+        if (layout == null || r.width() != layout.getWidth()) {
+            SpannableStringBuilder bob = new SpannableStringBuilder();
+            if (diary.title != null) {
+                // MAX - 1 since we add a space
+                bob.append(drawTextSanitizer(diary.title.toString(), MAX_EVENT_TEXT_LEN - 1));
+                bob.setSpan(new StyleSpan(android.graphics.Typeface.BOLD), 0,
+                        bob.length(), 0);
+                bob.append(' ');
+            }
+            if (diary.location != null) {
+                bob.append(drawTextSanitizer(diary.location.toString(),
+                        MAX_EVENT_TEXT_LEN - bob.length()));
+            }
+            paint.setColor(mEventTextColor);
+
+            // Leave a one pixel boundary on the left and right of the rectangle for the event
+            layout = new StaticLayout(bob, 0, bob.length(), new TextPaint(paint), r.width(),
+                    Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true, null, r.width());
+
+            layouts[i] = layout;
+        }
+        layout.getPaint().setAlpha(mEventsAlpha);
+        return layout;
+    }
     /**
      * Return the layout for a numbered event. Create it if not already existing
      */
@@ -3109,6 +3185,64 @@ public class DayView extends View implements View.OnCreateContextMenuListener,
         }
     }
 
+    private void drawDiaries(int date, int dayIndex, int top, Canvas canvas, Paint p) {
+        Paint eventTextPaint = mEventTextPaint;
+        int left = computeDayLeftPosition(dayIndex) + 1;
+        int cellWidth = computeDayLeftPosition(dayIndex + 1) - left + 1;
+        int cellHeight = mCellHeight;
+
+        // Use the selected hour as the selection region
+        Rect selectionArea = mSelectionRect;
+        selectionArea.top = top + mSelectionHour * (cellHeight + HOUR_GAP);
+        selectionArea.bottom = selectionArea.top + cellHeight;
+        selectionArea.left = left;
+        selectionArea.right = selectionArea.left + cellWidth;
+
+        final ArrayList<Diary> diaries = mDiaries;
+        int numEvents = diaries.size();
+        DiaryGeometry geometry = mDiaryGeometry;
+
+
+        final int viewEndY = mViewStartY + mViewHeight - DAY_HEADER_HEIGHT - mAlldayHeight;
+
+        int alpha = eventTextPaint.getAlpha();
+        eventTextPaint.setAlpha(mEventsAlpha);
+        for (int i = 0; i < numEvents; i++) {
+            Diary diary = diaries.get(i);
+            if (!geometry.computeDiaryRect(date, left, top, cellWidth, diary)) {
+                continue;
+            }
+
+            // Don't draw it if it is not visible
+            if (diary.bottom < mViewStartY || diary.top > viewEndY) {
+                continue;
+            }
+
+            if (date == mSelectionDay && mComputeSelectedDiaries
+                    && geometry.diaryIntersectsSelection(diary, selectionArea)) {
+                mSelectedDiaries.add(diary);
+            }
+
+            Rect r = drawDiaryRect(diary, canvas, p, mViewStartY, viewEndY);
+            setupTextRect(r);
+
+            // Don't draw text if it is not visible
+            if (r.top > viewEndY || r.bottom < mViewStartY) {
+                continue;
+            }
+            StaticLayout layout = getDiaryLayout(mLayouts, i, diary, eventTextPaint, r);
+            // TODO: not sure why we are 4 pixels off
+            drawEventText(layout, r, canvas, mViewStartY + 4, mViewStartY + mViewHeight
+                    - DAY_HEADER_HEIGHT - mAlldayHeight, false);
+        }
+        eventTextPaint.setAlpha(alpha);
+
+        if (date == mSelectionDay && !mSelectionAllday && isFocused()
+                && mSelectionMode != SELECTION_HIDDEN) {
+            computeNeighbors();
+        }
+    }
+
     private void drawEvents(int date, int dayIndex, int top, Canvas canvas, Paint p) {
         Paint eventTextPaint = mEventTextPaint;
         int left = computeDayLeftPosition(dayIndex) + 1;
@@ -3125,6 +3259,7 @@ public class DayView extends View implements View.OnCreateContextMenuListener,
         final ArrayList<Event> events = mEvents;
         int numEvents = events.size();
         EventGeometry geometry = mEventGeometry;
+        DiaryGeometry geometryd = mDiaryGeometry;
 
         final int viewEndY = mViewStartY + mViewHeight - DAY_HEADER_HEIGHT - mAlldayHeight;
 
@@ -3451,6 +3586,85 @@ public class DayView extends View implements View.OnCreateContextMenuListener,
             ev.nextRight = rightEvent;
         }
         setSelectedEvent(startEvent);
+    }
+
+    private Rect drawDiaryRect(Diary diary, Canvas canvas, Paint p, int visibleTop, int visibleBot) {
+        // Draw the Event Rect
+        Rect r = mRect;
+        r.top = Math.max((int) diary.top + EVENT_RECT_TOP_MARGIN, visibleTop);
+        r.bottom = Math.min((int) diary.bottom - EVENT_RECT_BOTTOM_MARGIN, visibleBot);
+        r.left = (int) diary.left + EVENT_RECT_LEFT_MARGIN;
+        r.right = (int) diary.right;
+
+        int color;
+        if (diary == mClickedDiary) {
+            color = mClickedColor;
+        } else {
+            color = diary.color;
+        }
+        p.setStyle(Style.FILL_AND_STROKE);
+        p.setAntiAlias(false);
+
+        int floorHalfStroke = (int) Math.floor(EVENT_RECT_STROKE_WIDTH / 2.0f);
+        int ceilHalfStroke = (int) Math.ceil(EVENT_RECT_STROKE_WIDTH / 2.0f);
+        r.top = Math.max((int) diary.top + EVENT_RECT_TOP_MARGIN + floorHalfStroke, visibleTop);
+        r.bottom = Math.min((int) diary.bottom - EVENT_RECT_BOTTOM_MARGIN - ceilHalfStroke,
+                visibleBot);
+        r.left += floorHalfStroke;
+        r.right -= ceilHalfStroke;
+        p.setStrokeWidth(EVENT_RECT_STROKE_WIDTH);
+        p.setColor(color);
+        int alpha = p.getAlpha();
+        p.setAlpha(mEventsAlpha);
+        canvas.drawRect(r, p);
+        p.setAlpha(alpha);
+        p.setStyle(Style.FILL);
+
+        // If this event is selected, then use the selection color
+        if (mSelectedDiary == diary && mClickedDiary != null) {
+            boolean paintIt = false;
+            color = 0;
+            if (mSelectionMode == SELECTION_PRESSED) {
+                // Also, remember the last selected event that we drew
+                mPrevSelectedDiary = diary;
+                color = mPressedColor;
+                paintIt = true;
+            } else if (mSelectionMode == SELECTION_SELECTED) {
+                // Also, remember the last selected event that we drew
+                mPrevSelectedDiary = diary;
+                color = mPressedColor;
+                paintIt = true;
+            }
+
+            if (paintIt) {
+                p.setColor(color);
+                canvas.drawRect(r, p);
+            }
+            p.setAntiAlias(true);
+        }
+
+        // Draw cal color square border
+        // r.top = (int) event.top + CALENDAR_COLOR_SQUARE_V_OFFSET;
+        // r.left = (int) event.left + CALENDAR_COLOR_SQUARE_H_OFFSET;
+        // r.bottom = r.top + CALENDAR_COLOR_SQUARE_SIZE + 1;
+        // r.right = r.left + CALENDAR_COLOR_SQUARE_SIZE + 1;
+        // p.setColor(0xFFFFFFFF);
+        // canvas.drawRect(r, p);
+
+        // Draw cal color
+        // r.top++;
+        // r.left++;
+        // r.bottom--;
+        // r.right--;
+        // p.setColor(event.color);
+        // canvas.drawRect(r, p);
+
+        // Setup rect for drawEventText which follows
+        r.top = (int) diary.top + EVENT_RECT_TOP_MARGIN;
+        r.bottom = (int) diary.bottom - EVENT_RECT_BOTTOM_MARGIN;
+        r.left = (int) diary.left + EVENT_RECT_LEFT_MARGIN;
+        r.right = (int) diary.right - EVENT_RECT_RIGHT_MARGIN;
+        return r;
     }
 
     private Rect drawEventRect(Event event, Canvas canvas, Paint p, Paint eventTextPaint,

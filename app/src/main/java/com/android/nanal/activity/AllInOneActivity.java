@@ -672,7 +672,15 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                         this, EventType.CREATE_EVENT, -1, t.toMillis(true), 0, 0, 0, -1);
             }
         });
-        //todo: 다이어리 추가
+        mAddDiary.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Time t = new Time();
+                t.set(mController.getTime());
+                mController.sendEventRelatedEvent(
+                        this, EventType.CREATE_DIARY, -1, t.toMillis(true), 0, 0, 0, -1);
+            }
+        });
     }
 
 
