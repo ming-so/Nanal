@@ -13,6 +13,12 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- 일기 관련 -->
+    <string name="diary_hint_title">일기 제목</string>
+    <string name="diary_hint_content">내용을 작성하세요.</string>
+    <string name="diary_color">레이블 색상</string>
+    <string name="diary_picture">사진 추가</string>
+    <string name="diary_location_origin">장소</string>
 
     <!-- 로그인/회원가입 화면 -->
     <string name="pw_hint1">비밀번호</string>

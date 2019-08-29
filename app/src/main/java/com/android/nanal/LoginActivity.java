@@ -142,6 +142,7 @@ public class LoginActivity extends Activity {
                                     btn_login.stopProgress();
                                 } else {
                                     // 로그인 실패 횟수가 5 이상인 경우
+                                    // todo:없는 아이디로 로그인할 때 이거 뜨는 것 같음! else if 처리가 좋을 듯
                                     Toast.makeText(LoginActivity.this, R.string.pw_out, Toast.LENGTH_LONG).show();
                                     btn_login.setButtonState(ProcessButton.state.FAILURE);
                                     btn_login.stopProgress();

@@ -45,6 +45,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:ems="10"
+        android:hint="@string/diary_hint_title"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.503"
@@ -59,6 +60,8 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:ems="10"
+        android:gravity="top"
+        android:hint="@string/diary_hint_content"
         android:inputType="textMultiLine"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -80,13 +83,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:src="@drawable/ic_menu_colorpicker_dialog" />
+            android:src="@drawable/ic_color_lens_white_24dp"
+            android:tint="?android:attr/colorPrimary"
+            app:srcCompat="@drawable/ic_menu_email_holo_light" />
 
         <TextView
             android:id="@+id/tv_edit_diary_color"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:text="@string/diary_color" />
 
     </LinearLayout>
 
@@ -111,6 +118,7 @@
             android:id="@+id/sp_edit_diary_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -142,7 +150,9 @@
             android:id="@+id/tv_edit_diary_pic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:text="@string/diary_picture" />
 
     </LinearLayout>
 
@@ -167,7 +177,9 @@
             android:id="@+id/tv_edit_diary_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:text="@string/diary_location_origin" />
 
     </LinearLayout>
 
