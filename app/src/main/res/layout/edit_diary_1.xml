@@ -13,6 +13,10 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -55,7 +59,7 @@
     <EditText
         android:id="@+id/et_edit_diary_content"
         android:layout_width="0dp"
-        android:layout_height="300dp"
+        android:layout_height="350dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
@@ -80,19 +84,19 @@
 
         <ImageView
             android:id="@+id/iv_edit_diary_color"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_weight="1"
             android:src="@drawable/ic_color_lens_white_24dp"
             android:tint="?android:attr/colorPrimary"
-            app:srcCompat="@drawable/ic_menu_email_holo_light" />
+            android:layout_gravity="center" />
 
         <TextView
             android:id="@+id/tv_edit_diary_color"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_weight="1"
+            android:paddingLeft="5dp"
             android:text="@string/diary_color" />
 
     </LinearLayout>
@@ -109,10 +113,11 @@
 
         <ImageView
             android:id="@+id/iv_edit_diary_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:srcCompat="@drawable/ic_menu_email_holo_light" />
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_mode_comment_black_24dp"
+            android:tint="?android:attr/colorPrimary"
+            android:layout_gravity="center" />
 
         <Spinner
             android:id="@+id/sp_edit_diary_group"
@@ -125,34 +130,35 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/et_edit_diary_content"
-            app:layout_constraintVertical_bias="0.227" />
-    </LinearLayout>
+            app:layout_constraintVertical_bias="0.227"
+            android:paddingLeft="5dp"/>
 
+    </LinearLayout>
     <LinearLayout
         android:id="@+id/ll_edit_diary_pic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:layout_weight="1"
         android:orientation="horizontal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ll_edit_diary_group">
 
         <ImageView
             android:id="@+id/iv_edit_diary_pic"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:srcCompat="@drawable/ic_menu_email_holo_light" />
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_image_black_24dp"
+            android:tint="?android:attr/colorPrimary"
+            android:layout_gravity="center"/>
 
         <TextView
             android:id="@+id/tv_edit_diary_pic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:text="@string/diary_picture" />
+            android:text="@string/diary_picture"
+            android:paddingLeft="5dp"/>
 
     </LinearLayout>
 
@@ -168,19 +174,21 @@
 
         <ImageView
             android:id="@+id/iv_edit_diary_weather"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:srcCompat="@drawable/ic_menu_email_holo_light" />
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            app:srcCompat="@drawable/ic_wb_sunny_black_24dp"
+            android:tint="?android:attr/colorPrimary"
+            android:layout_gravity="center" />
 
         <TextView
             android:id="@+id/tv_edit_diary_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:text="@string/diary_location_origin" />
+            android:text="@string/diary_location_origin"
+            android:paddingLeft="5dp"/>
 
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
+</ScrollView>

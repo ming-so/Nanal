@@ -69,6 +69,7 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
     ArrayList<View> mEditOnlyList = new ArrayList<View>();
     ArrayList<View> mEditViewList = new ArrayList<View>();
     ArrayList<View> mViewOnlyList = new ArrayList<View>();
+//    ArrayList<Group>
     TextView mLoadingMessage;
     ScrollView mScrollView;
     TextView mTvDay, mTvColor, mTvPic, mTvLocation;

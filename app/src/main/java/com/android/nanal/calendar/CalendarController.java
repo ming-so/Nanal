@@ -20,6 +20,7 @@ import android.text.format.Time;
 import android.util.Log;
 import android.util.Pair;
 
+import com.android.nanal.GroupActivity;
 import com.android.nanal.activity.AlertActivity;
 import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.activity.CalendarSettingsActivity;
@@ -453,6 +454,7 @@ public class CalendarController {
             }
 
             if(event.eventType == EventType.LAUNCH_GROUP) {
+                launchGroups();
                 return;
             }
 
@@ -642,6 +644,12 @@ public class CalendarController {
         //todo: GeneralPreferences(fragment)로 이동
         intent.setClass(mContext, SettingsActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        mContext.startActivity(intent);
+    }
+
+    private void launchGroups() {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setClass(mContext, GroupActivity.class);
         mContext.startActivity(intent);
     }
 
