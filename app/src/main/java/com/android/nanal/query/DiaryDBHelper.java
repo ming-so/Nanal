@@ -13,13 +13,26 @@ public class DiaryDBHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String sql = "CREATE TABLE diary (" +
-                "'diary_id'" +
-                //todo:테이블 쿼리문 추가
+                "'diary_id' INTEGER PRIMARY KEY NOT NULL, " +
+                "'account_id' VARCHAR(12) NOT NULL, " +
+                "'connect_type' CHAR(1) NOT NULL, " +
+                "'color' INTEGER, " +
+                "'location' VARCHAR(20), " +
+                "'day' DATE NOT NULL, " +
+                "'title' VARCHAR(10), "+
+                "'content' TEXT, "+
+                "'weather' VARCHAR(10), "+
+                "'image' VARCHAR(20), "+
+                "'group_id' INTEGER"+
                 ");";
+        db.execSQL(sql);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        String sql = "DROP TABLE IF EXISTS diary";
+        db.execSQL(sql);
 
+        onCreate(db);
     }
 }

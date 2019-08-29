@@ -104,6 +104,8 @@ public class GeneralPreferences extends PreferenceFragment implements
     public static final String KEY_DETAILED_VIEW = "preferred_detailedView";
     public static final String KEY_DEFAULT_CALENDAR = "preference_defaultCalendar";
 
+    public static final String KEY_DEFAULT_GROUP = "preference_defaultGroup";
+
     /** Key to preference for default new event duration (if provider doesn't indicate one)
      * 기본 새 이벤트 지속 시간에 대한 Preference 키(제공자가 해당 이벤트를 표시하지 않는 경우) */
     public static final String KEY_DEFAULT_EVENT_DURATION = "preferences_default_event_duration";

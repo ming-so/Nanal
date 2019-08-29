@@ -80,14 +80,14 @@ public class Diary implements Cloneable {
             "diary_id",
             "account_id",
             "connect_type",
-            "group_id",
             "color",
             "location",
             "day",
             "title",
             "content",
             "weather",
-            "image"
+            "image",
+            "group_id",
     };
 
     // The indices for the projection array above.
@@ -95,30 +95,31 @@ public class Diary implements Cloneable {
     private static final int PROJECTION_DIARY_ID_INDEX = 0;
     private static final int PROJECTION_ACCOUNT_ID_INDEX = 1;
     private static final int PROJECTION_CONNECT_TYPE_INDEX = 2;
-    private static final int PROJECTION_GROUP_ID_INDEX = 3;
-    private static final int PROJECTION_COLOR_INDEX = 4;
-    private static final int PROJECTION_LOCATION_INDEX = 5;
-    private static final int PROJECTION_DAY_INDEX = 6;
-    private static final int PROJECTION_TITLE_INDEX = 7;
-    private static final int PROJECTION_CONTENT_INDEX = 9;
-    private static final int PROJECTION_WEATHER_INDEX = 10;
-    private static final int PROJECTION_IMAGE_INDEX = 11;
+    private static final int PROJECTION_COLOR_INDEX = 3;
+    private static final int PROJECTION_LOCATION_INDEX = 4;
+    private static final int PROJECTION_DAY_INDEX = 5;
+    private static final int PROJECTION_TITLE_INDEX = 6;
+    private static final int PROJECTION_CONTENT_INDEX = 7;
+    private static final int PROJECTION_WEATHER_INDEX = 8;
+    private static final int PROJECTION_IMAGE_INDEX = 9;
+    private static final int PROJECTION_GROUP_ID_INDEX = 10;
 
     private static String mNoTitleString;
+    private static String mNoContentString;
     private static int mNoColorColor;
 
 
-    public long id;
+    public int id;
     public String account_id;
     public String connect;
-    public int group_id;
     public int color;
     public String location;
-    public int day;
+    public long day;
     public String title;
     public String content;
     public String weather;
     public String img;
+    public int group_id;
 
     // The coordinates of the event rectangle drawn on the screen.
     // 화면에 그려진 이벤트 사각형의 좌표
@@ -140,17 +141,17 @@ public class Diary implements Cloneable {
     public static final Diary newInstance() {
         Diary d = new Diary();
 
-        d.id = 0;
+        d.id = -1;
         d.account_id = "";
         d.connect = "";
-        d.group_id = 0;
-        d.color = 0;
+        d.color = -1;
         d.location = "";
-        d.day = 0;
+        d.day = -1;
         d.title = "";
         d.content = "";
         d.weather = "";
         d.img = "";
+        d.group_id = -1;
 
         return d;
     }
@@ -305,6 +306,7 @@ public class Diary implements Cloneable {
 
         Resources res = context.getResources();
         mNoTitleString = res.getString(R.string.no_title_label);
+        mNoContentString = res.getString(R.string.no_content_label);
         mNoColorColor = res.getColor(R.color.event_center);
         // Sort events in two passes so we ensure the allday and standard events
         // get sorted in the correct order
@@ -334,17 +336,21 @@ public class Diary implements Cloneable {
         e.id = cDiaries.getInt(PROJECTION_DIARY_ID_INDEX);
         e.account_id = cDiaries.getString(PROJECTION_ACCOUNT_ID_INDEX);
         e.connect = cDiaries.getString(PROJECTION_CONNECT_TYPE_INDEX);
-        e.group_id = cDiaries.getInt(PROJECTION_GROUP_ID_INDEX);
         e.color = cDiaries.getInt(PROJECTION_COLOR_INDEX);
         e.location = cDiaries.getString(PROJECTION_LOCATION_INDEX);
         e.day = cDiaries.getInt(PROJECTION_DAY_INDEX);
         e.title = cDiaries.getString(PROJECTION_TITLE_INDEX);
+        e.content = cDiaries.getString(PROJECTION_CONTENT_INDEX);
         e.weather = cDiaries.getString(PROJECTION_WEATHER_INDEX);
         e.img = cDiaries.getString(PROJECTION_IMAGE_INDEX);
+        e.group_id = cDiaries.getInt(PROJECTION_GROUP_ID_INDEX);
 
         // todo:비어 있는 거 처리할 텍스트 추가
         if (e.title == null || e.title.length() == 0) {
             e.title = mNoTitleString;
+        }
+        if(e.content == null || e.content.length() <= 0) {
+            e.content = mNoContentString;
         }
 
         if (!cDiaries.isNull(PROJECTION_COLOR_INDEX)) {
@@ -505,7 +511,7 @@ public class Diary implements Cloneable {
         mMaxColumns = maxColumns;
     }
 
-    public int getDay() {
+    public long getDay() {
         return day;
     }
 
