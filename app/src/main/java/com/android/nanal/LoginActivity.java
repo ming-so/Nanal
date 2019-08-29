@@ -86,27 +86,26 @@ public class LoginActivity extends Activity {
                         }
                         if (isSignup) {
                             // 회원가입 처리
-                            // SignUpHelper 클래스에서 처리하고 switch문으로 return값 처리도 괜찮을 것 같음
                             String id = et_email.getText().toString();
                             String password = et_pw.getText().toString();
-                            String result = "false";
+                            String result = "fail";
 
                             try {
                                 SignUpHelper signUpHelper = new SignUpHelper();
                                 result = (String) signUpHelper.execute(id, password).get();
 
-                                if (result.equals("true")) {
+                                if (result.equals("0")) {
                                     // 회원가입 성공했을 경우
                                     btn_login.setButtonState(ProcessButton.state.SUCCESS);
                                     btn_login.stopProgress();
-                                } else if(result.equals("false")) {
+                                } else if (result.equals("1")) {
                                     // 이미 존재하는 아이디인 경우
                                     Toast.makeText(LoginActivity.this, R.string.email_exist, Toast.LENGTH_LONG).show();
                                     btn_login.setButtonState(ProcessButton.state.FAILURE);
                                     btn_login.stopProgress();
                                 } else {
                                     // 회원가입 실패했을 경우
-                                    Toast.makeText(LoginActivity.this, R.string.signup_error, Toast.LENGTH_LONG).show();
+                                    Toast.makeText(LoginActivity.this, R.string.signup_fail, Toast.LENGTH_LONG).show();
                                     btn_login.setButtonState(ProcessButton.state.FAILURE);
                                     btn_login.stopProgress();
                                 }
@@ -119,30 +118,35 @@ public class LoginActivity extends Activity {
                             // 로그인 처리
                             String id = et_email.getText().toString();
                             String password = et_pw.getText().toString();
-                            String result = "false";
+                            String result = "fail";
 
                             try {
                                 LoginHelper loginHelper = new LoginHelper();
                                 result = (String) loginHelper.execute(id, password).get();
 
-                                if (result.equals("true")) {
+                                if (result.equals("0")) {
                                     // 로그인 성공했을 경우
                                     btn_login.setButtonState(ProcessButton.state.SUCCESS);
                                     btn_login.stopProgress();
                                     goHome();
-                                } else if(result.equals("iderr")) {
+                                } else if (result.equals("1")) {
                                     // 아이디 틀린 경우
                                     Toast.makeText(LoginActivity.this, R.string.email_diff, Toast.LENGTH_LONG).show();
                                     btn_login.setButtonState(ProcessButton.state.FAILURE);
                                     btn_login.stopProgress();
-                                } else if(result.equals("passerr")) {
+                                } else if (result.equals("3")) {
                                     // 비밀번호 틀린 경우
                                     Toast.makeText(LoginActivity.this, R.string.pw_diff, Toast.LENGTH_LONG).show();
                                     btn_login.setButtonState(ProcessButton.state.FAILURE);
                                     btn_login.stopProgress();
-                                } else {
+                                } else if (result.equals("2")) {
                                     // 로그인 실패 횟수가 5 이상인 경우
                                     Toast.makeText(LoginActivity.this, R.string.pw_out, Toast.LENGTH_LONG).show();
+                                    btn_login.setButtonState(ProcessButton.state.FAILURE);
+                                    btn_login.stopProgress();
+                                } else {
+                                    // 로그인 실패했을 경우
+                                    Toast.makeText(LoginActivity.this, R.string.login_fail, Toast.LENGTH_LONG).show();
                                     btn_login.setButtonState(ProcessButton.state.FAILURE);
                                     btn_login.stopProgress();
                                 }
