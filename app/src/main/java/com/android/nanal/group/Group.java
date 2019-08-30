@@ -47,5 +47,9 @@ public class Group {
         this.account_id = account_id;
     }
 
+    public static final Group newInstance() {
+        Group g = new Group(-1, "", -1, "");
+        return g;
+    }
 
 }

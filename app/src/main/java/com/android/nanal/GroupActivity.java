@@ -1,6 +1,7 @@
 package com.android.nanal;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,5 +24,19 @@ public class GroupActivity extends Activity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         GroupListAdapter groupListAdapter = new GroupListAdapter(groups);
         recyclerView.setAdapter(groupListAdapter);
+
+
+    }
+
+    class GroupTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            return null;
+        }
     }
 }

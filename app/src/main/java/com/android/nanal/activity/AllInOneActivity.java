@@ -89,6 +89,7 @@ import com.android.nanal.datetimepicker.date.DatePickerDialog;
 import com.android.nanal.event.EventInfoFragment;
 import com.android.nanal.event.GeneralPreferences;
 import com.android.nanal.event.Utils;
+import com.android.nanal.group.GroupFragment;
 import com.android.nanal.interfaces.AllInOneMenuExtensionsInterface;
 import com.android.nanal.month.MonthByWeekFragment;
 import com.getbase.floatingactionbutton.FloatingActionButton;
@@ -490,7 +491,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                         break;
                     case R.id.action_group:
                         // mode 3
-                        mController.sendEvent(this, EventType.LAUNCH_GROUP, null, null, 0, 0);
+                        mController.sendEvent(this, EventType.GO_TO, null, null, 0, ViewType.GROUP);
                         selectedMode = 3;
                         break;
                     case R.id.action_settings:
@@ -1270,6 +1271,11 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             case ViewType.TODAY:
                 frag = new TodayFragment(timeMillis);
                 mFAB.setVisibility(View.GONE);
+                break;
+            case ViewType.GROUP:
+                frag = new GroupFragment();
+                mFAB.setVisibility(View.VISIBLE);
+                // todo: FAB 버튼 바꾸기
                 break;
             case ViewType.WEEK:
             default:

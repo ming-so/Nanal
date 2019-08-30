@@ -8,9 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.nanal.R;
+import com.android.nanal.query.GroupAsyncTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +22,12 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
     private List<Group> groupList;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        LinearLayout group_wrapper;
         ImageView group_icon;
         TextView group_name;
         ViewHolder(View itemView) {
             super(itemView);
+            group_wrapper = itemView.findViewById(R.id.ll_group_wrapper);
             group_icon = itemView.findViewById(R.id.iv_group_list);
             group_name = itemView.findViewById(R.id.tv_group_list);
         }
@@ -43,7 +48,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int i) {
         Group group = groupList.get(i);
         viewHolder.group_name.setText(group.group_name);
         switch (group.group_color) {
@@ -73,6 +78,17 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
                         viewHolder.group_icon.getContext(), R.color.colorPurpleAccent));
                 break;
         }
+        viewHolder.group_wrapper.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Context context = v.getContext();
+                Toast.makeText(context, "선택 > "+i, Toast.LENGTH_LONG).show();
+
+                String result;
+                GroupAsyncTask asyncTask = new GroupAsyncTask();
+//                result = asyncTask.execute("")
+            }
+        });
     }
 
     @Override

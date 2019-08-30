@@ -453,11 +453,6 @@ public class CalendarController {
                 return;
             }
 
-            if(event.eventType == EventType.LAUNCH_GROUP) {
-                launchGroups();
-                return;
-            }
-
             if(event.eventType == EventType.LAUNCH_SETTINGS_DIRECT) {
                 launchSettingsDirectly();
                 return;
@@ -863,6 +858,7 @@ public class CalendarController {
         final long LAUNCH_SETTINGS_DIRECT = 1L << 13;
 
         final long LAUNCH_GROUP = 1L << 14;
+        final long GROUPS_CHANGED = 1L << 15;
 
     }
 
@@ -879,7 +875,8 @@ public class CalendarController {
         final int MONTH = 4;
         final int EDIT = 5;
         final int TODAY = 6;
-        final int MAX_VALUE = 6;
+        final int GROUP = 7;
+        final int MAX_VALUE = 7;
 
     }
 
@@ -900,6 +897,12 @@ public class CalendarController {
         long getSupportedDiaryTypes();
         void handleEvent(DiaryInfo diary);
         void diariesChanged();
+    }
+
+    public interface GroupHandler {
+        long getSupportedGroupTypes();
+        void handleEvent(GroupInfo group);
+        void groupsChanged();
     }
 
     public static class EventInfo {
@@ -1053,5 +1056,14 @@ public class CalendarController {
             }
             return true;
         }
+    }
+
+    public static class GroupInfo {
+        public int group_id;
+        public String group_name;
+        public int group_color;
+        public String account_id;
+
+        public long eventType;
     }
 }
