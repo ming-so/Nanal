@@ -340,6 +340,7 @@
     <!-- This is a label on a menu item. Pressing this menu item shows the
          View settings menu [CHAR LIMIT=20] -->
     <string name="view_settings">"보기 설정"</string>
+    <string name="menu_logout">로그아웃</string>
 
 
     <!-- Month view -->
