@@ -13,6 +13,9 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- 그룹 관련 -->
+    <string name="group_hint_title">그룹명</string>
+    <string name="group_color">그룹 색상</string>
     <!-- 일기 관련 -->
     <string name="diary_hint_title">일기 제목</string>
     <string name="diary_hint_content">내용을 작성하세요.</string>
@@ -297,6 +300,7 @@
     <!-- This is a label on a menu item. Pressing this menu item displays the
          details of an event. -->
     <string name="today_view">"오늘"</string>
+    <string name="group_view">"그룹"</string>
     <string name="event_view">"일정 보기"</string>
     <!-- This is a label on a menu item. Pressing this menu item allows the
          user to create a new event. -->

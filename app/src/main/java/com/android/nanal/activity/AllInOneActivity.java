@@ -258,6 +258,8 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
     public int selectedMode = 1;
 
+    private boolean isGroupMenu = false;
+
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -584,6 +586,9 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 case ViewType.TODAY:
                     titleResource = R.string.today_view;
                     break;
+                case ViewType.GROUP:
+                    titleResource = R.string.group_view;
+                    break;
                 case ViewType.WEEK:
                 default:
                     titleResource = R.string.week_view;
@@ -639,47 +644,51 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     }
 
     public void setupFloatingActionButton() {
-//        mFab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                //Create new Event
-//                Time t = new Time();
-//                t.set(mController.getTime());
-//                t.second = 0;
-//                if (t.minute > 30) {
-//                    t.hour++;
-//                    t.minute = 0;
-//                } else if (t.minute > 0 && t.minute < 30) {
-//                    t.minute = 30;
-//                }
-//                mController.sendEventRelatedEvent(
-//                        this, EventType.CREATE_EVENT, -1, t.toMillis(true), 0, 0, 0, -1);
-//            }
-//        });
+        if(!isGroupMenu) {
+            mAddCalendar.setVisibility(View.GONE);
+            mAddDiary.setVisibility(View.GONE);
+            mFAB.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mController.sendEventRelatedEvent(
+                            this, EventType.CREATE_GROUP, -1, -1, 0, 0, 0, -1);
+                }
+            });
+        }
         mAddCalendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //Create new Event
-                Time t = new Time();
-                t.set(mController.getTime());
-                t.second = 0;
-                if (t.minute > 30) {
-                    t.hour++;
-                    t.minute = 0;
-                } else if (t.minute > 0 && t.minute < 30) {
-                    t.minute = 30;
+                if (!isGroupMenu) {
+                    Time t = new Time();
+                    t.set(mController.getTime());
+                    t.second = 0;
+                    if (t.minute > 30) {
+                        t.hour++;
+                        t.minute = 0;
+                    } else if (t.minute > 0 && t.minute < 30) {
+                        t.minute = 30;
+                    }
+                    mController.sendEventRelatedEvent(
+                            this, EventType.CREATE_EVENT, -1, t.toMillis(true), 0, 0, 0, -1);
                 }
-                mController.sendEventRelatedEvent(
-                        this, EventType.CREATE_EVENT, -1, t.toMillis(true), 0, 0, 0, -1);
+                else {
+                    // 그룹 추가
+                }
             }
         });
+
         mAddDiary.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Time t = new Time();
-                t.set(mController.getTime());
-                mController.sendEventRelatedEvent(
-                        this, EventType.CREATE_DIARY, -1, t.toMillis(true), 0, 0, 0, -1);
+                if (!isGroupMenu) {
+                    Time t = new Time();
+                    t.set(mController.getTime());
+                    mController.sendEventRelatedEvent(
+                            this, EventType.CREATE_DIARY, -1, t.toMillis(true), 0, 0, 0, -1);
+                } else {
+
+                }
             }
         });
     }
@@ -1248,6 +1257,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                     mToolbar.setTitle(R.string.agenda_view);
                 }
                 mFAB.setVisibility(View.VISIBLE);
+                isGroupMenu = false;
                 break;
             case ViewType.DAY:
                 //mNavigationView.getMenu().findItem(R.id.day_menu_item).setChecked(true);
@@ -1256,6 +1266,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                     mToolbar.setTitle(R.string.day_view);
                 }
                 mFAB.setVisibility(View.VISIBLE);
+                isGroupMenu = false;
                 break;
             case ViewType.MONTH:
                 //mNavigationView.getMenu().findItem(R.id.month_menu_item).setChecked(true);
@@ -1267,15 +1278,18 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                     mToolbar.setTitle(R.string.month_view);
                 }
                 mFAB.setVisibility(View.VISIBLE);
+                isGroupMenu = false;
                 break;
             case ViewType.TODAY:
                 frag = new TodayFragment(timeMillis);
                 mFAB.setVisibility(View.GONE);
+                isGroupMenu = false;
                 break;
             case ViewType.GROUP:
                 frag = new GroupFragment();
                 mFAB.setVisibility(View.VISIBLE);
                 // todo: FAB 버튼 바꾸기
+                isGroupMenu = true;
                 break;
             case ViewType.WEEK:
             default:
@@ -1285,6 +1299,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                     mToolbar.setTitle(R.string.week_view);
                 }
                 mFAB.setVisibility(View.VISIBLE);
+                isGroupMenu = false;
                 break;
         }
         // Update the current view so that the menu can update its look according to the
@@ -1730,5 +1745,5 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                     }, null);
         }
     }
-
 }
+
