@@ -1164,6 +1164,12 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 mController.sendEvent(this, EventType.LAUNCH_SETTINGS, null, null, 0, 0);
                 break;
             case R.id.test:
+                SharedPreferences loginPref = getSharedPreferences("login_setting", MODE_PRIVATE);
+                SharedPreferences.Editor editor = loginPref.edit();
+                editor.remove("loginId");
+                editor.remove("loginPw");
+                editor.commit();
+
                 Intent intent = new Intent(AllInOneActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();

@@ -2,6 +2,7 @@ package com.android.nanal;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
@@ -42,6 +43,29 @@ public class LoginActivity extends Activity {
         et_email = findViewById(R.id.et_email);
         et_pw = findViewById(R.id.et_pw);
 
+        // 자동 로그인
+        final SharedPreferences loginPref = getSharedPreferences("login_setting", MODE_PRIVATE);
+
+        String loginId = loginPref.getString("loginId", null);
+        String loginPw = loginPref.getString("loginPw", null);
+
+        if (loginId != null && loginPw != null) {
+            LoginHelper loginHelper = new LoginHelper();
+            String result = null;
+            try {
+                result = (String) loginHelper.execute(loginId, loginPw).get();
+
+                if (result.equals("0")) {
+                    // 로그인 성공했을 경우
+                    goHome();
+                }
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         tv_inform.setText(getString(R.string.sign));
         btn_login.setBtnText(getString(R.string.button_login));
         tv_inform.setPaintFlags(tv_inform.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
@@ -53,7 +77,6 @@ public class LoginActivity extends Activity {
         ll_login.setBackgroundColor(getResources().getColor(DynamicTheme.getColorId(selectedColorName)));
         // 상단바 색상 변경
         getWindow().setStatusBarColor(getResources().getColor(DynamicTheme.getColorId(selectedColorName)));
-
 
         btn_login.setProgressActivated(false);
         btn_login.setIntepolator(ProcessButton.interpolators.INTERPOLATOR_ACCELERATEDECELERATE);
@@ -98,6 +121,9 @@ public class LoginActivity extends Activity {
                                     // 회원가입 성공했을 경우
                                     btn_login.setButtonState(ProcessButton.state.SUCCESS);
                                     btn_login.stopProgress();
+
+                                    //MailSender mailSender = new MailSender();
+                                    //mailSender.execute(id);
                                 } else if (result.equals("1")) {
                                     // 이미 존재하는 아이디인 경우
                                     Toast.makeText(LoginActivity.this, R.string.email_exist, Toast.LENGTH_LONG).show();
@@ -116,6 +142,7 @@ public class LoginActivity extends Activity {
                             }
                         } else {
                             // 로그인 처리
+                            // 로그인 처리 중 가끔 null 리턴하는 것 고치기
                             String id = et_email.getText().toString();
                             String password = et_pw.getText().toString();
                             String result = "fail";
@@ -128,6 +155,12 @@ public class LoginActivity extends Activity {
                                     // 로그인 성공했을 경우
                                     btn_login.setButtonState(ProcessButton.state.SUCCESS);
                                     btn_login.stopProgress();
+
+                                    SharedPreferences.Editor editor = loginPref.edit();
+                                    editor.putString("loginId", id);
+                                    editor.putString("loginPw", password);
+                                    editor.commit();
+
                                     goHome();
                                 } else if (result.equals("1")) {
                                     // 아이디 틀린 경우
@@ -160,7 +193,9 @@ public class LoginActivity extends Activity {
                 }, 1000);
             }
         });
+
     }
+
     public void goHome() {
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -173,7 +208,7 @@ public class LoginActivity extends Activity {
     }
 
     public void ModeSwitch(View v) {
-        if(isSignup) {
+        if (isSignup) {
             // 회원가입 화면을 보여 주고 있다면 로그인으로 전환
             tv_inform.setText(getString(R.string.sign));
             et_pw.setHint(R.string.pw_hint1);
