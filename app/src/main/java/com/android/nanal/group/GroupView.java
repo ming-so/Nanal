@@ -12,8 +12,6 @@ import android.widget.ViewSwitcher;
 import com.android.nanal.R;
 import com.android.nanal.calendar.CalendarController;
 
-import java.util.ArrayList;
-
 public class GroupView extends View {
     private static final int INVALID_GROUP_ID = -1;
 
@@ -26,27 +24,17 @@ public class GroupView extends View {
     protected boolean mPaused = true;
     private int mLastPopupGroupID;
 
+    static RecyclerView recyclerView;
+    static GroupListAdapter groupListAdapter;
+
     public GroupView(Context context, CalendarController controller,
                      ViewSwitcher viewSwitcher) {
         super(context);
         mContext = context;
         mResources = getResources();
 
-        ArrayList<Group> groups = new ArrayList<>();
-        groups.add(new Group(1, "test", 2, "test"));
-
-        RecyclerView recyclerView = findViewById(R.id.rv_group);
+        recyclerView = findViewById(R.id.rv_group);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        GroupListAdapter groupListAdapter = new GroupListAdapter(groups);
-        recyclerView.setAdapter(groupListAdapter);
-    }
-
-    static Group getNewGroup(int groupId, String groupName, int groupColor) {
-        Group group = Group.newInstance();
-        group.group_id = groupId;
-        group.group_name = groupName;
-        group.group_color = groupColor;
-        return group;
     }
 
     @Override

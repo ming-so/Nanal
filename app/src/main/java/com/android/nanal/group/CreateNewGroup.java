@@ -1,4 +1,4 @@
-package com.android.nanal.query;
+package com.android.nanal.group;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -11,14 +11,14 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class GroupAsyncTask extends AsyncTask<String, String, String> {
-    String sendMsg, receiveMsg;
+public class CreateNewGroup extends AsyncTask<String, String, String> {
 
     @Override
     protected String doInBackground(String... strings) {
+        String str, sendMsg, receiveMsg = "";
+        Log.d("CreateNewGroup", "doInBackground");
         try {
-            String str;
-            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/GroupAsync.jsp");
+            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/GroupCreate.jsp");
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -40,6 +40,8 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
                 receiveMsg = buffer.toString();
                 tmp.close();
                 reader.close();
+                Log.d("CreateNewGroup", "doInBackground 완료");
+                Log.d("CreateNewGroup", receiveMsg);
             } else {
                 Log.i("통신 결과", conn.getResponseCode() + "에러");
             }
@@ -49,5 +51,11 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
             e.printStackTrace();
         }
         return receiveMsg;
+    }
+
+    @Override
+    protected void onPostExecute(String s) {
+        super.onPostExecute(s);
+
     }
 }

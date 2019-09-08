@@ -24,6 +24,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.nanal.CreateNanalCalendar;
 import com.android.nanal.R;
 import com.android.nanal.calendar.CalendarController;
 import com.android.nanal.calendar.CalendarController.EventType;
@@ -227,7 +228,7 @@ public class CreateDiaryDialogFragment extends DialogFragment implements TextWat
                     })
                     .setNegativeButton(android.R.string.no, null);
             builder.show();
-            //CreateNanalCalendar.CreateCalendar(getActivity(), connectID, connectID);
+            CreateNanalCalendar.CreateCalendar(getActivity(), connectID, connectID);
             return;
         }
 

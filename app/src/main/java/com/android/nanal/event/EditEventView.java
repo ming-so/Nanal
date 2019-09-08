@@ -67,6 +67,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
+import com.android.nanal.CreateNanalCalendar;
 import com.android.nanal.EmailAddressAdapter;
 import com.android.nanal.R;
 import com.android.nanal.RecipientAdapter;
@@ -1125,7 +1126,7 @@ public class EditEventView implements View.OnClickListener, DialogInterface.OnCa
                     .setPositiveButton(R.string.add_account, this)
                     .setNegativeButton(android.R.string.no, this).setOnCancelListener(this);
             mNoCalendarsDialog = builder.show();
-//            CreateNanalCalendar.CreateCalendar(this.mActivity.getApplicationContext(), connectID, connectID);
+            CreateNanalCalendar.CreateCalendar(this.mActivity.getApplicationContext(), connectID, connectID);
             return;
         }
 
@@ -1473,7 +1474,8 @@ public class EditEventView implements View.OnClickListener, DialogInterface.OnCa
     }
 
     public void setColorPickerButtonStates(int[] colorArray) {
-        setColorPickerButtonStates(colorArray != null && colorArray.length > 0);
+//        setColorPickerButtonStates(colorArray != null && colorArray.length > 0);
+        setColorPickerButtonStates(true);
     }
 
     public void setColorPickerButtonStates(boolean showColorPalette) {

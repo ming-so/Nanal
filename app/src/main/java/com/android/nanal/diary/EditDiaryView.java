@@ -35,7 +35,6 @@ import com.android.nanal.Rfc822InputFilter;
 import com.android.nanal.calendar.CalendarDiaryModel;
 import com.android.nanal.chips.AccountSpecifier;
 import com.android.nanal.diary.EditDiaryHelper.EditDoneRunnable;
-import com.android.nanal.event.EventInfoFragment;
 import com.android.nanal.event.GeneralPreferences;
 import com.android.nanal.event.Utils;
 import com.android.nanal.timezonepicker.TimeZoneInfo;
@@ -241,9 +240,6 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
         if(TextUtils.isEmpty(mModel.mDiaryContent)) {
             mModel.mDiaryContent = null;
         }
-
-        int status = EventInfoFragment.getResponseFromButtonId(mResponseRadioGroup
-                .getCheckedRadioButtonId());
 
         // If this was a new event we need to fill in the Calendar information
         if (mModel.mUri == null) {

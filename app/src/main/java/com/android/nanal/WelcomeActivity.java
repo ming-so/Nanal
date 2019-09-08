@@ -91,6 +91,7 @@ public class WelcomeActivity extends Activity {
                 }
             }
         });
+//        CreateNanalCalendar.DeleteCalendar(this.getApplicationContext(), "test", "test");
     }
 
     private void addBottomDots(int currentPage) {

@@ -49,7 +49,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int i) {
-        Group group = groupList.get(i);
+        final Group group = groupList.get(i);
         viewHolder.group_name.setText(group.group_name);
         switch (group.group_color) {
             case 1:
@@ -82,7 +82,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
             @Override
             public void onClick(View v) {
                 Context context = v.getContext();
-                Toast.makeText(context, "선택 > "+i, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "선택 > "+group.group_id, Toast.LENGTH_LONG).show();
 
                 String result;
                 GroupAsyncTask asyncTask = new GroupAsyncTask();

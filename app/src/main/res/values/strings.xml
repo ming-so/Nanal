@@ -14,7 +14,7 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- 그룹 관련 -->
-    <string name="group_hint_title">그룹명</string>
+    <string name="group_hint_name">그룹명</string>
     <string name="group_color">그룹 색상</string>
     <!-- 일기 관련 -->
     <string name="diary_hint_title">일기 제목</string>
@@ -314,6 +314,10 @@
     <string name="diary_create">"일기 작성"</string>
     <string name="diary_edit">"일기 수정"</string>
     <string name="diary_delete">"일기 삭제"</string>
+
+    <string name="group_create">"그룹 생성"</string>
+    <string name="group_edit">"그룹 수정"</string>
+    <string name="group_delete">"그룹 삭제"</string>
     <string name="share_label">공유</string>
     <!-- This is a label on a menu item. Pressing this menu
          item takes the user to the current day (today) in whatever view
@@ -408,6 +412,10 @@
     <string name="saving_diary">"일기를 저장했습니다."</string>
     <string name="empty_diary">"빈 일기는 만들 수 없습니다."</string>
 
+    <string name="creating_group">"그룹을 생성했습니다."</string>
+    <string name="saving_group">"그룹을 저장했습니다."</string>
+    <string name="empty_group">"빈 그룹은 만들 수 없습니다."</string>
+
     <!-- Toast message displayed responding to an event from an email as accepted
      [CHAR LIMIT=50] -->
     <string name="rsvp_accepted">"승낙했습니다."</string>
@@ -499,6 +507,9 @@
     <string name="choose_diary_color_label">일기 색상 선택</string>
     <string name="diary_color_picker_dialog_title">일기 색상</string>
     <string name="diary_color_set_to_default">기본 일기 색상으로 설정</string>
+
+    <string name="choose_group_color_label">그룹 색상 선택</string>
+    <string name="group_color_picker_dialog_title">그룹 색상</string>
 
     <!-- Title for calendar color picker dialog -->
     <string name="calendar_color_picker_dialog_title">캘린더 색상</string>
@@ -696,6 +707,7 @@
          this operation. -->
     <string name="delete_recurring_event_title">"<xliff:g id="eventtitle">%s</xliff:g>을(를) 삭제하시겠습니까?"</string>
     <string name="delete_this_diary_title">해당 일기를 삭제하시겠습니까?</string>
+    <string name="delete_this_group_title">해당 그룹을 삭제하시겠습니까?</string>
     <string name="delete_recurring_diary_title">"<xliff:g id="diarytitle">%s</xliff:g>을(를) 삭제하시겠습니까?</string>
     <!-- This is the title of a popup dialog that asks for confirmation before
          changing the response to an invitation. -->

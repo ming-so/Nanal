@@ -203,6 +203,7 @@ public class EditEventHelper {
     static final String COLORS_WHERE = Colors.ACCOUNT_NAME + "=? AND " + Colors.ACCOUNT_TYPE +
             "=? AND " + Colors.COLOR_TYPE + "=" + Colors.TYPE_EVENT;
 
+
     static final int COLORS_INDEX_ACCOUNT_NAME = 1;
     static final int COLORS_INDEX_ACCOUNT_TYPE = 2;
     static final int COLORS_INDEX_COLOR = 3;
