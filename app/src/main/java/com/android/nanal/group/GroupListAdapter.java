@@ -13,7 +13,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.nanal.R;
-import com.android.nanal.query.GroupAsyncTask;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,10 +82,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
             public void onClick(View v) {
                 Context context = v.getContext();
                 Toast.makeText(context, "선택 > "+group.group_id, Toast.LENGTH_LONG).show();
-
-                String result;
-                GroupAsyncTask asyncTask = new GroupAsyncTask();
-//                result = asyncTask.execute("")
+                //todo: groupId 가지고 그룹 상세 보기 화면으로 전환
             }
         });
     }

@@ -1171,7 +1171,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 //                Intent intent = new Intent(AllInOneActivity.this, LoginActivity.class);
 //                startActivity(intent);
 //                finish();
-                CreateNanalCalendar.DeleteCalendar(AllInOneActivity.this.getApplicationContext(), "나날", connectId);
+                CreateNanalCalendar.DeleteCalendar(AllInOneActivity.this.getApplicationContext(), connectId);
                 CreateNanalCalendar.DeleteColors(AllInOneActivity.this.getApplicationContext(), connectId);
                 Toast.makeText(AllInOneActivity.this.getApplicationContext(), "삭제", Toast.LENGTH_LONG).show();
                 break;

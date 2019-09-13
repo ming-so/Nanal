@@ -12,6 +12,7 @@ import com.android.nanal.activity.AbstractCalendarActivity;
 import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.calendar.CalendarGroupModel;
 import com.android.nanal.query.AsyncQueryService;
+import com.android.nanal.query.GroupAsyncTask;
 
 import java.util.concurrent.ExecutionException;
 
@@ -147,15 +148,17 @@ public class EditGroupHelper {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.d(TAG, "groups에 추가 시도");
+                    Log.d(TAG, "groups에 추가 시도, "+ACCOUNT_ID);
                     //todo:db 직접 연동으로 바꾸면 add문은 지워야 함
-                    AllInOneActivity.groups.add(new Group(Integer.parseInt(GROUP_ID), GROUP_NAME, GROUP_COLOR, ACCOUNT_ID));
-
+//                    AllInOneActivity.groups.add(new Group(Integer.parseInt(GROUP_ID), GROUP_NAME, GROUP_COLOR, ACCOUNT_ID));
+                    GroupAsyncTask groupAsyncTask = new GroupAsyncTask();
+                    groupAsyncTask.execute(ACCOUNT_ID);
                     Message message = handler.obtainMessage();
                     handler.sendMessage(message);
                 }
             }).start();
         }
+        mCreateGroupTask.cancel(true);
         return true;
     }
 
