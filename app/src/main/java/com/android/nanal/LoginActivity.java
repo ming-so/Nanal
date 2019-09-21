@@ -20,7 +20,6 @@ import net.cryptobrewery.androidprocessingbutton.ProcessButton;
 
 import java.util.concurrent.ExecutionException;
 
-
 public class LoginActivity extends Activity {
     ConstraintLayout ll_login;
     TextView tv_inform, tv_pw;
@@ -121,9 +120,6 @@ public class LoginActivity extends Activity {
                                     // 회원가입 성공했을 경우
                                     btn_login.setButtonState(ProcessButton.state.SUCCESS);
                                     btn_login.stopProgress();
-
-                                    //MailSender mailSender = new MailSender();
-                                    //mailSender.execute(id);
                                 } else if (result.equals("1")) {
                                     // 이미 존재하는 아이디인 경우
                                     Toast.makeText(LoginActivity.this, R.string.email_exist, Toast.LENGTH_LONG).show();
