@@ -17,6 +17,7 @@ package com.android.nanal.calendar;
  */
 
 import android.accounts.Account;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ListFragment;
 import android.app.LoaderManager;
@@ -89,6 +90,7 @@ public class SelectCalendarsSyncFragment extends ListFragment
     public SelectCalendarsSyncFragment() {
     }
 
+    @SuppressLint("ValidFragment")
     public SelectCalendarsSyncFragment(Bundle bundle) {
         mAccount = new Account(bundle.getString(Calendars.ACCOUNT_NAME),
                 bundle.getString(Calendars.ACCOUNT_TYPE));

@@ -67,13 +67,11 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="vnd.android.cursor.item/event" />
-            </intent-filter>
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.VIEW" />-->
+                <!--<category android:name="android.intent.category.DEFAULT" />-->
+                <!--<data android:mimeType="vnd.android.cursor.item/event" />-->
+            <!--</intent-filter>-->
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -297,6 +295,7 @@
             />
         <activity android:name=".activity.EditDiaryActivity"/>
         <activity android:name=".GroupActivity"/>
+        <activity android:name=".activity.EditGroupActivity"/>
     </application>
 
 </manifest>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/edit_diary"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    style="@style/EditEvent_Layout"
+    android:background="?attr/edit_event_bgcolor">
+    <TextView
+        android:id="@+id/loading_message"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="@string/loading"
+        style="?android:attr/textAppearanceLarge"
+        android:background="?attr/edit_event_bgcolor"/>
+    <ScrollView
+        android:id="@+id/g_scroll_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:animateLayoutChanges="true"
+        android:fillViewport="true"
+        android:visibility="gone">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <View android:id="@+id/group_bg"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="1dip"
+                android:layout_marginRight="1dip"
+                android:layout_marginTop="1dip"
+                android:layout_marginBottom="1dip"
+                android:layout_gravity="center_horizontal|top"
+                android:background="?attr/edit_event_bgcolor"/>
+
+            <LinearLayout
+                android:id="@+id/g_two_pane"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|top">
+
+                <!-- TOP HALF -->
+                <include
+                    layout="@layout/edit_group_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+            <View android:id="@+id/g_color_chip"
+                android:layout_width="25dip"
+                android:layout_height="25dip"
+                android:visibility="gone"
+                android:layout_marginStart="0dip"
+                android:layout_marginTop="0dip"
+                android:layout_gravity="start|top"/>
+        </FrameLayout>
+    </ScrollView>
+</LinearLayout>

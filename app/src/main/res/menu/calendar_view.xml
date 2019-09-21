@@ -37,5 +37,11 @@
             android:icon="@drawable/ic_action_name"
             android:title="@string/menu_logout" />
 
+        <item
+            android:id="@+id/test2"
+            android:icon="@drawable/ic_add_event"
+            android:title="계정 생성"
+            />
+
     </group>
 </menu>

@@ -24,6 +24,7 @@ import com.android.nanal.GroupActivity;
 import com.android.nanal.activity.AlertActivity;
 import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.activity.CalendarSettingsActivity;
+import com.android.nanal.activity.EditGroupActivity;
 import com.android.nanal.activity.EditDiaryActivity;
 import com.android.nanal.activity.EditEventActivity;
 import com.android.nanal.activity.SelectVisibleCalendarsActivity;
@@ -86,6 +87,7 @@ public class CalendarController {
     private int mPreviousViewType = -1;
     private long mEventId = -1;
     private long mDiaryId = -1;
+    private long mGroupId = -1;
     private long mDateFlags = 0;
 
     public Uri DUri = Uri.parse("content://" + "com.android.nanal" + "/diary");
@@ -476,6 +478,9 @@ public class CalendarController {
             } else if(event.eventType == EventType.CREATE_DIARY) {
                 launchCreateDiary(event.startTime.toMillis(false), event.eventTitle);
                 return;
+            } else if(event.eventType == EventType.CREATE_GROUP) {
+                launchCreateGroup();
+                return;
             } else if (event.eventType == EventType.VIEW_EVENT) {
                 launchViewEvent(event.id, event.startTime.toMillis(false), endTime,
                         event.getResponse());
@@ -662,6 +667,12 @@ public class CalendarController {
         mContext.startActivity(intent);
     }
 
+    private void launchCreateGroup() {
+        Intent intent = generateCreateGroupIntent();
+        mGroupId = -1;
+        mContext.startActivity(intent);
+    }
+
     public Intent generateCreateEventIntent(long startMillis, long endMillis,
                                             boolean allDayEvent, String title, long calendarId) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -679,6 +690,12 @@ public class CalendarController {
         intent.setClass(mContext, EditDiaryActivity.class);
         intent.putExtra("mStart", startMillis);
         intent.putExtra("mtitle", title);
+        return intent;
+    }
+
+    public Intent generateCreateGroupIntent() {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setClass(mContext, EditGroupActivity.class);
         return intent;
     }
 
@@ -858,7 +875,8 @@ public class CalendarController {
         final long LAUNCH_SETTINGS_DIRECT = 1L << 13;
 
         final long LAUNCH_GROUP = 1L << 14;
-        final long GROUPS_CHANGED = 1L << 15;
+        final long CREATE_GROUP = 1L << 16;
+        final long GROUPS_CHANGED = 1L << 17;
 
     }
 
@@ -1063,6 +1081,8 @@ public class CalendarController {
         public String group_name;
         public int group_color;
         public String account_id;
+
+        public boolean isCreated;
 
         public long eventType;
     }

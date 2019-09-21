@@ -10,32 +10,31 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.nanal.R;
+import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.calendar.CalendarController;
-
-import java.util.ArrayList;
 
 public class GroupFragment extends Fragment implements CalendarController.EventHandler {
     protected static final String BUNDLE_KEY_RESTORE_TIME = "key_restore_time";
     private static final int VIEW_ID = 2;
-    GroupListAdapter groupListAdapter;
-    public static ArrayList<Group> groups = new ArrayList<>();
+
+    static RecyclerView recyclerView;
+
 
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
 
         Context context = getActivity();
-        groups.add(new Group(1, "test", 2, "test"));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.group_activity, null);
-        RecyclerView recyclerView = v.findViewById(R.id.rv_group);
+        recyclerView = v.findViewById(R.id.rv_group);
+
+        recyclerView.setAdapter(AllInOneActivity.groupListAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(v.getContext()));
-        groupListAdapter = new GroupListAdapter(groups);
-        recyclerView.setAdapter(groupListAdapter);
         return v;
     }
 
@@ -57,4 +56,17 @@ public class GroupFragment extends Fragment implements CalendarController.EventH
     public void eventsChanged() {
 
     }
+
+//    public static void addGroup(String groupId, String groupName, int groupColor) {
+//        AllInOneActivity.groups.add(getNewGroup(Integer.parseInt(groupId), groupName, groupColor));
+//        refreshGroups();
+//    }
+//
+//    static Group getNewGroup(int groupId, String groupName, int groupColor) {
+//        Group group = Group.newInstance();
+//        group.group_id = groupId;
+//        group.group_name = groupName;
+//        group.group_color = groupColor;
+//        return group;
+//    }
 }

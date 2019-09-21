@@ -43,6 +43,24 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/appBarLayout2" />
 
+        <com.getbase.floatingactionbutton.FloatingActionButton
+            android:id="@+id/floating_action_button_group"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:visibility="gone"
+            app:fab_colorNormal="?android:attr/colorPrimary"
+            app:fab_colorPressed="?android:attr/colorPrimaryDark"
+            app:fab_labelStyle="@style/menu_labels_style"
+            app:fab_labelsPosition="left"
+            app:layout_anchorGravity="bottom|right|end"
+            app:layout_constraintBottom_toTopOf="@+id/bottom_navigation"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1"
+            app:fab_icon="@drawable/ic_add_event"
+            />
         <com.getbase.floatingactionbutton.FloatingActionsMenu
             android:id="@+id/floating_action_button2"
             android:layout_width="wrap_content"

@@ -73,6 +73,7 @@ public class GlobalDismissManager extends BroadcastReceiver {
     };
     private static final String TAG = "GlobalDismissManager";
     private static final String GOOGLE_ACCOUNT_TYPE = "com.google";
+    private static final String NANAL_ACCOUNT_TYPE = "com.android.nanal";
     private static final String GLOBAL_DISMISS_MANAGER_PREFS = "com.android.calendar.alerts.GDM";
     private static final String ACCOUNT_KEY = "known_accounts";
 
@@ -110,6 +111,8 @@ public class GlobalDismissManager extends BroadcastReceiver {
         Set<String> accounts = new LinkedHashSet<String>();
         for (Pair<String, String> accountPair : calendarsToAccounts.values()) {
             if (GOOGLE_ACCOUNT_TYPE.equals(accountPair.first)) {
+                accounts.add(accountPair.second);
+            } else if(NANAL_ACCOUNT_TYPE.equals(accountPair.first)) {
                 accounts.add(accountPair.second);
             }
         }
@@ -191,7 +194,7 @@ public class GlobalDismissManager extends BroadcastReceiver {
         for (Long eventId : eventsToCalendars.keySet()) {
             Long calendar = eventsToCalendars.get(eventId);
             Pair<String, String> account = calendarsToAccounts.get(calendar);
-            if (GOOGLE_ACCOUNT_TYPE.equals(account.first)) {
+            if (GOOGLE_ACCOUNT_TYPE.equals(account.first) || NANAL_ACCOUNT_TYPE.equals(account.first)) {
                 Uri uri = asSync(Events.CONTENT_URI, account.first, account.second);
                 Cursor cursor = resolver.query(uri, EVENT_SYNC_PROJECTION,
                         Events._ID + " = " + eventId, null, null);
