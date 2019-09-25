@@ -33,6 +33,7 @@
     <string name="complete">완료(테스트)</string>
     <string name="error">오류!</string>
     <string name="pw">비밀번호 찾기</string>
+    <string name="pw_complete">비밀번호를 찾으셨나요?</string>
 
     <string name="email_error">이메일을 바르게 입력하세요.</string>
     <string name="pw_error">비밀번호를 바르게 입력하세요.</string>
@@ -43,6 +44,8 @@
     <string name="pw_diff">비밀번호가 맞지 않습니다.</string>
     <string name="pw_out">로그인을 5회 실패하여 계정이 잠겼습니다.\n이메일 인증 후 다시 로그인 해주세요.</string>
     <string name="login_fail">로그인 중 문제가 발생했습니다.</string>
+    <string name="pw_fail">비밀번호 찾기 중 문제가 발생했습니다.</string>
+    <string name="pw_send">임시 비밀번호를 메일로 보냈습니다.</string>
 
     <string name="TEAL">#388d7f</string>
     <string name="ORANGE">#b36f28</string>

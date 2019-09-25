@@ -11,7 +11,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class SignUpHelper extends AsyncTask<String, Void, String> {
+public class FindPasswordHelper extends AsyncTask<String, Void, String> {
     private String msg;
     private String result;
 
@@ -19,13 +19,13 @@ public class SignUpHelper extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... strings) {
         try {
             String str;
-            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/SignUpHelper.jsp");
+            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/FindPassword.jsp");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             conn.setRequestMethod("POST");
 
             OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream());
-            msg = "id=" + strings[0] + "&password=" + strings[1];
+            msg = "id=" + strings[0];
             osw.write(msg);
             osw.flush();
             osw.close();
