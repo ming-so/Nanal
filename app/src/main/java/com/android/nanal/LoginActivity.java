@@ -20,7 +20,6 @@ import net.cryptobrewery.androidprocessingbutton.ProcessButton;
 
 import java.util.concurrent.ExecutionException;
 
-
 public class LoginActivity extends Activity {
     ConstraintLayout ll_login;
     TextView tv_inform, tv_pw;
@@ -30,6 +29,7 @@ public class LoginActivity extends Activity {
     private int mMorphCounter = 1;
 
     boolean isSignup = false;
+    boolean isPass = false;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -103,7 +103,7 @@ public class LoginActivity extends Activity {
                             btn_login.stopProgress();
                             return;
                         }
-                        if (et_pw.getText().toString().length() < 8) {
+                        if (et_pw.getText().toString().length() < 8 && !isPass) {
                             Toast.makeText(LoginActivity.this, R.string.pw_error, Toast.LENGTH_LONG).show();
                             btn_login.setButtonState(ProcessButton.state.FAILURE);
                             btn_login.stopProgress();
@@ -123,9 +123,6 @@ public class LoginActivity extends Activity {
                                     // 회원가입 성공했을 경우
                                     btn_login.setButtonState(ProcessButton.state.SUCCESS);
                                     btn_login.stopProgress();
-
-                                    //MailSender mailSender = new MailSender();
-                                    //mailSender.execute(id);
                                 } else if (result.equals("1")) {
                                     // 이미 존재하는 아이디인 경우
                                     Toast.makeText(LoginActivity.this, R.string.email_exist, Toast.LENGTH_LONG).show();
@@ -134,6 +131,36 @@ public class LoginActivity extends Activity {
                                 } else {
                                     // 회원가입 실패했을 경우
                                     Toast.makeText(LoginActivity.this, R.string.signup_fail, Toast.LENGTH_LONG).show();
+                                    btn_login.setButtonState(ProcessButton.state.FAILURE);
+                                    btn_login.stopProgress();
+                                }
+                            } catch (ExecutionException e) {
+                                e.printStackTrace();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        } else if (isPass) {
+                            // 비밀번호 찾기 처리
+                            String id = et_email.getText().toString();
+                            String result = "fail";
+
+                            try {
+                                FindPasswordHelper findPasswordHelper = new FindPasswordHelper();
+                                result = (String) findPasswordHelper.execute(id).get();
+
+                                if (result.equals("0")) {
+                                    // 비밀번호 찾기 성공했을 경우
+                                    Toast.makeText(LoginActivity.this, R.string.pw_send, Toast.LENGTH_LONG).show();
+                                    btn_login.setButtonState(ProcessButton.state.SUCCESS);
+                                    btn_login.stopProgress();
+                                } else if (result.equals("1")) {
+                                    // 존재하지 않는 아이디인 경우
+                                    Toast.makeText(LoginActivity.this, R.string.email_diff, Toast.LENGTH_LONG).show();
+                                    btn_login.setButtonState(ProcessButton.state.FAILURE);
+                                    btn_login.stopProgress();
+                                } else {
+                                    // 비밀번호 찾기 실패했을 경우
+                                    Toast.makeText(LoginActivity.this, R.string.pw_fail, Toast.LENGTH_LONG).show();
                                     btn_login.setButtonState(ProcessButton.state.FAILURE);
                                     btn_login.stopProgress();
                                 }
@@ -224,5 +251,24 @@ public class LoginActivity extends Activity {
             tv_pw.setVisibility(View.GONE);
         }
         isSignup = !isSignup;
+    }
+
+    public void ModeSwitchPass(View v) {
+        if (isPass) {
+            // 비밀번호 찾기 화면을 보여 주고 있다면 로그인으로 전환
+            tv_inform.setVisibility(View.VISIBLE);
+            tv_pw.setText(getString(R.string.pw));
+            et_pw.setVisibility(View.VISIBLE);
+            btn_login.setBtnText(getString(R.string.button_login));
+        } else {
+            // 비밀번호 찾기 화면으로 전환
+            tv_inform.setVisibility(View.GONE);
+            tv_pw.setText(getString(R.string.pw_complete));
+            et_email.setText("");
+            et_pw.setText("");
+            et_pw.setVisibility(View.GONE);
+            btn_login.setBtnText(getString(R.string.pw));
+        }
+        isPass = !isPass;
     }
 }
