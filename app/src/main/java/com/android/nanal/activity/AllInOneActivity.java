@@ -70,6 +70,8 @@ import com.android.nanal.DayFragment;
 import com.android.nanal.DayOfMonthDrawable;
 import com.android.nanal.DynamicTheme;
 import com.android.nanal.ExtensionsFactory;
+import com.android.nanal.LoginActivity;
+import com.android.nanal.PrefManager;
 import com.android.nanal.R;
 import com.android.nanal.TodayFragment;
 import com.android.nanal.ViewDetailsPreferences;
@@ -153,6 +155,8 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             eventsChanged();
         }
     };
+
+    private boolean isCreatedCalendar = false;
 
     private boolean mOnSaveInstanceStateCalled = false;
     private boolean mBackToPreviousView = false;
@@ -300,8 +304,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         super.onCreate(icicle);
         dynamicTheme.onCreate(this);
 
-
-
 //        if (icicle != null && icicle.containsKey(BUNDLE_KEY_CHECK_ACCOUNTS)) {
 //            mCheckForAccounts = icicle.getBoolean(BUNDLE_KEY_CHECK_ACCOUNTS);
 //        }
@@ -432,14 +434,12 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         mAddDiary = findViewById(R.id.action_add_diary);
         mFABGroup = findViewById(R.id.floating_action_button_group);
 
-
         if (mIsTabletConfig) {
             mDateRange = (TextView) findViewById(R.id.date_bar);
             mWeekTextView = (TextView) findViewById(R.id.week_num);
         } else {
             mDateRange = (TextView) getLayoutInflater().inflate(R.layout.date_range_title, null);
         }
-
 
         setupToolbar(viewType);
         setupNavDrawer();
@@ -513,9 +513,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 return true;
             }
         });
-
-        prefs = this.getApplicationContext().getSharedPreferences("login_setting", MODE_PRIVATE);
-        connectId = prefs.getString("loginId", null);
     }
 
     private void checkAppPermissions() {
@@ -549,11 +546,8 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 // 요청이 취소되면 결과 배열이 비어 있음
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
                     // permission was granted, yay!
                     // 퍼미션 받음!
-                    // todo: 회원가입 & 로그인 들어오면 로그인 때 처리하는 걸로 수정하기!!
-                    //CreateNanalCalendar.CreateCalendar(this, connectID, connectID);
                 } else {
                     Toast.makeText(getApplicationContext(), R.string.user_rejected_calendar_write_permission, Toast.LENGTH_LONG).show();
                 }
@@ -568,6 +562,18 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         // Clean up cached ics and vcs files - in case onDestroy() didn't run the last time
         // 캐시된 ics, vcs 파일을 정리 - onDestory()가 마지막으로 실행되지 않은 경우
         cleanupCachedEventFiles();
+    }
+
+    private void createCalendar() {
+        try {
+            if(!isCreatedCalendar) {
+                CreateNanalCalendar.CreateCalendar(AllInOneActivity.this.getApplicationContext(), "나날", connectId);
+                Toast.makeText(AllInOneActivity.this.getApplicationContext(), "생성, " + connectId, Toast.LENGTH_LONG).show();
+                isCreatedCalendar = true;
+            }
+        } catch (IllegalArgumentException e) {
+            Toast.makeText(AllInOneActivity.this.getApplicationContext(), "에러 발생", Toast.LENGTH_LONG).show();
+        }
     }
 
 
@@ -657,6 +663,12 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         mAddCalendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                PrefManager prefManager = new PrefManager(AllInOneActivity.this);
+                if(!prefManager.isCalendarCreated()) {
+                    prefs = getApplicationContext().getSharedPreferences("login_setting", MODE_PRIVATE);
+                    connectId = prefs.getString("loginId", null);
+                    createCalendar();
+                }
                 //Create new Event
                     Time t = new Time();
                     t.set(mController.getTime());
@@ -799,6 +811,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         invalidateOptionsMenu();
 
         mCalIntentReceiver = Utils.setTimeChangesReceiver(this, mTimeChangesUpdater);
+        mController.refreshCalendars();
     }
 
 
@@ -1068,6 +1081,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         final int itemId = item.getItemId();
         if (itemId == R.id.action_refresh) {
             mController.refreshCalendars();
+            //todo:DB갱신
             return true;
         } else if (itemId == R.id.action_today) {
             viewType = ViewType.CURRENT;
@@ -1162,22 +1176,23 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 mController.sendEvent(this, EventType.LAUNCH_SETTINGS, null, null, 0, 0);
                 break;
             case R.id.test:
-//                SharedPreferences loginPref = getSharedPreferences("login_setting", MODE_PRIVATE);
-//                SharedPreferences.Editor editor = loginPref.edit();
-//                editor.remove("loginId");
-//                editor.remove("loginPw");
-//                editor.commit();
-//
-//                Intent intent = new Intent(AllInOneActivity.this, LoginActivity.class);
-//                startActivity(intent);
-//                finish();
+                SharedPreferences loginPref = getSharedPreferences("login_setting", MODE_PRIVATE);
+                SharedPreferences.Editor editor = loginPref.edit();
+                editor.remove("loginId");
+                editor.remove("loginPw");
+                editor.commit();
+
+                Intent intent = new Intent(AllInOneActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+                break;
+            case R.id.test2:
+                createCalendar();
+                break;
+            case R.id.test3:
                 CreateNanalCalendar.DeleteCalendar(AllInOneActivity.this.getApplicationContext(), connectId);
                 CreateNanalCalendar.DeleteColors(AllInOneActivity.this.getApplicationContext(), connectId);
                 Toast.makeText(AllInOneActivity.this.getApplicationContext(), "삭제", Toast.LENGTH_LONG).show();
-                break;
-            case R.id.test2:
-                CreateNanalCalendar.CreateCalendar(AllInOneActivity.this.getApplicationContext(), "나날", connectId);
-                Toast.makeText(AllInOneActivity.this.getApplicationContext(), "생성", Toast.LENGTH_LONG).show();
                 break;
         }
         mDrawerLayout.closeDrawers();

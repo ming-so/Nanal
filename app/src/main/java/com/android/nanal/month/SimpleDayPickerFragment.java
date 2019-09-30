@@ -90,7 +90,7 @@ public class SimpleDayPickerFragment extends ListFragment implements OnScrollLis
     protected int mDayNameColor = 0;
     // You can override these numbers to get a different appearance
     // 다른 모습을 원하려면 이 숫자들을 오버라이드하기
-    protected int mNumWeeks = 6;
+    protected int mNumWeeks = 5;
     protected boolean mShowWeekNumber = false;
     protected int mDaysPerWeek = 7;
     // These affect the scroll speed and feel

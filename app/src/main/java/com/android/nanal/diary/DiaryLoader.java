@@ -246,7 +246,7 @@ public class DiaryLoader {
 
         public void processRequest(DiaryLoader diaryLoader) {
             Diary.loadDiaries(diaryLoader.mContext, diaries, startDay,
-                    id, diaryLoader.mSequenceNumber);
+                    numDays, id, diaryLoader.mSequenceNumber);
 
             // Check if we are still the most recent request.
             // 여전히 가장 최근의 요청인지 체크하기

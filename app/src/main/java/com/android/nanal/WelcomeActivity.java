@@ -58,7 +58,8 @@ public class WelcomeActivity extends Activity {
                 R.layout.welcome_slide1,
                 R.layout.welcome_slide2,
                 R.layout.welcome_slide3,
-                R.layout.welcome_slide4};
+                R.layout.welcome_slide4
+        };
 
         // adding bottom dots
         addBottomDots(0);
@@ -91,7 +92,6 @@ public class WelcomeActivity extends Activity {
                 }
             }
         });
-//        CreateNanalCalendar.DeleteCalendar(this.getApplicationContext(), "test", "test");
     }
 
     private void addBottomDots(int currentPage) {

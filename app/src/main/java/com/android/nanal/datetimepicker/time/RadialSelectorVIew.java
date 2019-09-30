@@ -28,8 +28,10 @@ import android.graphics.Paint;
 import android.util.Log;
 import android.view.View;
 
-import com.android.nanal.datetimepicker.Utils;
+import com.android.nanal.DynamicTheme;
 import com.android.nanal.R;
+import com.android.nanal.datetimepicker.Utils;
+import com.android.nanal.event.GeneralPreferences;
 
 /**
  * View to show what number is selected. This will draw a blue circle over the number, with a blue
@@ -110,8 +112,8 @@ class RadialSelectorView extends View {
         }
 
         Resources res = context.getResources();
-
-        int blue = res.getColor(R.color.blue);
+        String selectedColorName = com.android.nanal.event.Utils.getSharedPreference(context, GeneralPreferences.KEY_COLOR_PREF, "teal");
+        int blue = res.getColor(DynamicTheme.getColorId(selectedColorName));
         mPaint.setColor(blue);
         mPaint.setAntiAlias(true);
         mSelectionAlpha = SELECTED_ALPHA;
@@ -157,14 +159,9 @@ class RadialSelectorView extends View {
 
     /* package */ void setTheme(Context context, boolean themeDark) {
         Resources res = context.getResources();
-        int color;
-        if (themeDark) {
-            color = res.getColor(R.color.red);
-            mSelectionAlpha = SELECTED_ALPHA_THEME_DARK;
-        } else {
-            color = res.getColor(R.color.blue);
-            mSelectionAlpha = SELECTED_ALPHA;
-        }
+        String selectedColorName = com.android.nanal.event.Utils.getSharedPreference(context, GeneralPreferences.KEY_COLOR_PREF, "teal");
+        int color = res.getColor(DynamicTheme.getColorId(selectedColorName));
+        mSelectionAlpha = SELECTED_ALPHA;
         mPaint.setColor(color);
     }
 

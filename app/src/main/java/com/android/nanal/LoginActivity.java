@@ -45,28 +45,28 @@ public class LoginActivity extends Activity {
 
         // 자동 로그인
         final SharedPreferences loginPref = getSharedPreferences("login_setting", MODE_PRIVATE);
-
-        String loginId = loginPref.getString("loginId", null);
-        String loginPw = loginPref.getString("loginPw", null);
-
-        if (loginId != null && loginPw != null) {
-            LoginHelper loginHelper = new LoginHelper();
-            String result = null;
-            try {
-                result = (String) loginHelper.execute(loginId, loginPw).get();
-
-                if (result.equals("0")) {
-                    // 로그인 성공했을 경우
-                    goHome();
-                }
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            }
-        }
+//
+//        String loginId = loginPref.getString("loginId", null);
+//        String loginPw = loginPref.getString("loginPw", null);
+//
+//        if (loginId != null && loginPw != null) {
+//            LoginHelper loginHelper = new LoginHelper();
+//            String result = null;
+//            try {
+//                result = (String) loginHelper.execute(loginId, loginPw).get();
+//
+//                if (result.equals("0")) {
+//                    // 로그인 성공했을 경우
+//                    goHome();
+//                }
+//            } catch (ExecutionException e) {
+//                e.printStackTrace();
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            } catch (NullPointerException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         tv_inform.setText(getString(R.string.sign));
         btn_login.setBtnText(getString(R.string.button_login));

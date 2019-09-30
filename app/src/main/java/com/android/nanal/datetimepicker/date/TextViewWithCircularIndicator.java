@@ -25,7 +25,10 @@ import android.graphics.Paint.Style;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
+import com.android.nanal.DynamicTheme;
 import com.android.nanal.R;
+import com.android.nanal.event.GeneralPreferences;
+import com.android.nanal.event.Utils;
 
 /**
  * A text view which, when pressed or activated, displays a blue circle around the text.
@@ -49,7 +52,8 @@ public class TextViewWithCircularIndicator extends TextView {
     public TextViewWithCircularIndicator(Context context, AttributeSet attrs) {
         super(context, attrs);
         Resources res = context.getResources();
-        mCircleColor = res.getColor(R.color.blue);
+        String selectedColorName = Utils.getSharedPreference(context, GeneralPreferences.KEY_COLOR_PREF, "teal");
+        mCircleColor = res.getColor(DynamicTheme.getColorId(selectedColorName));
         mRadius = res.getDimensionPixelOffset(R.dimen.month_select_circle_radius);
         mItemIsSelectedText = context.getResources().getString(R.string.item_is_selected);
 

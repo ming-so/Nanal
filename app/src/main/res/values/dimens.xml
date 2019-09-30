@@ -14,6 +14,9 @@
      limitations under the License.
 -->
 <resources>
+    <!-- 다이어리 점 테스트 -->
+    <dimen name="dot_size">4dp</dimen>
+
     <!-- 로그인 쪽 -->
     <color name="mb_white">#ffffff</color>
     <color name="mb_blue">#ff0099cc</color>

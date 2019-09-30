@@ -218,12 +218,14 @@
         <item name="ic_menu_email">@drawable/ic_menu_email_holo_light</item>
         <item name="calendar_future_bg_color">@color/calendar_future_bg_color</item>
         <item name="month_other_bgcolor">@color/month_other_bgcolor</item>
+        <item name="month_today_bgcolor">@color/colorPrimaryToday</item>
     </style>
 
     <style name="Base.CalendarAppThemeWithActionBar" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="month_today_bgcolor">@color/colorPrimaryToday</item>
     </style>
 
     <style name="Widget.CalendarAppTheme.ActionBar" parent="Widget.AppCompat.ActionBar">

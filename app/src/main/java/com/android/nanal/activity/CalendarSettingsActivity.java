@@ -132,7 +132,7 @@ public class CalendarSettingsActivity extends PreferenceActivity {
                     Header accountHeader = new Header();
                     accountHeader.title = acct.name;
                     accountHeader.fragment =
-                            "com.android.calendar.selectcalendars.SelectCalendarsSyncFragment";
+                            "com.android.nanal.calendar.SelectCalendarsSyncFragment";
                     Bundle args = new Bundle();
                     args.putString(Calendars.ACCOUNT_NAME, acct.name);
                     args.putString(Calendars.ACCOUNT_TYPE, acct.type);

@@ -25,8 +25,10 @@ import android.graphics.Typeface;
 import android.util.Log;
 import android.view.View;
 
-import com.android.nanal.datetimepicker.Utils;
+import com.android.nanal.DynamicTheme;
 import com.android.nanal.R;
+import com.android.nanal.datetimepicker.Utils;
+import com.android.nanal.event.GeneralPreferences;
 
 import java.text.DateFormatSymbols;
 
@@ -77,7 +79,8 @@ class AmPmCirclesView extends View {
 
         Resources res = context.getResources();
         mUnselectedColor = res.getColor(android.R.color.white);// 선택되지 않은 색상
-        mSelectedColor = res.getColor(R.color.blue);            // 선택된 색상
+        String selectedColorName = com.android.nanal.event.Utils.getSharedPreference(context, GeneralPreferences.KEY_COLOR_PREF, "teal");
+        mSelectedColor = res.getColor(DynamicTheme.getColorId(selectedColorName));            // 선택된 색상
         mAmPmTextColor = res.getColor(R.color.ampm_text_color); // AM/PM 색상
         mSelectedAlpha = SELECTED_ALPHA;
         String typefaceFamily = res.getString(R.string.sans_serif);
@@ -102,17 +105,11 @@ class AmPmCirclesView extends View {
 
     /* package */ void setTheme(Context context, boolean themeDark) {   // 테마 설정
         Resources res = context.getResources();
-        if (themeDark) {        // 테마가 어두우면
-            mUnselectedColor = res.getColor(R.color.dark_gray);
-            mSelectedColor = res.getColor(R.color.red);
-            mAmPmTextColor = res.getColor(android.R.color.white);
-            mSelectedAlpha = SELECTED_ALPHA_THEME_DARK;
-        } else {
             mUnselectedColor = res.getColor(android.R.color.white);
-            mSelectedColor = res.getColor(R.color.blue);
+            String selectedColorName = com.android.nanal.event.Utils.getSharedPreference(context, GeneralPreferences.KEY_COLOR_PREF, "teal");
+            mSelectedColor = res.getColor(DynamicTheme.getColorId(selectedColorName));
             mAmPmTextColor = res.getColor(R.color.ampm_text_color);
             mSelectedAlpha = SELECTED_ALPHA;
-        }
     }
 
     public void setAmOrPm(int amOrPm) {

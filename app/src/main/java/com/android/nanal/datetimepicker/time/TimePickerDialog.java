@@ -36,10 +36,12 @@ import android.view.Window;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.nanal.DynamicTheme;
+import com.android.nanal.R;
 import com.android.nanal.datetimepicker.HapticFeedbackController;
 import com.android.nanal.datetimepicker.Utils;
 import com.android.nanal.datetimepicker.time.RadialPickerLayout.OnValueSelectedListener;
-import com.android.nanal.R;
+import com.android.nanal.event.GeneralPreferences;
 
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
@@ -116,6 +118,8 @@ public class TimePickerDialog extends DialogFragment implements OnValueSelectedL
     private String mSelectHours;
     private String mMinutePickerDescription;
     private String mSelectMinutes;
+
+
 
     /**
      * The callback interface used to indicate the user is done filling in
@@ -213,7 +217,9 @@ public class TimePickerDialog extends DialogFragment implements OnValueSelectedL
         mSelectHours = res.getString(R.string.select_hours);
         mMinutePickerDescription = res.getString(R.string.minute_picker_description);
         mSelectMinutes = res.getString(R.string.select_minutes);
-        mSelectedColor = res.getColor(mThemeDark? R.color.red : R.color.blue);
+
+        String selectedColorName = com.android.nanal.event.Utils.getSharedPreference(getActivity().getApplicationContext(), GeneralPreferences.KEY_COLOR_PREF, "teal");
+        mSelectedColor = res.getColor(DynamicTheme.getColorId(selectedColorName));
         mUnselectedColor =
                 res.getColor(mThemeDark? android.R.color.white : R.color.numbers_text_color);
 

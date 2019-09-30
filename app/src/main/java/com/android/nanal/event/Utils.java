@@ -2408,6 +2408,13 @@ public class Utils {
         int count;
     }
 
+    public static class DNADiary {
+        public float[] points;
+        public int color;
+        int position;
+        int count;
+    }
+
     // A segment is a single continuous length of time occupied by a single
     // color. Segments should never span multiple days.
     // segment는 한 가지 색으로 칠해지는 단일 연속 시간임, 여러 날에 걸쳐서는 안 됨
