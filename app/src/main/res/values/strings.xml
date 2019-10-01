@@ -46,6 +46,7 @@
     <string name="login_fail">로그인 중 문제가 발생했습니다.</string>
     <string name="pw_fail">비밀번호 찾기 중 문제가 발생했습니다.</string>
     <string name="pw_send">임시 비밀번호를 메일로 보냈습니다.</string>
+    <string name="no_internet">서버와의 통신에 실패했습니다. 인터넷 연결을 확인하세요.</string>
 
     <string name="TEAL">#388d7f</string>
     <string name="ORANGE">#b36f28</string>

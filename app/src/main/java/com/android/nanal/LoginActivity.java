@@ -130,14 +130,14 @@ public class LoginActivity extends Activity {
                                     btn_login.stopProgress();
                                 } else {
                                     // 회원가입 실패했을 경우
-                                    Toast.makeText(LoginActivity.this, R.string.signup_fail, Toast.LENGTH_LONG).show();
-                                    btn_login.setButtonState(ProcessButton.state.FAILURE);
-                                    btn_login.stopProgress();
+                                    signupFail();
                                 }
                             } catch (ExecutionException e) {
-                                e.printStackTrace();
+                                signupFail();
                             } catch (InterruptedException e) {
-                                e.printStackTrace();
+                                signupFail();
+                            } catch (NullPointerException e) {
+                                noInternet();
                             }
                         } else if (isPass) {
                             // 비밀번호 찾기 처리
@@ -160,14 +160,14 @@ public class LoginActivity extends Activity {
                                     btn_login.stopProgress();
                                 } else {
                                     // 비밀번호 찾기 실패했을 경우
-                                    Toast.makeText(LoginActivity.this, R.string.pw_fail, Toast.LENGTH_LONG).show();
-                                    btn_login.setButtonState(ProcessButton.state.FAILURE);
-                                    btn_login.stopProgress();
+                                    pwdFail();
                                 }
                             } catch (ExecutionException e) {
-                                e.printStackTrace();
+                                pwdFail();
                             } catch (InterruptedException e) {
-                                e.printStackTrace();
+                                pwdFail();
+                            } catch (NullPointerException e) {
+                                noInternet();
                             }
                         } else {
                             // 로그인 처리
@@ -208,14 +208,14 @@ public class LoginActivity extends Activity {
                                     btn_login.stopProgress();
                                 } else {
                                     // 로그인 실패했을 경우
-                                    Toast.makeText(LoginActivity.this, R.string.login_fail, Toast.LENGTH_LONG).show();
-                                    btn_login.setButtonState(ProcessButton.state.FAILURE);
-                                    btn_login.stopProgress();
+                                    loginFail();
                                 }
                             } catch (ExecutionException e) {
-                                e.printStackTrace();
+                                loginFail();
                             } catch (InterruptedException e) {
-                                e.printStackTrace();
+                                loginFail();
+                            } catch (NullPointerException e) {
+                                noInternet();
                             }
                         }
                     }
@@ -223,6 +223,30 @@ public class LoginActivity extends Activity {
             }
         });
 
+    }
+
+    private void loginFail() {
+        Toast.makeText(LoginActivity.this, R.string.login_fail, Toast.LENGTH_LONG).show();
+        btn_login.setButtonState(ProcessButton.state.FAILURE);
+        btn_login.stopProgress();
+    }
+
+    private void pwdFail() {
+        Toast.makeText(LoginActivity.this, R.string.pw_fail, Toast.LENGTH_LONG).show();
+        btn_login.setButtonState(ProcessButton.state.FAILURE);
+        btn_login.stopProgress();
+    }
+
+    private void signupFail() {
+        Toast.makeText(LoginActivity.this, R.string.signup_fail, Toast.LENGTH_LONG).show();
+        btn_login.setButtonState(ProcessButton.state.FAILURE);
+        btn_login.stopProgress();
+    }
+
+    private void noInternet() {
+        Toast.makeText(LoginActivity.this, R.string.no_internet, Toast.LENGTH_LONG).show();
+        btn_login.setButtonState(ProcessButton.state.FAILURE);
+        btn_login.stopProgress();
     }
 
     public void goHome() {

@@ -70,6 +70,7 @@ import com.android.nanal.DayFragment;
 import com.android.nanal.DayOfMonthDrawable;
 import com.android.nanal.DynamicTheme;
 import com.android.nanal.ExtensionsFactory;
+import com.android.nanal.LoginActivity;
 import com.android.nanal.R;
 import com.android.nanal.TodayFragment;
 import com.android.nanal.ViewDetailsPreferences;
@@ -552,8 +553,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
                     // permission was granted, yay!
                     // 퍼미션 받음!
-                    // todo: 회원가입 & 로그인 들어오면 로그인 때 처리하는 걸로 수정하기!!
-                    //CreateNanalCalendar.CreateCalendar(this, connectID, connectID);
                 } else {
                     Toast.makeText(getApplicationContext(), R.string.user_rejected_calendar_write_permission, Toast.LENGTH_LONG).show();
                 }
@@ -1162,22 +1161,24 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 mController.sendEvent(this, EventType.LAUNCH_SETTINGS, null, null, 0, 0);
                 break;
             case R.id.test:
-//                SharedPreferences loginPref = getSharedPreferences("login_setting", MODE_PRIVATE);
-//                SharedPreferences.Editor editor = loginPref.edit();
-//                editor.remove("loginId");
-//                editor.remove("loginPw");
-//                editor.commit();
-//
-//                Intent intent = new Intent(AllInOneActivity.this, LoginActivity.class);
-//                startActivity(intent);
-//                finish();
-                CreateNanalCalendar.DeleteCalendar(AllInOneActivity.this.getApplicationContext(), connectId);
-                CreateNanalCalendar.DeleteColors(AllInOneActivity.this.getApplicationContext(), connectId);
-                Toast.makeText(AllInOneActivity.this.getApplicationContext(), "삭제", Toast.LENGTH_LONG).show();
+                SharedPreferences loginPref = getSharedPreferences("login_setting", MODE_PRIVATE);
+                SharedPreferences.Editor editor = loginPref.edit();
+                editor.remove("loginId");
+                editor.remove("loginPw");
+                editor.commit();
+
+                Intent intent = new Intent(AllInOneActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
                 break;
             case R.id.test2:
                 CreateNanalCalendar.CreateCalendar(AllInOneActivity.this.getApplicationContext(), "나날", connectId);
                 Toast.makeText(AllInOneActivity.this.getApplicationContext(), "생성", Toast.LENGTH_LONG).show();
+                break;
+            case R.id.test3:
+                CreateNanalCalendar.DeleteCalendar(AllInOneActivity.this.getApplicationContext(), connectId);
+                CreateNanalCalendar.DeleteColors(AllInOneActivity.this.getApplicationContext(), connectId);
+                Toast.makeText(AllInOneActivity.this.getApplicationContext(), "삭제", Toast.LENGTH_LONG).show();
                 break;
         }
         mDrawerLayout.closeDrawers();
