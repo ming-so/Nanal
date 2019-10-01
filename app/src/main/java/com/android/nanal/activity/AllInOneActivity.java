@@ -71,6 +71,7 @@ import com.android.nanal.DayOfMonthDrawable;
 import com.android.nanal.DynamicTheme;
 import com.android.nanal.ExtensionsFactory;
 import com.android.nanal.LoginActivity;
+import com.android.nanal.PrefManager;
 import com.android.nanal.R;
 import com.android.nanal.TodayFragment;
 import com.android.nanal.ViewDetailsPreferences;
@@ -265,6 +266,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     public int selectedMode = 1;
 
     private boolean isGroupMenu = false;
+    private boolean permission = false;
 
     public static ArrayList<Group> groups = new ArrayList<>();
     public static GroupListAdapter groupListAdapter = new GroupListAdapter(AllInOneActivity.groups);
@@ -538,6 +540,8 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.WRITE_CALENDAR, Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     PERMISSIONS_REQUEST_WRITE_CALENDAR);
+        } else {
+            permission = true;
         }
     }
 
@@ -550,11 +554,12 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 // 요청이 취소되면 결과 배열이 비어 있음
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
+                        permission = true;
                     // permission was granted, yay!
                     // 퍼미션 받음!
                 } else {
                     Toast.makeText(getApplicationContext(), R.string.user_rejected_calendar_write_permission, Toast.LENGTH_LONG).show();
+                    permission = false;
                 }
                 return;
             }
@@ -666,8 +671,12 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                     } else if (t.minute > 0 && t.minute < 30) {
                         t.minute = 30;
                     }
-                    mController.sendEventRelatedEvent(
-                            this, EventType.CREATE_EVENT, -1, t.toMillis(true), 0, 0, 0, -1);
+                    if(createLocalCalendar()) {
+                        mController.sendEventRelatedEvent(
+                                this, EventType.CREATE_EVENT, -1, t.toMillis(true), 0, 0, 0, -1);
+                    } else {
+
+                    }
             }
         });
 
@@ -690,7 +699,30 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         });
     }
 
-
+    private boolean createLocalCalendar() {
+        checkAppPermissions();
+        if(permission) {
+            // 권한 있음
+            PrefManager prefManager = new PrefManager(getApplicationContext());
+            if (!prefManager.isCalendarCreated()) {
+                // 로컬 캘린더가 만들어지지 않았다면
+                try {
+                    CreateNanalCalendar.CreateCalendar(AllInOneActivity.this.getApplicationContext(), "나날", connectId);
+                    Toast.makeText(AllInOneActivity.this.getApplicationContext(), "캘린더를 생성했습니다.", Toast.LENGTH_LONG).show();
+                    prefManager.setCalendarCreated(true);
+                    return true;
+                } catch (IllegalArgumentException e) {
+                    Toast.makeText(AllInOneActivity.this.getApplicationContext(), "로컬 캘린더 생성에 문제가 발생했습니다.", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+            } else {
+                // 로컬 캘린더가 이미 있다면
+                return true;
+            }
+        }
+        // 권한 없음, 아무것도 하지 않음
+        return false;
+    }
 
     private void hideActionBar() {
         if (mActionBar == null) return;

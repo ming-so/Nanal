@@ -35,7 +35,7 @@ import java.text.DateFormatSymbols;
 /**
  * Draw the two smaller AM and PM circles next to where the larger circle will be.
  */
-class AmPmCirclesView extends View {
+public class AmPmCirclesView extends View {
     private static final String TAG = "AmPmCirclesView";
 
     // Alpha level for selected circle.

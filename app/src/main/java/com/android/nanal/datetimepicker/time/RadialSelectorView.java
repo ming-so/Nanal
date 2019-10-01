@@ -39,7 +39,7 @@ import com.android.nanal.event.GeneralPreferences;
  * 선택된 숫자를 보여 주는 view
  * 숫자 위에 파란색 원을 그리며, 메인 원 중심으로부터 파란 줄
  */
-class RadialSelectorView extends View {
+public class RadialSelectorView extends View {
     private static final String TAG = "RadialSelectorView";
 
     // Alpha level for selected circle.
