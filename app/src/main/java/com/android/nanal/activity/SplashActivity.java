@@ -73,7 +73,7 @@ public class SplashActivity extends Activity {
                         goLogin();
                     }
                 } else {
-                    // 처음 켜는 거라면... WelcomeActivity로 이동
+                    // 처음 켜는 거라면 DB 생성 후 WelcomeActivity로 이동
                     startActivity(new Intent(SplashActivity.this, WelcomeActivity.class));
                     overridePendingTransition(R.anim.fadein, R.anim.hold);
                     finish();

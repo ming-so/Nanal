@@ -27,6 +27,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Rect;
 import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
@@ -71,6 +72,7 @@ import com.android.nanal.DayOfMonthDrawable;
 import com.android.nanal.DynamicTheme;
 import com.android.nanal.ExtensionsFactory;
 import com.android.nanal.LoginActivity;
+import com.android.nanal.NanalDBHelper;
 import com.android.nanal.PrefManager;
 import com.android.nanal.R;
 import com.android.nanal.TodayFragment;
@@ -267,6 +269,9 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
     private boolean isGroupMenu = false;
     private boolean permission = false;
+
+    public static NanalDBHelper helper = null;
+    public static SQLiteDatabase nanalDB = null;
 
     public static ArrayList<Group> groups = new ArrayList<>();
     public static GroupListAdapter groupListAdapter = new GroupListAdapter(AllInOneActivity.groups);
@@ -519,6 +524,23 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
         prefs = this.getApplicationContext().getSharedPreferences("login_setting", MODE_PRIVATE);
         connectId = prefs.getString("loginId", null);
+
+        openDatabase();
+    }
+
+    public void openDatabase() {
+        PrefManager prefManager = new PrefManager(getApplicationContext());
+        if(helper == null) {
+            helper = new NanalDBHelper(getApplicationContext());
+        }
+        if(!prefManager.isDBCreated()) {
+            // DB가 만들어지지 않았다면 새로 생성하기
+            nanalDB = helper.getWritableDatabase();
+            prefManager.setDBCreated(true);
+            Toast.makeText(this, "DB 생성 완료", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "DB 이미 존재함", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void checkAppPermissions() {

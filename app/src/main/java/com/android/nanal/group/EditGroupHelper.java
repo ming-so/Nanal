@@ -54,9 +54,12 @@ public class EditGroupHelper {
     static final int COLORS_INDEX_COLOR = 3;
     static final int COLORS_INDEX_COLOR_KEY = 4;
 
+    private Context mContext;
+
 
     public EditGroupHelper(Context context) {
         mService = ((AbstractCalendarActivity) context).getAsyncQueryService();
+        mContext = context;
     }
 
 
@@ -115,11 +118,14 @@ public class EditGroupHelper {
 //                Utils.UNDO_DELAY);
         //todo: 생성/수정 따로 처리해야 함, jsp에서 처리하면 느려질까???
         CreateNewGroup mCreateGroupTask = new CreateNewGroup();
-        final String receiveMsg;
+        String receiveMsg;
         String group_id = "";
         try {
+            Log.d(TAG, "서버 DB에 데이터 전송하여 insert하고 그룹 아이디 받아오기");
             receiveMsg = mCreateGroupTask.execute(model.group_name, Integer.toString(model.group_color), model.account_id).get();
-            group_id = receiveMsg;
+            group_id = receiveMsg.trim();
+            AllInOneActivity.helper.addGroup(Integer.parseInt(group_id), model.group_name, model.group_color, model.account_id);
+            Log.d(TAG, "DB에 그룹 추가! group_id="+group_id+", group_name="+model.group_name);
         } catch (InterruptedException e) {
             Log.e(TAG, e.getMessage());
         } catch (ExecutionException e) {
@@ -149,9 +155,7 @@ public class EditGroupHelper {
                 @Override
                 public void run() {
                     Log.d(TAG, "groups에 추가 시도, "+ACCOUNT_ID);
-                    //todo:db 직접 연동으로 바꾸면 add문은 지워야 함
-//                    AllInOneActivity.groups.add(new Group(Integer.parseInt(GROUP_ID), GROUP_NAME, GROUP_COLOR, ACCOUNT_ID));
-                    GroupAsyncTask groupAsyncTask = new GroupAsyncTask();
+                    GroupAsyncTask groupAsyncTask = new GroupAsyncTask(mContext);
                     groupAsyncTask.execute(ACCOUNT_ID);
                     Message message = handler.obtainMessage();
                     handler.sendMessage(message);

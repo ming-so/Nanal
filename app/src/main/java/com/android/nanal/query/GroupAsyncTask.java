@@ -1,7 +1,17 @@
 package com.android.nanal.query;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
+
+import com.android.nanal.CreateNanalCalendar;
+import com.android.nanal.activity.AllInOneActivity;
+import com.android.nanal.diary.Diary;
+import com.android.nanal.event.Event;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,9 +20,17 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class GroupAsyncTask extends AsyncTask<String, String, String> {
     String sendMsg, receiveMsg;
+    private Context mContext;
+
+    public GroupAsyncTask(Context context) {
+        mContext = context;
+    }
 
     @Override
     protected String doInBackground(String... String) {
@@ -52,6 +70,7 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
                 }
                 receiveMsg = buffer.toString();
                 Log.i("GroupAsyncTask", receiveMsg);
+                parseJSON(receiveMsg);
                 tmp.close();
                 reader.close();
             } else {
@@ -69,5 +88,68 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
         // UI 작업
+    }
+
+    protected void parseJSON(String msg) {
+        try {
+            JSONObject jsonObject = new JSONObject(msg);
+            String group = jsonObject.getString("GROUP");
+            JSONArray jsonArray = new JSONArray(group);
+            for(int i = 0; i < jsonArray.length(); i++) {
+                JSONObject subObject = jsonArray.getJSONObject(i);
+                String group_name = subObject.getString("group_name");
+                int group_color = subObject.getInt("group_color");
+                String account_id = subObject.getString("account_id");
+                int group_id = subObject.getInt("group_id");
+                if(AllInOneActivity.helper.checkGroup(group_id)) {
+                    // 그룹이 있다면 업데이트해야 함
+                    if(AllInOneActivity.helper.getGroupSync(group_id) != -1) {
+                        // 버전이 옳게 들어간 경우에만 업데이트
+                    } else {
+                        // 버전이 이상한 경우 그냥 싹 밀고 다 저장하기
+                    }
+                } else {
+                    // 그룹이 없다면 생성해야 함
+                    AllInOneActivity.helper.addGroup(group_id, group_name, group_color, account_id);
+                    CreateNanalCalendar.CreateCalendar(mContext, group_name, account_id);
+                }
+
+                // 다이어리
+                String diary_formatting = subObject.getString("group_diary");
+                JSONArray diaryArray = new JSONArray(diary_formatting);
+                for(int j = 0; j <diaryArray.length(); i++) {
+                    JSONObject diaryObject = diaryArray.getJSONObject(j);
+                    Diary diary = new Diary();
+                    diary.group_id = group_id;
+                    diary.id = diaryObject.getInt("diary_id");
+                    if(diaryObject.has("color")) { diary.color = diaryObject.getInt("color"); }
+                    if(diaryObject.has("location")) { diary.location = diaryObject.getString("location"); }
+                    String day = diaryObject.getString("day"); // 아마도 1999-09-09 이런 형식인 듯?
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    Date dateDay = dateFormat.parse(day, new ParsePosition(0));
+                    diary.day = dateDay.getTime();
+                    if(diaryObject.has("title")) { diary.title = diaryObject.getString("title"); }
+                    diary.content = diaryObject.getString("content");
+                    if(diaryObject.has("weather")) { diary.weather = diaryObject.getString("weather"); }
+                    if(diaryObject.has("image")) { diary.img = diaryObject.getString("image"); }
+                    AllInOneActivity.helper.addDiary(diary);
+                }
+                // 이벤트
+                String event_formatting = subObject.getString("group_event");
+                JSONArray eventArray = new JSONArray(event_formatting);
+                for(int j = 0; j < eventArray.length(); j++) {
+                    JSONObject eventObject = eventArray.getJSONObject(j);
+                    Event event = new Event();
+                    event.group_id = group_id;
+                    event.allDay = eventObject.getBoolean("all_day");
+                    //
+                    // start_time time -> long(milli) 변환 필요
+                    event.hasAlarm = eventObject.getBoolean("has_alarm");
+                    event.isRepeating = eventObject.getBoolean("is_recurring");
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

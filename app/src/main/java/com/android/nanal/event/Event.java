@@ -97,6 +97,8 @@ public class Event implements Cloneable {
             Events.GUESTS_CAN_MODIFY,        // 18
             Instances.ALL_DAY + "=1 OR (" + Instances.END + "-" + Instances.BEGIN + ")>="
                     + DateUtils.DAY_IN_MILLIS + " AS " + DISPLAY_AS_ALLDAY, // 19
+            "event_id",                      // 20
+            "group_id"                       // 21
     };
     private static final String EVENTS_WHERE = DISPLAY_AS_ALLDAY + "=0";
     private static final String ALLDAY_WHERE = DISPLAY_AS_ALLDAY + "=1";
@@ -121,6 +123,8 @@ public class Event implements Cloneable {
     private static final int PROJECTION_ORGANIZER_INDEX = 17;
     private static final int PROJECTION_GUESTS_CAN_INVITE_OTHERS_INDEX = 18;
     private static final int PROJECTION_DISPLAY_AS_ALLDAY = 19;
+    private static final int PROJECTION_EVENTN_ID_INDEX = 21;
+    private static final int PROJECTION_GROUP_ID_INDEX = 21;
     private static String mNoTitleString;
     private static int mNoColorColor;
 
@@ -143,6 +147,7 @@ public class Event implements Cloneable {
     public boolean hasAlarm;
     public boolean isRepeating;
     public int selfAttendeeStatus;
+    public int group_id;
     // The coordinates of the event rectangle drawn on the screen.
     // 화면에 그려진 이벤트 사각형의 좌표
     public float left;
@@ -176,6 +181,7 @@ public class Event implements Cloneable {
         e.hasAlarm = false;
         e.isRepeating = false;
         e.selfAttendeeStatus = Attendees.ATTENDEE_STATUS_NONE;
+        e.group_id = -1;
 
         return e;
     }
@@ -371,6 +377,7 @@ public class Event implements Cloneable {
         e.allDay = cEvents.getInt(PROJECTION_ALL_DAY_INDEX) != 0;
         e.organizer = cEvents.getString(PROJECTION_ORGANIZER_INDEX);
         e.guestsCanModify = cEvents.getInt(PROJECTION_GUESTS_CAN_INVITE_OTHERS_INDEX) != 0;
+        e.group_id = cEvents.getInt(PROJECTION_GROUP_ID_INDEX);
 
         if (e.title == null || e.title.length() == 0) {
             e.title = mNoTitleString;
@@ -567,6 +574,7 @@ public class Event implements Cloneable {
         e.selfAttendeeStatus = selfAttendeeStatus;
         e.organizer = organizer;
         e.guestsCanModify = guestsCanModify;
+        e.group_id = group_id;
 
         return e;
     }
@@ -588,6 +596,7 @@ public class Event implements Cloneable {
         dest.selfAttendeeStatus = selfAttendeeStatus;
         dest.organizer = organizer;
         dest.guestsCanModify = guestsCanModify;
+        dest.group_id = group_id;
     }
 
     public final void dump() {

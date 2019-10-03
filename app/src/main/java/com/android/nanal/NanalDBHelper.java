@@ -2,15 +2,16 @@ package com.android.nanal;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.android.nanal.diary.Diary;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class NanalDBHelper  extends SQLiteOpenHelper {
-
-
     public NanalDBHelper(Context context) {
         super(context, "nanal", null, 1);
     }
@@ -20,15 +21,14 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
         String CREATE_TABLE_DIARY = "CREATE TABLE IF NOT EXISTS diary (" +
                 "'diary_id' INTEGER PRIMARY KEY NOT NULL, " +
                 "'account_id' VARCHAR(320) NOT NULL, " +
-                "'connect_type' TINYINT NOT NULL, " +
+                "'group_id' INTEGER, "+
                 "'color' INTEGER, " +
                 "'location' VARCHAR(20), " +
                 "'day' DATE NOT NULL, " +
                 "'title' VARCHAR(10), "+
                 "'content' TEXT, "+
                 "'weather' VARCHAR(10), "+
-                "'image' VARCHAR(20), "+
-                "'group_id' INTEGER"+
+                "'image' VARCHAR(20)"+
                 ")";
         db.execSQL(CREATE_TABLE_DIARY);
         String CREATE_TABLE_COMMUNITY = "CREATE TABLE IF NOT EXISTS community (" +
@@ -51,7 +51,7 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void addDiary(int diary_id, String account_id, int connect_type, int color,
+    public void addDiary(int diary_id, String account_id, int color,
                         String location, Date day, String title, String content,
                          String weather, String image, int group_id) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -61,7 +61,6 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put("diary_id", diary_id);
         values.put("account_id", account_id);
-        values.put("connect_type", connect_type);
         values.put("day", dateFormat.format(day));
         if(color != -1) values.put("color", color);
         if(location != null) values.put("location", location);
@@ -70,6 +69,24 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
         if(weather != null) values.put("weather", weather);
         if(image != null) values.put("image", image);
         if(group_id != -1) values.put("group_id", group_id);
+        db.insert("diary", null, values);
+        db.close();
+    }
+
+    public void addDiary(Diary d) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("diary_id", d.id);
+        values.put("account_id", d.account_id);
+        values.put("day", d.day);
+        values.put("content", d.content);
+        if(d.color != -1) values.put("color", d.color);
+        if(d.location != null) values.put("location", d.location);
+        if(d.title != null) values.put("title", d.title);
+        if(d.content != null) values.put("content", d.content);
+        if(d.weather != null) values.put("weather", d.weather);
+        if(d.img != null) values.put("image", d.img);
+        if(d.group_id != -1) values.put("group_id", d.group_id);
         db.insert("diary", null, values);
         db.close();
     }
@@ -84,5 +101,27 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
         values.put("account_id", account_id);
         db.insert("group", null, values);
         db.close();
+    }
+
+    public boolean checkGroup(int group_id) {
+        SQLiteDatabase db = getReadableDatabase();
+        String sql = "SELECT * FROM community WHERE group_id='"+group_id+"'";
+        Cursor cursor = db.rawQuery(sql,null);
+        if(cursor.getCount() > 0) {
+            db.close();
+            return true;
+        }
+        db.close();
+        return false;
+    }
+
+    public int getGroupSync(int group_id) {
+        SQLiteDatabase db = getReadableDatabase();
+        String sql = "SELECT * FROM community WHERE group_id='"+group_id+"'";
+        Cursor cursor = db.rawQuery(sql, null);
+        if(cursor.moveToNext()) {
+            return cursor.getInt(cursor.getColumnIndex("sync_version"));
+        }
+        return -1;
     }
 }
