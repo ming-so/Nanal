@@ -1,5 +1,6 @@
 package com.android.nanal.group;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -55,11 +56,13 @@ public class EditGroupHelper {
     static final int COLORS_INDEX_COLOR_KEY = 4;
 
     private Context mContext;
+    private Activity mActivity;
 
 
     public EditGroupHelper(Context context) {
         mService = ((AbstractCalendarActivity) context).getAsyncQueryService();
         mContext = context;
+        mActivity = (AbstractCalendarActivity) context;
     }
 
 
@@ -74,6 +77,11 @@ public class EditGroupHelper {
             return false;
         }
 
+        if (model.group_name.trim().length() <= 0) {
+            Log.e(TAG, "빈 그룹 생성");
+            return false;
+        }
+
         if (originalModel != null) {
             Log.e(TAG, "Attempted to update existing event but models didn't refer to the same "
                     + "event.");
@@ -83,40 +91,6 @@ public class EditGroupHelper {
             return false;
         }
 
-//        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
-//        int groupIdIndex = -1;
-
-//        ContentValues values = getContentValuesFromModel(model);
-
-//        if (model.mUri != null && originalModel == null) {
-//            Log.e(TAG, "Existing event but no originalModel provided. Aborting save.");
-//            return false;
-//        }
-
-//        Uri uri = null;
-//        if (model.mUri != null) {
-//            uri = Uri.parse(model.mUri);
-//        }
-//
-//        groupIdIndex = ops.size();
-//
-//        if(uri == null) {
-//            Uri CONTENT_URI = Uri.parse("content://" + "com.android.nanal" + "/group");
-//            ContentProviderOperation.Builder b = ContentProviderOperation.newInsert(CONTENT_URI).withValues(values);
-//            ops.add(b.build());
-//        } else {
-//            ContentProviderOperation.Builder b = ContentProviderOperation.newInsert(uri).withValues(values);
-//            ops.add(b.build());
-//        }
-//
-//        // New Event or New Exception to an existing event
-//        boolean newGroup = (groupIdIndex != -1);
-//
-//        ContentProviderOperation.Builder b;
-//
-//        mService.startBatch(mService.getNextToken(), null, android.provider.CalendarContract.AUTHORITY, ops,
-//                Utils.UNDO_DELAY);
-        //todo: 생성/수정 따로 처리해야 함, jsp에서 처리하면 느려질까???
         CreateNewGroup mCreateGroupTask = new CreateNewGroup();
         String receiveMsg;
         String group_id = "";
@@ -155,7 +129,7 @@ public class EditGroupHelper {
                 @Override
                 public void run() {
                     Log.d(TAG, "groups에 추가 시도, "+ACCOUNT_ID);
-                    GroupAsyncTask groupAsyncTask = new GroupAsyncTask(mContext);
+                    GroupAsyncTask groupAsyncTask = new GroupAsyncTask(mContext, mActivity);
                     groupAsyncTask.execute(ACCOUNT_ID);
                     Message message = handler.obtainMessage();
                     handler.sendMessage(message);

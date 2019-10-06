@@ -98,6 +98,7 @@ import com.android.nanal.group.GroupFragment;
 import com.android.nanal.group.GroupListAdapter;
 import com.android.nanal.interfaces.AllInOneMenuExtensionsInterface;
 import com.android.nanal.month.MonthByWeekFragment;
+import com.android.nanal.query.GroupAsyncTask;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 
@@ -729,7 +730,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             if (!prefManager.isCalendarCreated()) {
                 // 로컬 캘린더가 만들어지지 않았다면
                 try {
-                    CreateNanalCalendar.CreateCalendar(AllInOneActivity.this.getApplicationContext(), "나날", connectId);
+                    CreateNanalCalendar.CreateCalendar(AllInOneActivity.this.getApplicationContext(), "나날", connectId, false);
                     Toast.makeText(AllInOneActivity.this.getApplicationContext(), "캘린더를 생성했습니다.", Toast.LENGTH_LONG).show();
                     prefManager.setCalendarCreated(true);
                     return true;
@@ -1121,6 +1122,9 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         final int itemId = item.getItemId();
         if (itemId == R.id.action_refresh) {
             mController.refreshCalendars();
+            GroupAsyncTask mTask = new GroupAsyncTask(AllInOneActivity.this, AllInOneActivity.this);
+            mTask.execute(connectId);
+            //todo: 상단바에 알림 띄우든가 버튼 돌아가게끔 하면 괜찮을 듯
             return true;
         } else if (itemId == R.id.action_today) {
             viewType = ViewType.CURRENT;
@@ -1226,7 +1230,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 finish();
                 break;
             case R.id.test2:
-                CreateNanalCalendar.CreateCalendar(AllInOneActivity.this.getApplicationContext(), "나날", connectId);
+                CreateNanalCalendar.CreateCalendar(AllInOneActivity.this.getApplicationContext(), "나날", connectId, false);
                 Toast.makeText(AllInOneActivity.this.getApplicationContext(), "생성", Toast.LENGTH_LONG).show();
                 break;
             case R.id.test3:

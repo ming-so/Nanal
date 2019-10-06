@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Calendars;
+import android.util.Log;
 
 import java.util.TimeZone;
 
@@ -18,12 +19,12 @@ public class CreateNanalCalendar {
             0xffFF007F, 0xffFF00FF, 0xffe67c73, 0xff616161
     };
 
-    public static Uri CreateCalendar(final Context context, String name, String accountName) {
+    public static Uri CreateCalendar(final Context context, String name, String accountName, boolean isGroup) {
         Uri target = Uri.parse(CalendarContract.Calendars.CONTENT_URI.toString());
 
         ContentValues values = new ContentValues();
         values.put(Calendars.ACCOUNT_NAME, accountName);
-        values.put(Calendars.ACCOUNT_TYPE, "com.android.nanal");
+        values.put(Calendars.ACCOUNT_TYPE, "com.android.calendar");
         values.put(Calendars.NAME, accountName);
         values.put(Calendars.CALENDAR_DISPLAY_NAME, name);
         values.put(Calendars.CALENDAR_ACCESS_LEVEL, Calendars.CAL_ACCESS_OWNER);
@@ -38,15 +39,20 @@ public class CreateNanalCalendar {
         target = target.buildUpon().appendQueryParameter(CalendarContract.CALLER_IS_SYNCADAPTER, "true")
                 .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_NAME, accountName)
 //                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, "com.google").build();
-                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, "com.android.nanal").build();
+                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, "com.android.calendar").build();
 
         Uri newCalendar = context.getContentResolver().insert(target, values);
 
-        CreateCalendarColors(context, accountName, colors);
-        CreateColors(context, accountName, colors);
-
         PrefManager prefManager = new PrefManager(context);
-        prefManager.setCalendarCreated(true);
+        try {
+            CreateCalendarColors(context, accountName, colors);
+            CreateColors(context, accountName, colors);
+        } catch (IllegalArgumentException e) {
+            Log.i("CreateNanalCalendar: ", "컬러 추가 에러");
+        } finally {
+
+            prefManager.setCalendarCreated(true);
+        }
         return newCalendar;
     }
 
@@ -56,14 +62,14 @@ public class CreateNanalCalendar {
         int i = 1;
         while (i <= colors.length) {
             values.put(CalendarContract.Colors.ACCOUNT_NAME, accountName);
-            values.put(CalendarContract.Colors.ACCOUNT_TYPE, "com.android.nanal");
+            values.put(CalendarContract.Colors.ACCOUNT_TYPE, "com.android.calendar");
             values.put(CalendarContract.Colors.COLOR_KEY, Integer.toString(i));
             values.put(CalendarContract.Colors.COLOR_TYPE, CalendarContract.Colors.TYPE_CALENDAR);
             values.put(CalendarContract.Colors.COLOR, colors[i-1]);
 
             target = target.buildUpon().appendQueryParameter(CalendarContract.CALLER_IS_SYNCADAPTER, "true")
                     .appendQueryParameter(CalendarContract.Colors.ACCOUNT_NAME, accountName)
-                    .appendQueryParameter(CalendarContract.Colors.ACCOUNT_TYPE, "com.android.nanal")
+                    .appendQueryParameter(CalendarContract.Colors.ACCOUNT_TYPE, "com.android.calendar")
                     .build();
 
             context.getContentResolver().insert(target, values);
@@ -77,14 +83,14 @@ public class CreateNanalCalendar {
         int i = 1;
         while (i <= colors.length) {
             values.put(CalendarContract.Colors.ACCOUNT_NAME, accountName);
-            values.put(CalendarContract.Colors.ACCOUNT_TYPE, "com.android.nanal");
+            values.put(CalendarContract.Colors.ACCOUNT_TYPE, "com.android.calendar");
             values.put(CalendarContract.Colors.COLOR_KEY, Integer.toString(i));
             values.put(CalendarContract.Colors.COLOR_TYPE, CalendarContract.Colors.TYPE_EVENT);
             values.put(CalendarContract.Colors.COLOR, colors[i-1]);
 
             target = target.buildUpon().appendQueryParameter(CalendarContract.CALLER_IS_SYNCADAPTER, "true")
                     .appendQueryParameter(CalendarContract.Colors.ACCOUNT_NAME, accountName)
-                    .appendQueryParameter(CalendarContract.Colors.ACCOUNT_TYPE, "com.android.nanal")
+                    .appendQueryParameter(CalendarContract.Colors.ACCOUNT_TYPE, "com.android.calendar")
                     .build();
 
             context.getContentResolver().insert(target, values);
@@ -96,7 +102,7 @@ public class CreateNanalCalendar {
         Uri target = Uri.parse(CalendarContract.Colors.CONTENT_URI.toString());
         target = target.buildUpon().appendQueryParameter(CalendarContract.CALLER_IS_SYNCADAPTER, "true")
                 .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_NAME, accountName)
-                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, "com.android.nanal").build();
+                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, "com.android.calendar").build();
         context.getContentResolver().delete(target, null, null);
     }
 
@@ -104,7 +110,7 @@ public class CreateNanalCalendar {
         Uri target = Uri.parse(CalendarContract.Calendars.CONTENT_URI.toString());
         target = target.buildUpon().appendQueryParameter(CalendarContract.CALLER_IS_SYNCADAPTER, "true")
                 .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_NAME, accountName)
-                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, "com.android.nanal").build();
+                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, "com.android.calendar").build();
 
         context.getContentResolver().delete(target, null, null);
     }
@@ -114,7 +120,7 @@ public class CreateNanalCalendar {
 
         ContentValues values = new ContentValues();
         values.put(Calendars.ACCOUNT_NAME, groupId);
-        values.put(Calendars.ACCOUNT_TYPE, "com.android.nanal");
+        values.put(Calendars.ACCOUNT_TYPE, "com.android.calendar");
         values.put(Calendars.NAME, groupId);
         values.put(Calendars.CALENDAR_DISPLAY_NAME, name);
         if(isGroupMaster) {
@@ -134,7 +140,7 @@ public class CreateNanalCalendar {
 
         target = target.buildUpon().appendQueryParameter(CalendarContract.CALLER_IS_SYNCADAPTER, "true")
                 .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_NAME, groupId)
-                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, "com.android.nanal").build();
+                .appendQueryParameter(CalendarContract.Calendars.ACCOUNT_TYPE, "com.android.calendar").build();
 
         Uri newCalendar = context.getContentResolver().insert(target, values);
 

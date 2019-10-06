@@ -5,15 +5,18 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.android.nanal.diary.Diary;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 
 public class NanalDBHelper  extends SQLiteOpenHelper {
+    public static int DB_VERSION = 1;
     public NanalDBHelper(Context context) {
-        super(context, "nanal", null, 1);
+        super(context, "nanal", null, DB_VERSION);
     }
 
     @Override
@@ -92,22 +95,25 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
     }
 
     public void addGroup(int group_id, String group_name, int group_color, String account_id) {
+        Log.i("NanalDBHelper: ", "그룹 추가 시도 "+group_id+", "+group_name+", "+group_color+", "+account_id);
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("group_id", group_id);
         values.put("group_name", group_name);
         values.put("group_color", group_color);
-        values.put("sync_version", 0);
+        values.put("sync_version", DB_VERSION);
         values.put("account_id", account_id);
-        db.insert("group", null, values);
+        db.insert("community", null, values);
         db.close();
     }
 
     public boolean checkGroup(int group_id) {
+        Log.i("NanalDBHelper", "그룹 확인 "+group_id);
         SQLiteDatabase db = getReadableDatabase();
         String sql = "SELECT * FROM community WHERE group_id='"+group_id+"'";
         Cursor cursor = db.rawQuery(sql,null);
-        if(cursor.getCount() > 0) {
+        if(cursor.getCount() > 0 && cursor.moveToFirst()) {
+            Log.i("NanalDBHelper", cursor.getString(1));
             db.close();
             return true;
         }
@@ -121,6 +127,29 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(sql, null);
         if(cursor.moveToNext()) {
             return cursor.getInt(cursor.getColumnIndex("sync_version"));
+        }
+        return -1;
+    }
+
+    public HashMap<Integer, String> getGroupList() {
+        HashMap<Integer, String> mGroupList = new HashMap<>();
+        SQLiteDatabase db = getReadableDatabase();
+        String sql = "SELECT group_id, group_name FROM community";
+        Cursor cursor = db.rawQuery(sql, null);
+        while(cursor.moveToNext()) {
+            int group_id = cursor.getInt(1);
+            String group_name = cursor.getString(2);
+            mGroupList.put(group_id, group_name);
+        }
+        return mGroupList;
+    }
+
+    public int getGroupColor(int id) {
+        SQLiteDatabase db = getReadableDatabase();
+        String sql = "SELECT group_color FROM community WHERE group_id = "+id;
+        Cursor cursor = db.rawQuery(sql, null);
+        if(cursor.moveToNext()) {
+            return cursor.getInt(1);
         }
         return -1;
     }

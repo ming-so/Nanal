@@ -554,7 +554,7 @@ public class EditGroupFragment extends Fragment implements CalendarController.Gr
                 }
 
                 Toast.makeText(mContext, stringResource, Toast.LENGTH_SHORT).show();
-            } else if ((mCode & Utils.DONE_SAVE) != 0 && mModel != null && isEmptyNewGroup()) {
+            } else if ((mCode & Utils.DONE_SAVE) != 0 && mModel != null && isEmptyNewGroup() && mModel.group_name.length() <= 0) {
                 Toast.makeText(mContext, R.string.empty_group, Toast.LENGTH_SHORT).show();
             }
 
