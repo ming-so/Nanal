@@ -9,6 +9,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.provider.CalendarContract;
+import android.support.design.widget.Snackbar;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.format.Time;
@@ -19,32 +20,37 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.ResourceCursorAdapter;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.nanal.EmailAddressAdapter;
 import com.android.nanal.R;
 import com.android.nanal.Rfc822InputFilter;
+import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.calendar.CalendarDiaryModel;
 import com.android.nanal.chips.AccountSpecifier;
 import com.android.nanal.diary.EditDiaryHelper.EditDoneRunnable;
-import com.android.nanal.event.GeneralPreferences;
 import com.android.nanal.event.Utils;
 import com.android.nanal.timezonepicker.TimeZoneInfo;
 import com.android.nanal.timezonepicker.TimeZonePickerDialog;
+import com.jaredrummler.materialspinner.MaterialSpinner;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Formatter;
+import java.util.List;
 import java.util.Locale;
 
 public class EditDiaryView implements DialogInterface.OnCancelListener,
@@ -68,22 +74,16 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
     ArrayList<View> mEditOnlyList = new ArrayList<View>();
     ArrayList<View> mEditViewList = new ArrayList<View>();
     ArrayList<View> mViewOnlyList = new ArrayList<View>();
-//    ArrayList<Group>
     TextView mLoadingMessage;
     ScrollView mScrollView;
     TextView mTvDay, mTvColor, mTvPic, mTvLocation;
     EditText mEtTitle, mEtContent;
     ImageView mIvColor, mIvGroup, mIvPic, mIvWeather;
-    Spinner mGroupSpinner;
+    MaterialSpinner mGroupSpinner;
 
     View mColorPickerNewEvent;
     View mColorPickerExistingEvent;
     View.OnClickListener mChangeColorOnClickListener;
-    View mTimezoneRow;
-    Spinner mCalendarsSpinner;
-    Spinner mAvailabilitySpinner;
-    Spinner mAccessLevelSpinner;
-    RadioGroup mResponseRadioGroup;
     TextView mTitleTextView;
     AutoCompleteTextView mLocationTextView;
     View mCalendarSelectorGroup;
@@ -104,7 +104,10 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
     private String mTimezone;
     private int mModification = EditDiaryHelper.MODIFY_UNINITIALIZED;
 
+    private int selectPosition = -1;
     public String connectID = "test";
+
+    List<String> mGroupsName;
 
 
     public EditDiaryView(Activity activity, View view, EditDiaryHelper.EditDoneRunnable done,
@@ -131,6 +134,30 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
 
         mGroupSpinner = view.findViewById(R.id.sp_edit_diary_group);
 
+        mGroupSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
+                if(position == 0) {
+                    Snackbar.make(view, "작성하신 일기가 나만 볼 수 있게 저장됩니다.", Snackbar.LENGTH_LONG).show();
+                } else {
+                    Snackbar.make(view, "작성하신 일기가 [" + item + "] 그룹에 저장됩니다.", Snackbar.LENGTH_LONG).show();
+                    position = position;
+                }
+            }
+        });
+        mGroupsName = new ArrayList<>();
+
+        ArrayAdapter arrayAdapter = new ArrayAdapter(mActivity.getApplicationContext(), android.R.layout.simple_spinner_item,
+                mGroupsName);
+
+        mGroupsName.add("개인 일기");
+        for(int i = 0; i < AllInOneActivity.mGroups.size(); i++) {
+            mGroupsName.add(AllInOneActivity.mGroups.get(i).getGroup_name());
+            Log.i(TAG, mGroupsName.get(i)+ " 추가 완료");
+        }
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mGroupSpinner.setAdapter(arrayAdapter);
+
         mColorPickerNewEvent = view.findViewById(R.id.tv_edit_diary_color);
         mColorPickerExistingEvent = view.findViewById(R.id.tv_edit_diary_color);
 
@@ -147,6 +174,14 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
         mTvDay.setText(mStringDay);
 
         setModel(null);
+
+        LinearLayout test = view.findViewById(R.id.ll_edit_diary_group);
+        test.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(mActivity, "클릭", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private String SetStringDay(Date day) {
@@ -241,19 +276,9 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
             mModel.mDiaryContent = null;
         }
 
-        // If this was a new event we need to fill in the Calendar information
+        // If this was a new event
         if (mModel.mUri == null) {
-
-            mModel.mDiaryGroupId = (int) mGroupSpinner.getSelectedItemId();
-            int groupCursorPosition = mGroupSpinner.getSelectedItemPosition();
-            if(mGroupsCursor.moveToPosition(groupCursorPosition)) {
-                String groupName = mGroupsCursor.getString(
-                        EditDiaryHelper.GROUP_INDEX_NAME);
-                //todo:기본(로컬) 캘린더 설정
-                String defaultGroup = "Nanal";
-                Utils.setSharedPreference(mActivity, GeneralPreferences.KEY_DEFAULT_GROUP, defaultGroup);
-                mModel.mDiaryGroupId = mGroupsCursor.getInt(EditDiaryHelper.GROUP_INDEX_ID);
-            }
+            mModel.mDiaryGroupId = (int) AllInOneActivity.mGroups.get(mGroupSpinner.getSelectedIndex()-1).getGroup_id();
         }
         mModel.mDiaryDay = mLongDay;
         mModel.mTimezone = mTimezone;
@@ -302,14 +327,14 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
         if (model.mUri != null) {
             // This is an existing event so hide the calendar spinner
             // since we can't change the calendar.
-            View calendarGroup = mView.findViewById(R.id.sp_edit_diary_group);
-            calendarGroup.setVisibility(View.GONE);
+//            View calendarGroup = mView.findViewById(R.id.sp_edit_diary_group);
+//            calendarGroup.setVisibility(View.GONE);
 //            TextView tv = (TextView) mView.findViewById(R.id.calendar_textview);
 //            tv.setText(model.mCalendarDisplayName);
 //            tv = (TextView) mView.findViewById(R.id.calendar_textview_secondary);
         } else {
-            View calendarGroup = mView.findViewById(R.id.sp_edit_diary_group);
-            calendarGroup.setVisibility(View.GONE);
+//            View calendarGroup = mView.findViewById(R.id.sp_edit_diary_group);
+//            calendarGroup.setVisibility(View.GONE);
         }
         if (model.mDiaryColorInitialized) {
             updateHeadlineColor(model, model.getDiaryColor());
@@ -416,10 +441,16 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
         }
 
         // populate the calendars spinner
-        GroupsAdapter gadapter = new GroupsAdapter(mActivity, R.layout.groups_spinner_item, cursor);
-        mGroupSpinner.setAdapter(gadapter);
-//        mGroupSpinner.setOnItemClickListener(this);
-        mGroupSpinner.setSelection(selection);
+//        ArrayAdapter arrayAdapter = new ArrayAdapter(mActivity.getApplicationContext(), R.layout.groups_spinner_item,
+//                AllInOneActivity.mGroups);
+//        mGroupSpinner.setAdapter(arrayAdapter);
+//        mGroupSpinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                Toast.makeText(mActivity.getApplicationContext(), AllInOneActivity.mGroups.get(position)+" 선택", Toast.LENGTH_LONG).show();
+//            }
+//        });
+//        mGroupSpinner.setSelection(selection);
 
         if (mSaveAfterQueryComplete) {
             mLoadingCalendarsDialog.cancel();

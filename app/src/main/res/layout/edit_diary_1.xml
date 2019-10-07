@@ -133,6 +133,11 @@
             app:layout_constraintVertical_bias="0.227"
             android:paddingLeft="5dp"/>
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="테스트"/>
+
     </LinearLayout>
     <LinearLayout
         android:id="@+id/ll_edit_diary_pic"

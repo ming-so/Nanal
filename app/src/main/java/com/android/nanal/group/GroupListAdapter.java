@@ -12,13 +12,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.nanal.NanalDBHelper;
 import com.android.nanal.R;
+import com.android.nanal.activity.AllInOneActivity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.ViewHolder> {
     private List<Group> groupList;
+    private NanalDBHelper helper;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         LinearLayout group_wrapper;
@@ -32,8 +34,9 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
         }
     }
 
-    public GroupListAdapter(ArrayList<Group> groupList) {
-        this.groupList = groupList;
+    public GroupListAdapter() {
+        helper = AllInOneActivity.helper;
+        groupList = helper.getGroupList();
     }
 
     @Override
@@ -50,29 +53,30 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int i) {
         final Group group = groupList.get(i);
         viewHolder.group_name.setText(group.group_name);
-        switch (group.group_color) {
-            case 1:
+        String hexColor = String.format("#%06X", (0xFFFFFF & group.group_color));
+        switch (hexColor) {
+            case "#41C3B1":
             default:
                 viewHolder.group_icon.setColorFilter(ContextCompat.getColor(
                         viewHolder.group_icon.getContext(), R.color.colorPrimary));
                 break;
-            case 2:
+            case "#F1922D":
                 viewHolder.group_icon.setColorFilter(ContextCompat.getColor(
                         viewHolder.group_icon.getContext(), R.color.colorOrangeAccent));
                 break;
-            case 3:
+            case "#4B7BEA":
                 viewHolder.group_icon.setColorFilter(ContextCompat.getColor(
                         viewHolder.group_icon.getContext(), R.color.colorBluePrimary));
                 break;
-            case 4:
+            case "#3ABE3F":
                 viewHolder.group_icon.setColorFilter(ContextCompat.getColor(
                         viewHolder.group_icon.getContext(), R.color.colorGreenAccent));
                 break;
-            case 5:
+            case "#C72C14":
                 viewHolder.group_icon.setColorFilter(ContextCompat.getColor(
                         viewHolder.group_icon.getContext(), R.color.colorRedAccent));
                 break;
-            case 6:
+            case "#9C27B0":
                 viewHolder.group_icon.setColorFilter(ContextCompat.getColor(
                         viewHolder.group_icon.getContext(), R.color.colorPurpleAccent));
                 break;
@@ -80,8 +84,10 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
         viewHolder.group_wrapper.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                String hexColor = String.format("#%06X", (0xFFFFFF & group.group_color));
                 Context context = v.getContext();
-                Toast.makeText(context, "선택 > "+group.group_id, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "선택 > "+group.group_id + ", hexColor > "+hexColor, Toast.LENGTH_LONG).show();
+
                 //todo: groupId 가지고 그룹 상세 보기 화면으로 전환
             }
         });

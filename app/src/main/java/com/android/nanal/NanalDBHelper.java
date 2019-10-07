@@ -7,11 +7,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.diary.Diary;
+import com.android.nanal.group.Group;
+import com.android.nanal.query.GroupAsyncTask;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 
 public class NanalDBHelper  extends SQLiteOpenHelper {
     public static int DB_VERSION = 1;
@@ -92,10 +95,12 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
         if(d.group_id != -1) values.put("group_id", d.group_id);
         db.insert("diary", null, values);
         db.close();
+
+
     }
 
     public void addGroup(int group_id, String group_name, int group_color, String account_id) {
-        Log.i("NanalDBHelper: ", "그룹 추가 시도 "+group_id+", "+group_name+", "+group_color+", "+account_id);
+        Log.i("NanalDBHelper", "그룹 추가 시도 "+group_id+", "+group_name+", "+group_color+", "+account_id);
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("group_id", group_id);
@@ -105,6 +110,10 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
         values.put("account_id", account_id);
         db.insert("community", null, values);
         db.close();
+
+        Log.i("NanalDBHelper", "AllInOneActivity Groups 갱신 시도");
+        GroupAsyncTask groupAsyncTask = new GroupAsyncTask(AllInOneActivity.mContext, AllInOneActivity.mActivity);
+        groupAsyncTask.execute(account_id);
     }
 
     public boolean checkGroup(int group_id) {
@@ -131,15 +140,18 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
         return -1;
     }
 
-    public HashMap<Integer, String> getGroupList() {
-        HashMap<Integer, String> mGroupList = new HashMap<>();
+    public ArrayList<Group> getGroupList() {
+        ArrayList<Group> mGroupList = new ArrayList<>();
+        // 그룹 아이디, 그룹 이름
         SQLiteDatabase db = getReadableDatabase();
-        String sql = "SELECT group_id, group_name FROM community";
+        String sql = "SELECT * FROM community";
         Cursor cursor = db.rawQuery(sql, null);
         while(cursor.moveToNext()) {
-            int group_id = cursor.getInt(1);
-            String group_name = cursor.getString(2);
-            mGroupList.put(group_id, group_name);
+            Group g = new Group(cursor.getInt(cursor.getColumnIndex("group_id")),
+                    cursor.getString(cursor.getColumnIndex("group_name")),
+                    cursor.getInt(cursor.getColumnIndex("group_color")),
+                    cursor.getString(cursor.getColumnIndex("account_id")));
+            mGroupList.add(g);
         }
         return mGroupList;
     }

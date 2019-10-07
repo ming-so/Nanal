@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.os.Handler;
-import android.os.Message;
 import android.provider.CalendarContract.Colors;
 import android.util.Log;
 
@@ -13,7 +11,6 @@ import com.android.nanal.activity.AbstractCalendarActivity;
 import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.calendar.CalendarGroupModel;
 import com.android.nanal.query.AsyncQueryService;
-import com.android.nanal.query.GroupAsyncTask;
 
 import java.util.concurrent.ExecutionException;
 
@@ -109,32 +106,6 @@ public class EditGroupHelper {
         if(group_id == "") {
             Log.d(TAG, "receiveMsg 없음");
             return false;
-        } else {
-            final String GROUP_ID = group_id.trim();
-            final String GROUP_NAME = model.group_name;
-            final int GROUP_COLOR = model.group_color;
-            final String ACCOUNT_ID = model.account_id;
-
-            final Handler handler = new Handler() {
-                @Override
-                public void handleMessage(Message msg) {
-                    super.handleMessage(msg);
-                        Log.d(TAG, "어댑터 갱신 시도");
-                        AllInOneActivity.groupListAdapter.notifyDataSetChanged();
-                        Log.d(TAG, "완료, 현재 갯수: " + AllInOneActivity.groupListAdapter.getItemCount());
-                }
-            };
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(TAG, "groups에 추가 시도, "+ACCOUNT_ID);
-                    GroupAsyncTask groupAsyncTask = new GroupAsyncTask(mContext, mActivity);
-                    groupAsyncTask.execute(ACCOUNT_ID);
-                    Message message = handler.obtainMessage();
-                    handler.sendMessage(message);
-                }
-            }).start();
         }
         mCreateGroupTask.cancel(true);
         return true;
