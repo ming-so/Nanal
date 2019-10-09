@@ -1,5 +1,6 @@
 package com.android.nanal.diary;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -14,7 +15,6 @@ import android.provider.CalendarContract.Calendars;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.text.format.DateUtils;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,14 +22,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.nanal.CreateNanalCalendar;
 import com.android.nanal.R;
 import com.android.nanal.calendar.CalendarController;
 import com.android.nanal.calendar.CalendarController.EventType;
-import com.android.nanal.calendar.CalendarEventModel;
-import com.android.nanal.event.EditEventHelper;
+import com.android.nanal.calendar.CalendarDiaryModel;
 import com.android.nanal.event.GeneralPreferences;
 import com.android.nanal.event.Utils;
 import com.android.nanal.query.AsyncQueryService;
@@ -57,12 +55,12 @@ public class CreateDiaryDialogFragment extends DialogFragment implements TextWat
     private Button mButtonAddEvent;
 
     private CalendarController mController;
-    private EditEventHelper mEditEventHelper;
+    private EditDiaryHelper mEditDiaryHelper;
 
     private String mDateString;
     private long mDateInMillis;
 
-    private CalendarEventModel mModel;
+    private CalendarDiaryModel mModel;
     private long mCalendarId = -1;
     private String mCalendarOwner;
 
@@ -72,6 +70,7 @@ public class CreateDiaryDialogFragment extends DialogFragment implements TextWat
         // Empty constructor required for DialogFragment.
     }
 
+    @SuppressLint("ValidFragment")
     public CreateDiaryDialogFragment(Time day) {
         setDay(day);
     }
@@ -117,7 +116,7 @@ public class CreateDiaryDialogFragment extends DialogFragment implements TextWat
 
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                createAllDayEvent();
+//                                createAllDayEvent();
                                 dismiss();
                             }
                         })
@@ -162,8 +161,8 @@ public class CreateDiaryDialogFragment extends DialogFragment implements TextWat
         super.onActivityCreated(args);
         final Context context = getActivity();
         mController = CalendarController.getInstance(getActivity());
-        mEditEventHelper = new EditEventHelper(context);
-        mModel = new CalendarEventModel(context);
+        mEditDiaryHelper = new EditDiaryHelper(context);
+        mModel = new CalendarDiaryModel(context);
         mService = new com.android.nanal.diary.CreateDiaryDialogFragment.CalendarQueryService(context);
         mService.startQuery(TOKEN_CALENDARS, null, Calendars.CONTENT_URI,
                 EditDiaryHelper.CALENDARS_PROJECTION,
@@ -171,18 +170,18 @@ public class CreateDiaryDialogFragment extends DialogFragment implements TextWat
                 null);
     }
 
-    private void createAllDayEvent() {
-        mModel.mStart = mDateInMillis;
-        mModel.mEnd = mDateInMillis + DateUtils.DAY_IN_MILLIS;
-        mModel.mTitle = mEventTitle.getText().toString();
-        mModel.mAllDay = true;
-        mModel.mCalendarId = mCalendarId;
-        mModel.mOwnerAccount = mCalendarOwner;
-
-        if (mEditEventHelper.saveEvent(mModel, null, 0)) {
-            Toast.makeText(getActivity(), R.string.creating_event, Toast.LENGTH_SHORT).show();
-        }
-    }
+//    private void createAllDayEvent() {
+//        mModel.mStart = mDateInMillis;
+//        mModel.mEnd = mDateInMillis + DateUtils.DAY_IN_MILLIS;
+//        mModel.mTitle = mEventTitle.getText().toString();
+//        mModel.mAllDay = true;
+//        mModel.mCalendarId = mCalendarId;
+//        mModel.mOwnerAccount = mCalendarOwner;
+//
+//        if (mEditDiaryHelper.saveDiary(mModel, null, 0)) {
+//            Toast.makeText(getActivity(), R.string.creating_event, Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
     @Override
     public void afterTextChanged(Editable s) {
@@ -228,7 +227,7 @@ public class CreateDiaryDialogFragment extends DialogFragment implements TextWat
                     })
                     .setNegativeButton(android.R.string.no, null);
             builder.show();
-            CreateNanalCalendar.CreateCalendar(getActivity(), connectID, connectID);
+            CreateNanalCalendar.CreateCalendar(getActivity(), connectID, connectID, false);
             return;
         }
 

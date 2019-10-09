@@ -1126,7 +1126,7 @@ public class EditEventView implements View.OnClickListener, DialogInterface.OnCa
                     .setPositiveButton(R.string.add_account, this)
                     .setNegativeButton(android.R.string.no, this).setOnCancelListener(this);
             mNoCalendarsDialog = builder.show();
-            CreateNanalCalendar.CreateCalendar(this.mActivity.getApplicationContext(), connectID, connectID);
+            CreateNanalCalendar.CreateCalendar(this.mActivity.getApplicationContext(), connectID, connectID, false);
             return;
         }
 

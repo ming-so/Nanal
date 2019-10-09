@@ -4,13 +4,15 @@
     android:layout_height="wrap_content"
     android:layout_width="match_parent">
 
-    <TextView android:id="@+id/group_name"
+    <TextView
+        android:id="@+id/group_name"
         style="?android:attr/spinnerItemStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:singleLine="true"
         android:ellipsize="end"
-        android:textColor="#FFFFFFFF"
+        android:singleLine="true"
+        android:text="텍스트"
+        android:textColor="#000000"
         android:textSize="18sp" />
 
 </LinearLayout>

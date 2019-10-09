@@ -73,7 +73,7 @@ public class GlobalDismissManager extends BroadcastReceiver {
     };
     private static final String TAG = "GlobalDismissManager";
     private static final String GOOGLE_ACCOUNT_TYPE = "com.google";
-    private static final String NANAL_ACCOUNT_TYPE = "com.android.nanal";
+    private static final String NANAL_ACCOUNT_TYPE = "com.android.calendar";
     private static final String GLOBAL_DISMISS_MANAGER_PREFS = "com.android.calendar.alerts.GDM";
     private static final String ACCOUNT_KEY = "known_accounts";
 

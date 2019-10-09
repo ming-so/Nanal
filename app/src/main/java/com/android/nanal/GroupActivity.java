@@ -6,10 +6,7 @@ import android.os.Bundle;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.nanal.group.Group;
 import com.android.nanal.group.GroupListAdapter;
-
-import java.util.ArrayList;
 
 public class GroupActivity extends Activity {
     @Override
@@ -17,15 +14,10 @@ public class GroupActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.group_activity);
 
-        ArrayList<Group> groups = new ArrayList<>();
-        groups.add(new Group(1, "test", 2, "test"));
-
         RecyclerView recyclerView = findViewById(R.id.rv_group);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        GroupListAdapter groupListAdapter = new GroupListAdapter(groups);
+        GroupListAdapter groupListAdapter = new GroupListAdapter();
         recyclerView.setAdapter(groupListAdapter);
-
-
     }
 
     class GroupTask extends AsyncTask<Void, Void, Void> {

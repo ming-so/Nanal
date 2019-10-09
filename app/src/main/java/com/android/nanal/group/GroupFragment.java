@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 
 
 import com.android.nanal.R;
-import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.calendar.CalendarController;
 
 public class GroupFragment extends Fragment implements CalendarController.EventHandler {
@@ -34,7 +33,7 @@ public class GroupFragment extends Fragment implements CalendarController.EventH
         View v = inflater.inflate(R.layout.group_activity, null);
         recyclerView = v.findViewById(R.id.rv_group);
 
-        recyclerView.setAdapter(AllInOneActivity.groupListAdapter);
+        recyclerView.setAdapter(new GroupListAdapter());
         recyclerView.setLayoutManager(new LinearLayoutManager(v.getContext()));
         return v;
     }
@@ -57,17 +56,4 @@ public class GroupFragment extends Fragment implements CalendarController.EventH
     public void eventsChanged() {
 
     }
-
-//    public static void addGroup(String groupId, String groupName, int groupColor) {
-//        AllInOneActivity.groups.add(getNewGroup(Integer.parseInt(groupId), groupName, groupColor));
-//        refreshGroups();
-//    }
-//
-//    static Group getNewGroup(int groupId, String groupName, int groupColor) {
-//        Group group = Group.newInstance();
-//        group.group_id = groupId;
-//        group.group_name = groupName;
-//        group.group_color = groupColor;
-//        return group;
-//    }
 }

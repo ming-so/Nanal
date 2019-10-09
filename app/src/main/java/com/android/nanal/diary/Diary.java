@@ -94,7 +94,7 @@ public class Diary implements Cloneable {
     // 위의 projection 배열을 위한 indices
     private static final int PROJECTION_DIARY_ID_INDEX = 0;
     private static final int PROJECTION_ACCOUNT_ID_INDEX = 1;
-    private static final int PROJECTION_CONNECT_TYPE_INDEX = 2;
+    private static final int PROJECTION_GROUP_ID_INDEX = 2;
     private static final int PROJECTION_COLOR_INDEX = 3;
     private static final int PROJECTION_LOCATION_INDEX = 4;
     private static final int PROJECTION_DAY_INDEX = 5;
@@ -102,7 +102,7 @@ public class Diary implements Cloneable {
     private static final int PROJECTION_CONTENT_INDEX = 7;
     private static final int PROJECTION_WEATHER_INDEX = 8;
     private static final int PROJECTION_IMAGE_INDEX = 9;
-    private static final int PROJECTION_GROUP_ID_INDEX = 10;
+
 
     private static String mNoTitleString;
     private static String mNoContentString;
@@ -111,7 +111,6 @@ public class Diary implements Cloneable {
 
     public int id;
     public String account_id;
-    public String connect;
     public int color;
     public String location;
     public long day;
@@ -143,7 +142,6 @@ public class Diary implements Cloneable {
 
         d.id = -1;
         d.account_id = "";
-        d.connect = "";
         d.color = -1;
         d.location = "";
         d.day = -1;
@@ -333,7 +331,6 @@ public class Diary implements Cloneable {
 
         e.id = cDiaries.getInt(PROJECTION_DIARY_ID_INDEX);
         e.account_id = cDiaries.getString(PROJECTION_ACCOUNT_ID_INDEX);
-        e.connect = cDiaries.getString(PROJECTION_CONNECT_TYPE_INDEX);
         e.color = cDiaries.getInt(PROJECTION_COLOR_INDEX);
         e.location = cDiaries.getString(PROJECTION_LOCATION_INDEX);
         e.day = cDiaries.getInt(PROJECTION_DAY_INDEX);
@@ -452,7 +449,6 @@ public class Diary implements Cloneable {
 
         d.id = id;
         d.account_id = account_id;
-        d.connect = connect;
         d.group_id = group_id;
         d.color = color;
         d.location = location;

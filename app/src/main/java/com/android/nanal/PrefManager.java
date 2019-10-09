@@ -18,6 +18,7 @@ public class PrefManager {
 
     private static final String IS_FIRST_TIME_LAUNCH = "IsFirstTimeLaunch";
     private static final String IS_CALENDAR_CREATED = "IsCalendarCreated";
+    private static final String IS_DB_CREATED = "IsDBCreated";
 
     public PrefManager(Context context) {
         this._context = context;
@@ -42,4 +43,11 @@ public class PrefManager {
     public boolean isFirstTimeLaunch() {
         return pref.getBoolean(IS_FIRST_TIME_LAUNCH, true);
     }
+
+    public void setDBCreated(boolean isCreated) {
+        editor.putBoolean(IS_DB_CREATED, isCreated);
+        editor.commit();
+    }
+
+    public boolean isDBCreated() { return pref.getBoolean(IS_DB_CREATED, false); }
 }

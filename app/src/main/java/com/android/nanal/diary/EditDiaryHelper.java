@@ -157,6 +157,7 @@ public class EditDiaryHelper {
 
         if(uri == null) {
             Uri CONTENT_URI = Uri.parse("content://" + "com.android.nanal" + "/diary");
+            //todo:수정
             ContentProviderOperation.Builder b = ContentProviderOperation.newInsert(CONTENT_URI).withValues(values);
             ops.add(b.build());
         } else {

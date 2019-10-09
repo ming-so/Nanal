@@ -158,7 +158,7 @@ public class EditEventHelper {
      */
     public static final String EVENT_ALL_DAY = "allDay";
 
-    static final String[] CALENDARS_PROJECTION = new String[] {
+    public static final String[] CALENDARS_PROJECTION = new String[] {
             Calendars._ID, // 0
             Calendars.CALENDAR_DISPLAY_NAME, // 1
             Calendars.OWNER_ACCOUNT, // 2
@@ -187,12 +187,12 @@ public class EditEventHelper {
     static final int CALENDARS_INDEX_ACCOUNT_NAME = 11;
     static final int CALENDARS_INDEX_ACCOUNT_TYPE = 12;
 
-    static final String CALENDARS_WHERE_WRITEABLE_VISIBLE = Calendars.CALENDAR_ACCESS_LEVEL + ">="
+    public static final String CALENDARS_WHERE_WRITEABLE_VISIBLE = Calendars.CALENDAR_ACCESS_LEVEL + ">="
             + Calendars.CAL_ACCESS_CONTRIBUTOR + " AND " + Calendars.VISIBLE + "=1";
 
     static final String CALENDARS_WHERE = Calendars._ID + "=?";
 
-    static final String[] COLORS_PROJECTION = new String[] {
+    public static final String[] COLORS_PROJECTION = new String[] {
             Colors._ID, // 0
             Colors.ACCOUNT_NAME,
             Colors.ACCOUNT_TYPE,
@@ -634,7 +634,7 @@ public class EditEventHelper {
      *
      * return -> 다음 30분을 나타내는 UTC 시간 (밀리초)
      */
-    protected long constructDefaultStartTime(long now) {
+    public long constructDefaultStartTime(long now) {
         Time defaultStart = new Time();
         defaultStart.set(now);
         defaultStart.second = 0;
@@ -658,7 +658,7 @@ public class EditEventHelper {
      * context -> 사용자 선호도를 검색하는 {@link Context}
      * return -> 기본 종료 시간
      */
-    protected long constructDefaultEndTime(long startTime, Context context) {
+    public long constructDefaultEndTime(long startTime, Context context) {
         return startTime + Utils.getDefaultEventDurationInMillis(context);
     }
 

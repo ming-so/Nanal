@@ -7,12 +7,10 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.CalendarContract;
@@ -34,7 +32,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.android.nanal.NanalDBHelper;
 import com.android.nanal.R;
+import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.calendar.CalendarController;
 import com.android.nanal.calendar.CalendarController.DiaryInfo;
 import com.android.nanal.calendar.CalendarDiaryModel;
@@ -64,6 +64,8 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
     private static final int TOKEN_DIARY = 1;
     private static final int TOKEN_COLORS = 1 << 1;
 
+    private int mId = -1;
+
 
     private static final int TOKEN_ALL = TOKEN_DIARY | TOKEN_COLORS;
     private static final int TOKEN_UNITIALIZED = 1 << 31;
@@ -84,7 +86,6 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
     private DiaryBundle mDiaryBundle;
     private int mDiaryColor;
     private boolean mDiaryColorInitialized = false;
-    private Uri mUri;
     private long mDay;
     private DiaryColorPickerDialog mColorPickerDialog;
     private AppCompatActivity mContext;
@@ -166,39 +167,27 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
 
 
     private void startQuery() {
-        mUri = null;
+        int diary_id = -1;
         mDay = -1;
-        Uri uri = Uri.parse("content://" + "com.android.nanal" + "/diary");
-        if (mDiary != null) {
+        NanalDBHelper helper = AllInOneActivity.helper;
+        if(mDiary != null) {
             if(mDiary.id != -1) {
                 mModel.mDiaryId = mDiary.id;
-                mUri = ContentUris.withAppendedId(uri, mDiary.id);
             }
             if(mDiary.day > 0) {
                 mDay = mDiary.day;
             }
-        } else if (mDiaryBundle != null) {
-            if (mDiaryBundle.id != -1) {
-                mModel.mDiaryId = mDiaryBundle.id;
-                mUri = ContentUris.withAppendedId(uri, mDiaryBundle.id);
-            }
-            mDay = mDiaryBundle.day;
-        }
-        if (mDiaryColorInitialized) {
-            mModel.setDiaryColor(mDiaryColor);
         }
         if(mDay <= 0) {
             mDay = mHelper.constructDefaultStartTime(System.currentTimeMillis());
         }
 
         // Kick off the query for the event
-        boolean newDiary = mUri == null;
+        boolean newDiary = mDiary.id == -1;
         if (!newDiary) {
+            // 수정해야 하는 경우
             mOutstandingQueries = TOKEN_ALL;
-            if (DEBUG) {
-                Log.d(TAG, "startQuery: uri for event is " + mUri.toString());
-            }
-            mHandler.startQuery(TOKEN_DIARY, null, mUri, EditDiaryHelper.DIARY_PROJECTION,
+            mHandler.startQuery(TOKEN_DIARY, null, null, EditDiaryHelper.DIARY_PROJECTION,
                     null /* selection */, null /* selection args */, null /* sort order */);
         } else {
             mOutstandingQueries = TOKEN_COLORS;
@@ -472,6 +461,7 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
             }
             int diaryId;
             switch (token) {
+
                 case TOKEN_DIARY:
                     if (cursor.getCount() == 0) {
                         // The cursor is empty. This can happen if the event
@@ -487,9 +477,9 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
                     EditDiaryHelper.setModelFromCursor(mModel, cursor);
                     cursor.close();
 
-                    mOriginalModel.mUri = mUri.toString();
+                    mOriginalModel.mDiaryId = mId;
+                    mModel.mDiaryId = mId;
 
-                    mModel.mUri = mUri.toString();
                     mModel.mDiaryDay = mDay;
                     if (mDiaryColorInitialized) {
                         mModel.setDiaryColor(mDiaryColor);
@@ -569,7 +559,7 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
                     && !isEmptyNewDiary()
                     && mHelper.saveDiary(mModel, mOriginalModel)) {
                 int stringResource;
-                if (mModel.mUri != null) {
+                if (mModel.mDiaryId != -1) {
                     stringResource = R.string.saving_diary;
                 } else {
                     stringResource = R.string.creating_diary;

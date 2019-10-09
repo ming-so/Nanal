@@ -1,10 +1,9 @@
 package com.android.nanal.group;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.os.Handler;
-import android.os.Message;
 import android.provider.CalendarContract.Colors;
 import android.util.Log;
 
@@ -12,7 +11,6 @@ import com.android.nanal.activity.AbstractCalendarActivity;
 import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.calendar.CalendarGroupModel;
 import com.android.nanal.query.AsyncQueryService;
-import com.android.nanal.query.GroupAsyncTask;
 
 import java.util.concurrent.ExecutionException;
 
@@ -54,9 +52,14 @@ public class EditGroupHelper {
     static final int COLORS_INDEX_COLOR = 3;
     static final int COLORS_INDEX_COLOR_KEY = 4;
 
+    private Context mContext;
+    private Activity mActivity;
+
 
     public EditGroupHelper(Context context) {
         mService = ((AbstractCalendarActivity) context).getAsyncQueryService();
+        mContext = context;
+        mActivity = (AbstractCalendarActivity) context;
     }
 
 
@@ -71,6 +74,11 @@ public class EditGroupHelper {
             return false;
         }
 
+        if (model.group_name.trim().length() <= 0) {
+            Log.e(TAG, "빈 그룹 생성");
+            return false;
+        }
+
         if (originalModel != null) {
             Log.e(TAG, "Attempted to update existing event but models didn't refer to the same "
                     + "event.");
@@ -80,46 +88,15 @@ public class EditGroupHelper {
             return false;
         }
 
-//        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
-//        int groupIdIndex = -1;
-
-//        ContentValues values = getContentValuesFromModel(model);
-
-//        if (model.mUri != null && originalModel == null) {
-//            Log.e(TAG, "Existing event but no originalModel provided. Aborting save.");
-//            return false;
-//        }
-
-//        Uri uri = null;
-//        if (model.mUri != null) {
-//            uri = Uri.parse(model.mUri);
-//        }
-//
-//        groupIdIndex = ops.size();
-//
-//        if(uri == null) {
-//            Uri CONTENT_URI = Uri.parse("content://" + "com.android.nanal" + "/group");
-//            ContentProviderOperation.Builder b = ContentProviderOperation.newInsert(CONTENT_URI).withValues(values);
-//            ops.add(b.build());
-//        } else {
-//            ContentProviderOperation.Builder b = ContentProviderOperation.newInsert(uri).withValues(values);
-//            ops.add(b.build());
-//        }
-//
-//        // New Event or New Exception to an existing event
-//        boolean newGroup = (groupIdIndex != -1);
-//
-//        ContentProviderOperation.Builder b;
-//
-//        mService.startBatch(mService.getNextToken(), null, android.provider.CalendarContract.AUTHORITY, ops,
-//                Utils.UNDO_DELAY);
-        //todo: 생성/수정 따로 처리해야 함, jsp에서 처리하면 느려질까???
         CreateNewGroup mCreateGroupTask = new CreateNewGroup();
-        final String receiveMsg;
+        String receiveMsg;
         String group_id = "";
         try {
+            Log.d(TAG, "서버 DB에 데이터 전송하여 insert하고 그룹 아이디 받아오기");
             receiveMsg = mCreateGroupTask.execute(model.group_name, Integer.toString(model.group_color), model.account_id).get();
-            group_id = receiveMsg;
+            group_id = receiveMsg.trim();
+            AllInOneActivity.helper.addGroup(Integer.parseInt(group_id), model.group_name, model.group_color, model.account_id);
+            Log.d(TAG, "DB에 그룹 추가! group_id="+group_id+", group_name="+model.group_name);
         } catch (InterruptedException e) {
             Log.e(TAG, e.getMessage());
         } catch (ExecutionException e) {
@@ -129,34 +106,6 @@ public class EditGroupHelper {
         if(group_id == "") {
             Log.d(TAG, "receiveMsg 없음");
             return false;
-        } else {
-            final String GROUP_ID = group_id.trim();
-            final String GROUP_NAME = model.group_name;
-            final int GROUP_COLOR = model.group_color;
-            final String ACCOUNT_ID = model.account_id;
-
-            final Handler handler = new Handler() {
-                @Override
-                public void handleMessage(Message msg) {
-                    super.handleMessage(msg);
-                        Log.d(TAG, "어댑터 갱신 시도");
-                        AllInOneActivity.groupListAdapter.notifyDataSetChanged();
-                        Log.d(TAG, "완료, 현재 갯수: " + AllInOneActivity.groupListAdapter.getItemCount());
-                }
-            };
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d(TAG, "groups에 추가 시도, "+ACCOUNT_ID);
-                    //todo:db 직접 연동으로 바꾸면 add문은 지워야 함
-//                    AllInOneActivity.groups.add(new Group(Integer.parseInt(GROUP_ID), GROUP_NAME, GROUP_COLOR, ACCOUNT_ID));
-                    GroupAsyncTask groupAsyncTask = new GroupAsyncTask();
-                    groupAsyncTask.execute(ACCOUNT_ID);
-                    Message message = handler.obtainMessage();
-                    handler.sendMessage(message);
-                }
-            }).start();
         }
         mCreateGroupTask.cancel(true);
         return true;

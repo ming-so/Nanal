@@ -639,7 +639,7 @@ public class EditEventFragment extends Fragment implements EventHandler, OnColor
 
         // TODO turn this into a helper function in EditEventHelper for building the
         // model
-        private class QueryHandler extends AsyncQueryHandler {
+        public class QueryHandler extends AsyncQueryHandler {
                 public QueryHandler(ContentResolver cr) {
                         super(cr);
                 }

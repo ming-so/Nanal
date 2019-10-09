@@ -442,8 +442,17 @@
             android:exported="false"
             android:permission="android.permission.BIND_REMOTEVIEWS"></service>
         <service android:name=".query.AsyncQueryServiceHelper" />
+        <activity android:name=".activity.SplashActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-        <activity android:name=".WelcomeActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.APP_CALENDAR" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".WelcomeActivity"/>
         <activity android:name=".LoginActivity" />
         <activity
             android:name=".activity.SettingsActivity"

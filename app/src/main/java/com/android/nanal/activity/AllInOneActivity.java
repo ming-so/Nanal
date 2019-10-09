@@ -9,6 +9,7 @@ import android.accounts.OperationCanceledException;
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -27,6 +28,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Rect;
 import android.graphics.drawable.LayerDrawable;
 import android.net.Uri;
@@ -41,6 +43,9 @@ import android.provider.CalendarContract.Events;
 import androidx.annotation.NonNull;
 
 import com.android.nanal.DynamicLinkManager;
+import com.android.nanal.LoginActivity;
+import com.android.nanal.NanalDBHelper;
+import com.android.nanal.PrefManager;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -74,8 +79,6 @@ import com.android.nanal.DayFragment;
 import com.android.nanal.DayOfMonthDrawable;
 import com.android.nanal.DynamicTheme;
 import com.android.nanal.ExtensionsFactory;
-import com.android.nanal.LoginActivity;
-import com.android.nanal.PrefManager;
 import com.android.nanal.R;
 import com.android.nanal.TodayFragment;
 import com.android.nanal.ViewDetailsPreferences;
@@ -97,9 +100,9 @@ import com.android.nanal.event.GeneralPreferences;
 import com.android.nanal.event.Utils;
 import com.android.nanal.group.Group;
 import com.android.nanal.group.GroupFragment;
-import com.android.nanal.group.GroupListAdapter;
 import com.android.nanal.interfaces.AllInOneMenuExtensionsInterface;
 import com.android.nanal.month.MonthByWeekFragment;
+import com.android.nanal.query.GroupAsyncTask;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
@@ -264,7 +267,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     private AllInOneMenuExtensionsInterface mExtensions = ExtensionsFactory
             .getAllInOneMenuExtensions();
 
-//    public String connectID = "test";
+    //    public String connectID = "test";
     SharedPreferences prefs;
     public static String connectId;
     public String connectNick = "테스트";
@@ -274,8 +277,13 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     private boolean isGroupMenu = false;
     private boolean permission = false;
 
-    public static ArrayList<Group> groups = new ArrayList<>();
-    public static GroupListAdapter groupListAdapter = new GroupListAdapter(AllInOneActivity.groups);
+    public static NanalDBHelper helper = null;
+    public static SQLiteDatabase nanalDB = null;
+
+    public static ArrayList<Group> mGroups = new ArrayList<>();
+
+    public static Activity mActivity;
+    public static Context mContext;
 
 
     @Override
@@ -308,6 +316,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         }
         super.onCreate(icicle);
         dynamicTheme.onCreate(this);
+
 
 
 //        if (icicle != null && icicle.containsKey(BUNDLE_KEY_CHECK_ACCOUNTS)) {
@@ -487,7 +496,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 switch (item.getItemId()) {
                     case R.id.action_calendar:
                         // mode 1
-                        if (selectedMode == 1) {
+                        if(selectedMode == 1) {
                             // 오늘 날짜로 갱신
                             Time t = new Time(mTimeZone);
                             t.setToNow();
@@ -558,6 +567,25 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                         Log.w(TAG, "getDynamicLink:onFailure", e);
                     }
                 });
+
+        openDatabase();
+    }
+
+    public void openDatabase() {
+        PrefManager prefManager = new PrefManager(getApplicationContext());
+        if (helper == null) {
+            helper = new NanalDBHelper(getApplicationContext());
+        }
+        if (!prefManager.isDBCreated()) {
+            // DB가 만들어지지 않았다면 새로 생성하기
+            nanalDB = helper.getWritableDatabase();
+            prefManager.setDBCreated(true);
+            Toast.makeText(this, "DB 생성 완료", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "DB 이미 존재함", Toast.LENGTH_LONG).show();
+            mGroups = helper.getGroupList();
+            Log.i(TAG, "mGroups.size() " + mGroups.size());
+        }
     }
 
     private void checkAppPermissions() {
@@ -593,7 +621,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 // 요청이 취소되면 결과 배열이 비어 있음
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        permission = true;
+                    permission = true;
                     // permission was granted, yay!
                     // 퍼미션 받음!
                 } else {
@@ -688,7 +716,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 Rect outRect = new Rect();
                 mFAB.getGlobalVisibleRect(outRect);
 
-                if(!outRect.contains((int)event.getRawX(), (int)event.getRawY()))
+                if (!outRect.contains((int) event.getRawX(), (int) event.getRawY()))
                     mFAB.collapse();
             }
         }
@@ -722,10 +750,11 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         mAddDiary.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    Time t = new Time();
-                    t.set(mController.getTime());
-                    mController.sendEventRelatedEvent(
-                            this, EventType.CREATE_DIARY, -1, t.toMillis(true), 0, 0, 0, -1);
+                GroupSync();
+                Time t = new Time();
+                t.set(mController.getTime());
+                mController.sendEventRelatedEvent(
+                        this, EventType.CREATE_DIARY, -1, t.toMillis(true), 0, 0, 0, -1);
             }
         });
 
@@ -740,13 +769,13 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
     private boolean createLocalCalendar() {
         checkAppPermissions();
-        if(permission) {
+        if (permission) {
             // 권한 있음
             PrefManager prefManager = new PrefManager(getApplicationContext());
             if (!prefManager.isCalendarCreated()) {
                 // 로컬 캘린더가 만들어지지 않았다면
                 try {
-                    CreateNanalCalendar.CreateCalendar(AllInOneActivity.this.getApplicationContext(), "나날", connectId);
+                    CreateNanalCalendar.CreateCalendar(AllInOneActivity.this.getApplicationContext(), "나날", connectId, false);
                     Toast.makeText(AllInOneActivity.this.getApplicationContext(), "캘린더를 생성했습니다.", Toast.LENGTH_LONG).show();
                     prefManager.setCalendarCreated(true);
                     return true;
@@ -1130,6 +1159,12 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         return true;
     }
 
+    public void GroupSync() {
+        GroupAsyncTask mTask = new GroupAsyncTask(AllInOneActivity.this, AllInOneActivity.this);
+        mTask.execute(connectId);
+        mGroups = helper.getGroupList();
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Time t = null;
@@ -1138,6 +1173,10 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         final int itemId = item.getItemId();
         if (itemId == R.id.action_refresh) {
             mController.refreshCalendars();
+            mGroups = helper.getGroupList();
+            Log.i(TAG, "mGroups.size() " + mGroups.size());
+            GroupSync();
+            //todo: 상단바에 알림 띄우든가 버튼 돌아가게끔 하면 괜찮을 듯
             return true;
         } else if (itemId == R.id.action_today) {
             viewType = ViewType.CURRENT;
@@ -1191,7 +1230,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         } else if (itemId == R.id.action_view_settings) {
             Intent intent = new Intent(this, CalendarSettingsActivity.class);
             intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT, ViewDetailsPreferences.class.getName());
-            intent.putExtra( PreferenceActivity.EXTRA_NO_HEADERS, true );
+            intent.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
             startActivity(intent);
         } else {
             return mExtensions.handleItemSelected(item, this);
@@ -1243,7 +1282,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 finish();
                 break;
             case R.id.test2:
-                CreateNanalCalendar.CreateCalendar(AllInOneActivity.this.getApplicationContext(), "나날", connectId);
+                CreateNanalCalendar.CreateCalendar(AllInOneActivity.this.getApplicationContext(), "나날", connectId, false);
                 Toast.makeText(AllInOneActivity.this.getApplicationContext(), "생성", Toast.LENGTH_LONG).show();
                 break;
             case R.id.test3:
@@ -1305,7 +1344,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     }
 
     public void setAgainFAB(boolean isGroupMenu) {
-        if(!isGroupMenu) {
+        if (!isGroupMenu) {
             mAddCalendar.setVisibility(View.VISIBLE);
             mAddDiary.setVisibility(View.VISIBLE);
         } else {
@@ -1680,7 +1719,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 int response = event.getResponse();
                 if ((mCurrentView == ViewType.AGENDA && mShowEventInfoFullScreenAgenda) ||
                         ((mCurrentView == ViewType.DAY || (mCurrentView == ViewType.WEEK) ||
-                                mCurrentView == ViewType.MONTH) && mShowEventInfoFullScreen)){
+                                mCurrentView == ViewType.MONTH) && mShowEventInfoFullScreen)) {
                     // start event info as activity
                     // activity로 이벤트 정보 시작
                     Intent intent = new Intent(Intent.ACTION_VIEW);
