@@ -38,16 +38,20 @@ import android.preference.PreferenceActivity;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Attendees;
 import android.provider.CalendarContract.Events;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+
+import com.android.nanal.DynamicLinkManager;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuItemCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
@@ -70,6 +74,8 @@ import com.android.nanal.DayFragment;
 import com.android.nanal.DayOfMonthDrawable;
 import com.android.nanal.DynamicTheme;
 import com.android.nanal.ExtensionsFactory;
+import com.android.nanal.LoginActivity;
+import com.android.nanal.PrefManager;
 import com.android.nanal.R;
 import com.android.nanal.TodayFragment;
 import com.android.nanal.ViewDetailsPreferences;
@@ -96,6 +102,8 @@ import com.android.nanal.interfaces.AllInOneMenuExtensionsInterface;
 import com.android.nanal.month.MonthByWeekFragment;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
+import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 
 import java.io.File;
 import java.io.IOException;
@@ -264,6 +272,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     public int selectedMode = 1;
 
     private boolean isGroupMenu = false;
+    private boolean permission = false;
 
     public static ArrayList<Group> groups = new ArrayList<>();
     public static GroupListAdapter groupListAdapter = new GroupListAdapter(AllInOneActivity.groups);
@@ -299,7 +308,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         }
         super.onCreate(icicle);
         dynamicTheme.onCreate(this);
-
 
 
 //        if (icicle != null && icicle.containsKey(BUNDLE_KEY_CHECK_ACCOUNTS)) {
@@ -479,7 +487,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 switch (item.getItemId()) {
                     case R.id.action_calendar:
                         // mode 1
-                        if(selectedMode == 1) {
+                        if (selectedMode == 1) {
                             // 오늘 날짜로 갱신
                             Time t = new Time(mTimeZone);
                             t.setToNow();
@@ -516,6 +524,40 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
         prefs = this.getApplicationContext().getSharedPreferences("login_setting", MODE_PRIVATE);
         connectId = prefs.getString("loginId", null);
+
+        // 다이나믹 링크 설정
+        // ATTENTION: This was auto-generated to handle app links.
+        Intent appLinkIntent = getIntent();
+        String appLinkAction = appLinkIntent.getAction();
+        Uri appLinkData = appLinkIntent.getData();
+
+        if (Intent.ACTION_VIEW.equals(appLinkAction) && appLinkData != null){
+//            String recipeId = appLinkData.getLastPathSegment();
+//            Uri appData = Uri.parse("content://com.recipe_app/recipe/").buildUpon()
+//                    .appendPath(recipeId).build();
+//            showRecipe(appData);
+            // 링크 연결됐을 때 실행될 코드 작성하기 (위 코드는 예시)
+        }
+
+        FirebaseDynamicLinks.getInstance()
+                .getDynamicLink(getIntent())
+                .addOnSuccessListener(this, new OnSuccessListener<PendingDynamicLinkData>() {
+                    @Override
+                    public void onSuccess(PendingDynamicLinkData pendingDynamicLinkData) {
+                        // Get deep link from result (may be null if no link is found)
+                        Uri deepLink = null;
+                        if (pendingDynamicLinkData != null) {
+                            deepLink = pendingDynamicLinkData.getLink();
+                        }
+                        Toast.makeText(AllInOneActivity.this, "다이나믹 링크 테스트", Toast.LENGTH_LONG).show();
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "getDynamicLink:onFailure", e);
+                    }
+                });
     }
 
     private void checkAppPermissions() {
@@ -537,6 +579,8 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.WRITE_CALENDAR, Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     PERMISSIONS_REQUEST_WRITE_CALENDAR);
+        } else {
+            permission = true;
         }
     }
 
@@ -549,13 +593,12 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 // 요청이 취소되면 결과 배열이 비어 있음
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
+                        permission = true;
                     // permission was granted, yay!
                     // 퍼미션 받음!
-                    // todo: 회원가입 & 로그인 들어오면 로그인 때 처리하는 걸로 수정하기!!
-                    //CreateNanalCalendar.CreateCalendar(this, connectID, connectID);
                 } else {
                     Toast.makeText(getApplicationContext(), R.string.user_rejected_calendar_write_permission, Toast.LENGTH_LONG).show();
+                    permission = false;
                 }
                 return;
             }
@@ -667,8 +710,12 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                     } else if (t.minute > 0 && t.minute < 30) {
                         t.minute = 30;
                     }
-                    mController.sendEventRelatedEvent(
-                            this, EventType.CREATE_EVENT, -1, t.toMillis(true), 0, 0, 0, -1);
+                    if(createLocalCalendar()) {
+                        mController.sendEventRelatedEvent(
+                                this, EventType.CREATE_EVENT, -1, t.toMillis(true), 0, 0, 0, -1);
+                    } else {
+
+                    }
             }
         });
 
@@ -691,7 +738,30 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         });
     }
 
-
+    private boolean createLocalCalendar() {
+        checkAppPermissions();
+        if(permission) {
+            // 권한 있음
+            PrefManager prefManager = new PrefManager(getApplicationContext());
+            if (!prefManager.isCalendarCreated()) {
+                // 로컬 캘린더가 만들어지지 않았다면
+                try {
+                    CreateNanalCalendar.CreateCalendar(AllInOneActivity.this.getApplicationContext(), "나날", connectId);
+                    Toast.makeText(AllInOneActivity.this.getApplicationContext(), "캘린더를 생성했습니다.", Toast.LENGTH_LONG).show();
+                    prefManager.setCalendarCreated(true);
+                    return true;
+                } catch (IllegalArgumentException e) {
+                    Toast.makeText(AllInOneActivity.this.getApplicationContext(), "로컬 캘린더 생성에 문제가 발생했습니다.", Toast.LENGTH_LONG).show();
+                    return false;
+                }
+            } else {
+                // 로컬 캘린더가 이미 있다면
+                return true;
+            }
+        }
+        // 권한 없음, 아무것도 하지 않음
+        return false;
+    }
 
     private void hideActionBar() {
         if (mActionBar == null) return;
@@ -1162,22 +1232,35 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 mController.sendEvent(this, EventType.LAUNCH_SETTINGS, null, null, 0, 0);
                 break;
             case R.id.test:
-//                SharedPreferences loginPref = getSharedPreferences("login_setting", MODE_PRIVATE);
-//                SharedPreferences.Editor editor = loginPref.edit();
-//                editor.remove("loginId");
-//                editor.remove("loginPw");
-//                editor.commit();
-//
-//                Intent intent = new Intent(AllInOneActivity.this, LoginActivity.class);
-//                startActivity(intent);
-//                finish();
-                /*CreateNanalCalendar.DeleteCalendar(AllInOneActivity.this.getApplicationContext(), connectId);
-                CreateNanalCalendar.DeleteColors(AllInOneActivity.this.getApplicationContext(), connectId);
-                Toast.makeText(AllInOneActivity.this.getApplicationContext(), "삭제", Toast.LENGTH_LONG).show();
-                break;*/
+                SharedPreferences loginPref = getSharedPreferences("login_setting", MODE_PRIVATE);
+                SharedPreferences.Editor editor = loginPref.edit();
+                editor.remove("loginId");
+                editor.remove("loginPw");
+                editor.commit();
+
+                Intent intent = new Intent(AllInOneActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+                break;
             case R.id.test2:
                 CreateNanalCalendar.CreateCalendar(AllInOneActivity.this.getApplicationContext(), "나날", connectId);
                 Toast.makeText(AllInOneActivity.this.getApplicationContext(), "생성", Toast.LENGTH_LONG).show();
+                break;
+            case R.id.test3:
+                CreateNanalCalendar.DeleteCalendar(AllInOneActivity.this.getApplicationContext(), connectId);
+                CreateNanalCalendar.DeleteColors(AllInOneActivity.this.getApplicationContext(), connectId);
+                Toast.makeText(AllInOneActivity.this.getApplicationContext(), "삭제", Toast.LENGTH_LONG).show();
+                break;
+            case R.id.grouptest:
+                // 다이나믹 링크 공유
+                DynamicLinkManager dynamicLinkManager = new DynamicLinkManager();
+                Uri dynamicLink = dynamicLinkManager.createDynamicLink();
+
+                Intent dynaminLinkIntent = new Intent(Intent.ACTION_SEND);
+                dynaminLinkIntent.setType("text/plain");
+                dynaminLinkIntent.putExtra(Intent.EXTRA_TEXT, dynamicLink.toString());
+
+                startActivity(Intent.createChooser(dynaminLinkIntent, "링크 공유"));
                 break;
         }
         mDrawerLayout.closeDrawers();

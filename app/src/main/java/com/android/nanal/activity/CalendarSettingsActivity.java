@@ -29,12 +29,12 @@ import android.preference.PreferenceActivity;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Calendars;
 import android.provider.Settings;
-import android.support.v7.widget.AppCompatCheckBox;
-import android.support.v7.widget.AppCompatCheckedTextView;
-import android.support.v7.widget.AppCompatEditText;
-import android.support.v7.widget.AppCompatRadioButton;
-import android.support.v7.widget.AppCompatSpinner;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.widget.AppCompatCheckBox;
+import androidx.appcompat.widget.AppCompatCheckedTextView;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.AppCompatRadioButton;
+import androidx.appcompat.widget.AppCompatSpinner;
+import androidx.appcompat.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -132,7 +132,7 @@ public class CalendarSettingsActivity extends PreferenceActivity {
                     Header accountHeader = new Header();
                     accountHeader.title = acct.name;
                     accountHeader.fragment =
-                            "com.android.calendar.selectcalendars.SelectCalendarsSyncFragment";
+                            "com.android.nanal.calendar.SelectCalendarsSyncFragment";
                     Bundle args = new Bundle();
                     args.putString(Calendars.ACCOUNT_NAME, acct.name);
                     args.putString(Calendars.ACCOUNT_TYPE, acct.type);

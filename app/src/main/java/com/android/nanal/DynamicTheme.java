@@ -80,6 +80,7 @@ public class DynamicTheme {
                 throw new IllegalArgumentException("Unknown theme: " + theme);
         }
     }
+
     public static int getColorId(String name) {
         switch (name) {
             case TEAL:
@@ -97,6 +98,26 @@ public class DynamicTheme {
             default:
                 return R.color.colorPrimary;
                 //throw new UnsupportedOperationException("Unknown color name : " + name);
+        }
+    }
+
+    public static int getColorToday(String name) {
+        switch (name) {
+            case TEAL:
+                return R.color.colorPrimaryToday;
+            case BLUE:
+                return R.color.colorBlueToday;
+            case ORANGE:
+                return R.color.colorOrangeToday;
+            case GREEN:
+                return R.color.colorGreenToday;
+            case RED:
+                return R.color.colorRedToday;
+            case PURPLE:
+                return R.color.colorPurpleToday;
+            default:
+                return R.color.colorPrimaryToday;
+            //throw new UnsupportedOperationException("Unknown color name : " + name);
         }
     }
 

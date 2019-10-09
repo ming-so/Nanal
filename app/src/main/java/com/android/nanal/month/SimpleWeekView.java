@@ -126,11 +126,15 @@ public class SimpleWeekView extends View {
     // affects the padding on the sides of this view
     // 이 view의 측면에 있는 padding에 영향을 미침
     protected int mPadding = 0;
+    protected int mDiaryPadding = 5;
 
     protected Rect r = new Rect();
     protected Paint p = new Paint();
     protected Paint mMonthNumPaint;
     protected Drawable mSelectedDayLine;
+
+    protected int circleX;
+    protected int circleY;
 
     // Cache the number strings so we don't have to recompute them each time
     // 매번 다시 계산할 필요 없게 숫자 문자열을 캐시함

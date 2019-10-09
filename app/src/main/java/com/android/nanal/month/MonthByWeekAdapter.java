@@ -34,6 +34,7 @@ import com.android.nanal.R;
 import com.android.nanal.calendar.CalendarController;
 import com.android.nanal.calendar.CalendarController.EventType;
 import com.android.nanal.calendar.CalendarController.ViewType;
+import com.android.nanal.diary.Diary;
 import com.android.nanal.event.Event;
 import com.android.nanal.event.Utils;
 
@@ -68,6 +69,8 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
     protected int mOrientation = Configuration.ORIENTATION_LANDSCAPE;
     protected ArrayList<ArrayList<Event>> mEventDayList = new ArrayList<ArrayList<Event>>();
     protected ArrayList<Event> mEvents = null;
+    protected ArrayList<ArrayList<Diary>> mDiaryDayList = new ArrayList<ArrayList<Diary>>();
+    protected ArrayList<Diary> mDiaries = null;
     MonthWeekEventsView mClickedView;
     MonthWeekEventsView mSingleTapUpView;
     MonthWeekEventsView mLongClickedView;
@@ -225,6 +228,48 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
         refresh();
     }
 
+    public void setDiaries(int firstJulianDay, int numDays, ArrayList<Diary> diaries) {
+        if (mIsMiniMonth) {
+            if (Log.isLoggable(TAG, Log.ERROR)) {
+                Log.e(TAG, "Attempted to set events for mini view. Events only supported in full"
+                        + " view.");
+            }
+            return;
+        }
+        mDiaries = diaries;
+        mFirstJulianDay = firstJulianDay;
+        mQueryDays = numDays;
+        // Create a new list, this is necessary since the weeks are referencing
+        // pieces of the old list
+        // 새 리스트 작성, 몇 주가 이전 리스트의 일부를 참조하기 때문이 이 작업이 필요함
+        ArrayList<ArrayList<Diary>> diaryDayList = new ArrayList<ArrayList<Diary>>();
+        for (int i = 0; i < numDays; i++) {
+            diaryDayList.add(new ArrayList<Diary>());
+        }
+
+        if (diaries == null || diaries.size() == 0) {
+            if(Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, "No diaries. Returning early--go schedule something fun.");
+            }
+            mDiaryDayList = diaryDayList;
+            refresh();
+            return;
+        }
+
+        // Compute the new set of days with events
+        // 이벤트를 사용하여 이벤트가 있는 일의 새로운 집합을 계산
+        for (Diary diary : diaries) {
+            long day = diary.day;
+            long startDay = day - mFirstJulianDay;
+            diaryDayList.get((int)day).add(diary);
+        }
+        if(Log.isLoggable(TAG, Log.DEBUG)) {
+            Log.d(TAG, "Processed " + diaries.size() + " diaries.");
+        }
+        mDiaryDayList = diaryDayList;
+        refresh();
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -299,6 +344,28 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
     }
 
     private void sendEventsToView(MonthWeekEventsView v) {
+        if (mEventDayList.size() == 0) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, "No events loaded, did not pass any events to view.");
+            }
+            v.setEvents(null, null);
+            return;
+        }
+        int viewJulianDay = v.getFirstJulianDay();
+        int start = viewJulianDay - mFirstJulianDay;
+        int end = start + v.mNumDays;
+        if (start < 0 || end > mEventDayList.size()) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
+                Log.d(TAG, "Week is outside range of loaded events. viewStart: " + viewJulianDay
+                        + " eventsStart: " + mFirstJulianDay);
+            }
+            v.setEvents(null, null);
+            return;
+        }
+        v.setEvents(mEventDayList.subList(start, end), mEvents);
+    }
+
+    private void sendDiariesToView(MonthWeekEventsView v) {
         if (mEventDayList.size() == 0) {
             if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "No events loaded, did not pass any events to view.");

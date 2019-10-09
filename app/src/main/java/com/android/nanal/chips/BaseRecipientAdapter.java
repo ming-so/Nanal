@@ -28,7 +28,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Directory;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.text.util.Rfc822Token;
 import android.util.Log;
@@ -187,6 +187,7 @@ public class BaseRecipientAdapter extends BaseAdapter implements Filterable, Acc
      * Used to pass results from {@link DefaultFilter#performFiltering(CharSequence)} to
      * {@link DefaultFilter#publishResults(CharSequence, android.widget.Filter.FilterResults)}
      */
+    @SuppressWarnings("JavadocReference")
     private static class DefaultFilterResult {
         public final List<RecipientEntry> entries;
         public final LinkedHashMap<Long, List<RecipientEntry>> entryMap;

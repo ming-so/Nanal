@@ -25,9 +25,10 @@ import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.accessibility.AccessibilityNodeInfoCompat;
-import android.support.v4.widget.ExploreByTouchHelper;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.accessibility.AccessibilityNodeInfoCompat;
+import androidx.customview.widget.ExploreByTouchHelper;
+//import androidx.core.widget.ExploreByTouchHelper;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.text.format.Time;
@@ -37,9 +38,11 @@ import android.view.View;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 
+import com.android.nanal.DynamicTheme;
 import com.android.nanal.R;
 import com.android.nanal.datetimepicker.Utils;
 import com.android.nanal.datetimepicker.date.MonthAdapter.CalendarDay;
+import com.android.nanal.event.GeneralPreferences;
 
 import java.security.InvalidParameterException;
 import java.util.Calendar;
@@ -119,8 +122,8 @@ abstract class MonthView extends View {
     protected static final int DEFAULT_NUM_DAYS = 7;
     protected static final int DEFAULT_SHOW_WK_NUM = 0;
     protected static final int DEFAULT_FOCUS_MONTH = -1;
-    protected static final int DEFAULT_NUM_ROWS = 6;
-    protected static final int MAX_NUM_ROWS = 6;
+    protected static final int DEFAULT_NUM_ROWS = 5;
+    protected static final int MAX_NUM_ROWS = 5;
 
     private static final int SELECTED_CIRCLE_ALPHA = 60;
 
@@ -233,7 +236,8 @@ abstract class MonthView extends View {
         mMonthTitleTypeface = res.getString(R.string.sans_serif);
 
         mDayTextColor = res.getColor(R.color.date_picker_text_normal);
-        mTodayNumberColor = res.getColor(R.color.blue);
+        String selectedColorName = com.android.nanal.event.Utils.getSharedPreference(context, GeneralPreferences.KEY_COLOR_PREF, "teal");
+        mTodayNumberColor = res.getColor(DynamicTheme.getColorId(selectedColorName));
         mDisabledDayTextColor = res.getColor(R.color.date_picker_text_disabled);
         mMonthTitleColor = res.getColor(android.R.color.white);
         mMonthTitleBGColor = res.getColor(R.color.circle_background);

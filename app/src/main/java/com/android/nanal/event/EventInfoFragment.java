@@ -54,9 +54,12 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds;
 import android.provider.ContactsContract.Intents;
 import android.provider.ContactsContract.QuickContact;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
+//import android.support.v7.app.AppCompatActivity;
+//import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -805,7 +808,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         mTitle = (TextView) mView.findViewById(R.id.title);
         mWhenDateTime = (TextView) mView.findViewById(R.id.when_datetime);
         mWhere = (TextView) mView.findViewById(R.id.where);
-        mDesc = (ExpandableTextView) mView.findViewById(R.id.description);
+        mDesc = mView.findViewById(R.id.description);
         mHeadlines = mView.findViewById(R.id.event_info_headline);
         mLongAttendees = (AttendeesView) mView.findViewById(R.id.long_attendee_list);
 

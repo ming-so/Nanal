@@ -36,6 +36,7 @@
         <item name="ic_menu_email">@drawable/ic_menu_email_holo_dark</item>
         <item name="calendar_future_bg_color">@color/calendar_future_bg_color_dark</item>
         <item name="month_other_bgcolor">@color/month_other_bgcolor_dark</item>
+        <item name="month_today_bgcolor">@color/colorPrimaryToday</item>
     </style>
 
     <style name="CalendarAppThemeBlack" parent="Theme.AppCompat.NoActionBar">
@@ -81,6 +82,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="app_bar_color">@color/app_bar</item>
+        <item name="month_today_bgcolor">@color/colorPrimaryToday</item>
     </style>
 
     <style name="CalendarAppThemeLightOrange" parent="CalendarAppTheme">
@@ -88,6 +90,7 @@
         <item name="colorPrimaryDark">@color/colorOrangePrimaryDark</item>
         <item name="colorAccent">@color/colorOrangeAccent</item>
         <item name="app_bar_color">@color/colorOrangePrimary</item>
+        <item name="month_today_bgcolor">@color/colorOrangeToday</item>
     </style>
 
     <style name="CalendarAppThemeLightBlue" parent="CalendarAppTheme">
@@ -95,6 +98,7 @@
         <item name="colorPrimaryDark">@color/colorBluePrimaryDark</item>
         <item name="colorAccent">@color/colorBlueAccent</item>
         <item name="app_bar_color">@color/colorBluePrimary</item>
+        <item name="month_today_bgcolor">@color/colorBlueToday</item>
     </style>
 
     <style name="CalendarAppThemeLightGreen" parent="CalendarAppTheme">
@@ -102,6 +106,7 @@
         <item name="colorPrimaryDark">@color/colorGreenPrimaryDark</item>
         <item name="colorAccent">@color/colorGreenAccent</item>
         <item name="app_bar_color">@color/colorGreenPrimary</item>
+        <item name="month_today_bgcolor">@color/colorGreenToday</item>
     </style>
 
     <style name="CalendarAppThemeLightRed" parent="CalendarAppTheme">
@@ -109,6 +114,7 @@
         <item name="colorPrimaryDark">@color/colorRedPrimaryDark</item>
         <item name="colorAccent">@color/colorRedAccent</item>
         <item name="app_bar_color">@color/colorRedPrimary</item>
+        <item name="month_today_bgcolor">@color/colorRedToday</item>
     </style>
 
     <style name="CalendarAppThemeLightPurple" parent="CalendarAppTheme">
@@ -116,6 +122,7 @@
         <item name="colorPrimaryDark">@color/colorPurplePrimaryDark</item>
         <item name="colorAccent">@color/colorPurpleAccent</item>
         <item name="app_bar_color">@color/colorPurplePrimary</item>
+        <item name="month_today_bgcolor">@color/colorPurpleToday</item>
     </style>
 
 

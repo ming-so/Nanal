@@ -47,7 +47,9 @@ import com.android.nanal.DynamicTheme;
 import com.android.nanal.R;
 import com.android.nanal.calendar.LunarUtils;
 import com.android.nanal.calendar.ViewDetailsPreferences;
+import com.android.nanal.diary.Diary;
 import com.android.nanal.event.Event;
+import com.android.nanal.event.GeneralPreferences;
 import com.android.nanal.event.Utils;
 
 import java.util.ArrayList;
@@ -65,7 +67,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
     public static final String VIEW_PARAMS_ORIENTATION = "orientation";
     public static final String VIEW_PARAMS_ANIMATE_TODAY = "animate_today";
     private static final String TAG = "MonthView";
-    private static final boolean DEBUG_LAYOUT = false;
+    private static final boolean DEBUG_LAYOUT = true;
     private static final int mClickedAlpha = 128;
     protected static StringBuilder mStringBuilder = new StringBuilder(50);
     // TODO recreate formatter when locale changes
@@ -100,6 +102,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
     private static int mEventXOffsetLandscape = 38;
     private static int mEventYOffsetLandscape = 8;
     private static int mEventYOffsetPortrait = 2;
+    // EventSquare: || 이벤트이름  옆에 작은 네모인 듯
     private static int mEventSquareWidth = 3;
     private static int mEventSquareHeight = 10;
     private static int mEventSquareBorder = 0;
@@ -110,6 +113,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
     private static int mSpacingWeekNumber = 0;
     private static int mBorderSpace;
     private static int mStrokeWidthAdj;
+    private static int mDiaryCircleSize = 3;
     private static boolean mInitialized = false;
     private static boolean mShowDetailsInMonth;
     private static int mMaxLinesInEvent = 7; //todo - should be configurable
@@ -119,6 +123,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
     protected int mTodayIndex = -1;
     protected int mOrientation = Configuration.ORIENTATION_LANDSCAPE;
     protected List<ArrayList<Event>> mEvents = null;
+    protected List<ArrayList<Diary>> mDiaries = null;
     protected ArrayList<Event> mUnsortedEvents = null;
     // This is for drawing the outlines around event chips and supports up to 10
     // events being drawn on each day. The code will expand this if necessary.
@@ -136,6 +141,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
     protected Paint mDNAAllDayPaint;
     protected Paint mDNATimePaint;
     protected Paint mEventSquarePaint;
+    protected Paint mDiaryCirclePaint;
     protected Drawable mTodayDrawable;
     protected int mMonthNumHeight;
     protected int mMonthNumAscentHeight;
@@ -167,6 +173,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
     protected int mEventChipOutlineColor = 0xFFFFFFFF;
     protected int mDaySeparatorInnerColor;
     protected int mTodayAnimateColor;
+    protected final Resources mResources;
     HashMap<Integer, Utils.DNAStrand> mDna = null;
     private int mClickedDayIndex = -1;
     private int mClickedDayColor;
@@ -181,6 +188,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
      */
     public MonthWeekEventsView(Context context) {
         super(context);
+        mResources = context.getResources();
     }
 
     // Sets the list of events for this week. Takes a sorted list of arrays
@@ -255,9 +263,26 @@ public class MonthWeekEventsView extends SimpleWeekView {
         }
     }
 
+    public void setDiaries(List<ArrayList<Diary>> diaries) {
+        mDiaries = diaries;
+        if (diaries == null) {
+            return;
+        }
+        if(diaries.size() != mNumDays) {
+            if (Log.isLoggable(TAG, Log.ERROR)) {
+                Log.wtf(TAG, "Events size must be same as days displayed: size="
+                        + diaries.size() + " days=" + mNumDays);
+            }
+            mEvents = null;
+            return;
+        }
+    }
+
     protected void loadColors(Context context) {
         Resources res = context.getResources();
         DynamicTheme dynamicTheme = new DynamicTheme();
+
+        String selectedColorName = Utils.getSharedPreference(context, GeneralPreferences.KEY_COLOR_PREF, "teal");
 
         mMonthWeekNumColor = dynamicTheme.getColor(context, "month_week_num_color");
         mMonthNumColor = dynamicTheme.getColor(context, "month_day_number");
@@ -269,7 +294,8 @@ public class MonthWeekEventsView extends SimpleWeekView {
         mMonthEventExtraColor = dynamicTheme.getColor(context, "month_event_extra_color");
         mMonthEventOtherColor = dynamicTheme.getColor(context, "month_event_other_color");
         mMonthEventExtraOtherColor = dynamicTheme.getColor(context, "month_event_extra_other_color");
-        mMonthBGTodayColor = dynamicTheme.getColor(context, "month_today_bgcolor");
+//        mMonthBGTodayColor = dynamicTheme.getColor(context, "month_today_bgcolor");
+        mMonthBGTodayColor = res.getColor(DynamicTheme.getColorToday(selectedColorName));
         mMonthBGFocusMonthColor = dynamicTheme.getColor(context, "month_focus_month_bgcolor");
         mMonthBGOtherColor = dynamicTheme.getColor(context, "month_other_bgcolor");
         mMonthBGColor = dynamicTheme.getColor(context, "month_bgcolor");
@@ -331,6 +357,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
                 mDefaultEdgeSpacing *= mScale;
                 mDnaAllDayWidth *= mScale;
                 mTodayHighlightWidth *= mScale;
+                mDiaryCircleSize *= mScale;
             }
             mBorderSpace = mEventSquareBorder + 1;       // want a 1-pixel gap inside border  1픽셀의 간격
             mStrokeWidthAdj = mEventSquareBorder / 2;   // adjust bounds for stroke width  선 width의 경계 조정
@@ -419,6 +446,11 @@ public class MonthWeekEventsView extends SimpleWeekView {
         mEventSquarePaint = new Paint();
         mEventSquarePaint.setStrokeWidth(mEventSquareBorder);
         mEventSquarePaint.setAntiAlias(false);
+
+        mDiaryCirclePaint = new Paint();
+        String selectedColorName = Utils.getSharedPreference(getContext(), GeneralPreferences.KEY_COLOR_PREF, "teal");
+        mDiaryCirclePaint.setColor(getContext().getResources().getColor(DynamicTheme.getColorId(selectedColorName)));
+        mDiaryCirclePaint.setAntiAlias(false);
 
         if (DEBUG_LAYOUT) {
             Log.d("EXTRA", "mScale=" + mScale);
@@ -750,6 +782,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
         ArrayList<DayEventFormatter> dayFormatters = weekFormatter.prepareFormattedEvents();
         for (DayEventFormatter dayEventFormatter : dayFormatters) {
             dayEventFormatter.drawDay(canvas, boxBoundaries);
+
         }
     }
 
@@ -1000,8 +1033,16 @@ public class MonthWeekEventsView extends SimpleWeekView {
             return mRegularBoundaries;
         }
 
+        protected BoundariesSetter getBoundariesSetter(Diary diary) {
+            return mRegularBoundaries;
+        }
+
         protected FormattedEventBase makeFormattedEvent(Event event, EventFormat format) {
             return new FormattedEvent(event, format, getBoundariesSetter(event));
+        }
+
+        protected FormattedDiaryBase makeFormattedDiary(Diary diary, DiaryFormat format) {
+            return new FormattedDiary(diary, format, getBoundariesSetter(diary));
         }
 
         // day is provided as an optimisation to look only on a certain day
@@ -1153,11 +1194,15 @@ public class MonthWeekEventsView extends SimpleWeekView {
          * @param boxBoundaries
          */
         public void drawDay(Canvas canvas, DayBoxBoundaries boxBoundaries) {
+            int x = mDiaryPadding;
+            int y = 0;
             for (FormattedEventBase event : mEventDay) {
                 if (eventShouldBeSkipped(event)) {
                     event.skip(mViewPreferences);
                 } else {
                     event.draw(canvas, mViewPreferences, mDay);
+//                    canvas.drawCircle(x, mWeekNumAscentHeight + mTopPaddingWeekNumber, mDiaryCircleSize, mWeekNumPaint);
+//                    x += mEventSquareHeight;
                 }
             }
             if (moreLinesWillBeDisplayed()) {
@@ -1408,6 +1453,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
         }
         public int getY() { return mBoxBoundaries.getY(); }
         public abstract void setRectangle(int spanningDays, int numberOfLines);
+        public abstract void setCircle(int spanningDays, int numberOfLines);
         public int getTextX() { return mBoxBoundaries.getX() + mBorderThickness + mXPadding; }
         public int getTextY() {
             return mBoxBoundaries.getY() + mEventAscentHeight;
@@ -1451,6 +1497,12 @@ public class MonthWeekEventsView extends SimpleWeekView {
             r.top = mBoxBoundaries.getY() + mStrokeWidthAdj;
             r.bottom = mBoxBoundaries.getY() + mEventHeight * numberOfLines + mBorderSpace * 2 - mStrokeWidthAdj;
         }
+
+        @Override
+        public void setCircle(int spanningDays, int numberOfLines) {
+            circleX = mBoxBoundaries.getX();
+            circleY = mBoxBoundaries.getY();
+        }
     }
 
     protected class RegularBoundariesSetter extends BoundariesSetter {
@@ -1466,6 +1518,12 @@ public class MonthWeekEventsView extends SimpleWeekView {
             r.right = mBoxBoundaries.getX() + mEventSquareWidth;
             r.top = mBoxBoundaries.getY() + mEventAscentHeight - mEventSquareHeight;
             r.bottom = mBoxBoundaries.getY() + mEventAscentHeight + (numberOfLines - 1) * mEventHeight;
+        }
+
+        @Override
+        public void setCircle(int spanningDays, int numberOfLines) {
+            circleX = mBoxBoundaries.getX();
+            circleY = mBoxBoundaries.getY();
         }
     }
     protected class FixedHeightRegularBoundariesSetter extends RegularBoundariesSetter {
@@ -1564,6 +1622,92 @@ public class MonthWeekEventsView extends SimpleWeekView {
         }
     }
 
+    protected static class DiaryFormat {
+        private int mLines;
+        private int[] mDaySpan;
+//        private int mYIndex;
+        private boolean mPartiallyHidden;
+        private final int Y_INDEX_NOT_SET = -1;
+
+        public DiaryFormat(int day, int weekDays) {
+            mDaySpan = new int[weekDays];
+            if (day < weekDays && day >= 0) {
+                mDaySpan[day] = 1;
+            }
+            mLines = 1;
+//            mYIndex = Y_INDEX_NOT_SET;
+            mPartiallyHidden = false;
+        }
+
+        /**
+         * Returns information about how many event lines are above this event
+         * If y-order is not yet determined returns -1
+         * 이 이벤트 위에 있는 이벤트 줄 수에 대한 정보 반환
+         * 만약 y-order가 아직 결정되지 않은 경우 -1 반환
+         * @return
+         */
+//        public int getYIndex() { return mYIndex;}
+//        public void setYIndex(int index) { mYIndex = index;}
+        public boolean isVisible() { return mLines > 0; }
+        public void hide(int day) {
+            if (mDaySpan.length <= day) {
+                return;
+            }
+            if (getTotalSpan() > 1) {
+                mPartiallyHidden = true;
+                int splitIndex = day;
+                while (splitIndex >= 0) {
+                    if (mDaySpan[splitIndex] > 0) {
+                        break;
+                    }
+                    splitIndex--;
+                }
+                int span = mDaySpan[splitIndex];
+                mDaySpan[splitIndex] = day - splitIndex;
+                mDaySpan[day] = 0;
+                if (mDaySpan.length > day + 1) {
+                    mDaySpan[day + 1] = span - 1 - mDaySpan[splitIndex];
+                }
+            } else {
+                mLines = 0;
+                mPartiallyHidden = false;
+            }
+        }
+
+        public boolean isPartiallyHidden() {
+            return mPartiallyHidden;
+        }
+        public int getDiaryLines() { return  mLines; }
+
+        /**
+         * If event is visible, sets new value of event lines
+         * 이벤트가 표시되는 경우, 이벤트 라인의 새 값 설정
+         * @param lines
+         */
+        public void setEventLines(int lines) {
+            if (mLines != 0) {
+                mLines = lines;
+            }
+        }
+        public void capEventLinesAt(int cap) { mLines = Math.min(mLines, cap); }
+        public void extendDaySpan(int day) {
+            for (int index = Math.min(day, mDaySpan.length - 1); index >= 0; index--) {
+                if (mDaySpan[index] > 0) {
+                    mDaySpan[index]++;
+                    break;
+                }
+            }
+        }
+        public int getDaySpan(int day) { return day < mDaySpan.length ? mDaySpan[day] : 0; }
+        public int getTotalSpan() {
+            int span = 0;
+            for (int i : mDaySpan) {
+                span += i;
+            }
+            return span;
+        }
+    }
+
     protected abstract class FormattedEventBase {
         protected BoundariesSetter mBoundaries;
         protected EventFormat mFormat;
@@ -1593,6 +1737,38 @@ public class MonthWeekEventsView extends SimpleWeekView {
         public int getHeight(ViewDetailsPreferences.Preferences preferences) {
             int timesHeight = isTimeInNextLine(preferences) ? mExtrasHeight : 0;
             return mBoundaries.getHeight(mFormat.getEventLines()) + timesHeight;
+        }
+    }
+
+    protected abstract class FormattedDiaryBase {
+        protected BoundariesSetter mBoundaries;
+        protected DiaryFormat mFormat;
+        FormattedDiaryBase(DiaryFormat format, BoundariesSetter boundaries) {
+            mBoundaries = boundaries;
+            mFormat = format;
+        }
+        public void setBoundaries(BoundariesSetter boundaries) { mBoundaries = boundaries; }
+        public boolean isBordered() { return mBoundaries.hasBorder(); }
+        public DiaryFormat getFormat() { return mFormat; }
+        public abstract void initialPreFormatText(ViewDetailsPreferences.Preferences preferences);
+        protected abstract boolean isTimeInNextLine(ViewDetailsPreferences.Preferences preferences);
+        public abstract void draw(Canvas canvas, ViewDetailsPreferences.Preferences preferences, int day);
+        public abstract boolean containsDiary(Diary diary);
+
+        public void skip(ViewDetailsPreferences.Preferences preferences) {
+            if (mFormat.isVisible()) {
+                mBoundaries.moveToFirstLine();
+                mBoundaries.moveLinesDown(mFormat.getDiaryLines());
+                if (isTimeInNextLine(preferences)) {
+                    mBoundaries.moveAfterDrawingTimes();
+                }
+                mBoundaries.moveToNextItem();
+            }
+        }
+
+        public int getHeight(ViewDetailsPreferences.Preferences preferences) {
+            int timesHeight = isTimeInNextLine(preferences) ? mExtrasHeight : 0;
+            return mBoundaries.getHeight(mFormat.getDiaryLines()) + timesHeight;
         }
     }
 
@@ -1806,6 +1982,54 @@ public class MonthWeekEventsView extends SimpleWeekView {
             }
         }
         public boolean containsEvent(Event event) { return event.equals(mEvent); }
+    }
+
+    protected class FormattedDiary extends FormattedDiaryBase {
+        private Diary mDiary;
+        private DynamicLayout mTextLayout;
+        public FormattedDiary(Diary diary, DiaryFormat format, BoundariesSetter boundaries) {
+            super(format, boundaries);
+            mDiary = diary;
+        }
+
+        protected Paint.Style getCirclePaintStyle() {
+            return Style.FILL;
+        }
+
+        protected int getCircleColor() {
+            String selectedColorName = Utils.getSharedPreference(getContext(), GeneralPreferences.KEY_COLOR_PREF, "teal");
+            return getContext().getResources().getColor(DynamicTheme.getColorId(selectedColorName));
+        }
+
+        protected void drawDiaryCircle(Canvas canvas, int day) {
+            mBoundaries.setCircle(mFormat.getDaySpan(day), mFormat.getDiaryLines());
+            mDiaryCirclePaint.setStyle(getCirclePaintStyle());
+            mDiaryCirclePaint.setColor(getCircleColor());
+            canvas.drawCircle(mBoundaries.getTextX(), mBoundaries.getTextY(), mDiaryCircleSize, mDiaryCirclePaint);
+        }
+
+        @Override
+        public void initialPreFormatText(ViewDetailsPreferences.Preferences preferences) {
+
+        }
+
+        @Override
+        protected boolean isTimeInNextLine(ViewDetailsPreferences.Preferences preferences) {
+            return false;
+        }
+
+        @Override
+        public void draw(Canvas canvas, ViewDetailsPreferences.Preferences preferences, int day) {
+            if(mFormat.isVisible() && mDiary != null) {
+                drawDiaryCircle(canvas, day);
+                mBoundaries.moveToNextItem();
+            }
+        }
+
+        @Override
+        public boolean containsDiary(Diary diary) {
+            return diary.equals(mDiary);
+        }
     }
 
     protected void drawMoreEvents(Canvas canvas, int remainingEvents, int x) {

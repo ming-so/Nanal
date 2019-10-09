@@ -67,7 +67,7 @@ abstract class DayPickerView extends ListView implements OnScrollListener,
     // 상단 라인이 separator 아래에 있도록
     // 다른 형태를 얻으려면 이 숫자들을 override하기
 
-    protected int mNumWeeks = 6;
+    protected int mNumWeeks = 5;
     protected boolean mShowWeekNumber = false;
     protected int mDaysPerWeek = 7;
     private static SimpleDateFormat YEAR_FORMAT = new SimpleDateFormat("yyyy", Locale.getDefault());

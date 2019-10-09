@@ -15,7 +15,7 @@
  */
 package com.android.nanal.activity;
 
-import android.support.v7.app.AppCompatActivity;
+import 	androidx.appcompat.app.AppCompatActivity;
 
 import com.android.nanal.query.AsyncQueryService;
 

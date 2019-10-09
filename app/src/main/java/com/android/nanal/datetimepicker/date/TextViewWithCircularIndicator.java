@@ -16,6 +16,7 @@ package com.android.nanal.datetimepicker.date;
  * limitations under the License.
  */
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
@@ -25,7 +26,12 @@ import android.graphics.Paint.Style;
 import android.util.AttributeSet;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.AppCompatTextView;
+
+import com.android.nanal.DynamicTheme;
 import com.android.nanal.R;
+import com.android.nanal.event.GeneralPreferences;
+import com.android.nanal.event.Utils;
 
 /**
  * A text view which, when pressed or activated, displays a blue circle around the text.
@@ -34,7 +40,7 @@ import com.android.nanal.R;
  * @deprecated This module is deprecated. Do not use this class.
  */
 @Deprecated
-public class TextViewWithCircularIndicator extends TextView {
+public class TextViewWithCircularIndicator extends AppCompatTextView {
 
     private static final int SELECTED_CIRCLE_ALPHA = 60;
 
@@ -49,7 +55,8 @@ public class TextViewWithCircularIndicator extends TextView {
     public TextViewWithCircularIndicator(Context context, AttributeSet attrs) {
         super(context, attrs);
         Resources res = context.getResources();
-        mCircleColor = res.getColor(R.color.blue);
+        String selectedColorName = Utils.getSharedPreference(context, GeneralPreferences.KEY_COLOR_PREF, "teal");
+        mCircleColor = res.getColor(DynamicTheme.getColorId(selectedColorName));
         mRadius = res.getDimensionPixelOffset(R.dimen.month_select_circle_radius);
         mItemIsSelectedText = context.getResources().getString(R.string.item_is_selected);
 
@@ -80,6 +87,7 @@ public class TextViewWithCircularIndicator extends TextView {
         }
     }
 
+    @SuppressLint("GetContentDescriptionOverride")
     @Override
     public CharSequence getContentDescription() {
         CharSequence itemText = getText();

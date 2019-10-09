@@ -17,11 +17,21 @@ public class PrefManager {
     private static final String PREF_NAME = "androidhive-welcome";
 
     private static final String IS_FIRST_TIME_LAUNCH = "IsFirstTimeLaunch";
+    private static final String IS_CALENDAR_CREATED = "IsCalendarCreated";
 
     public PrefManager(Context context) {
         this._context = context;
         pref = _context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
         editor = pref.edit();
+    }
+
+    public void setCalendarCreated(boolean isCreated) {
+        editor.putBoolean(IS_CALENDAR_CREATED, isCreated);
+        editor.commit();
+    }
+
+    public boolean isCalendarCreated() {
+        return pref.getBoolean(IS_CALENDAR_CREATED, false);
     }
 
     public void setFirstTimeLaunch(boolean isFirstTime) {

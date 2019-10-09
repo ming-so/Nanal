@@ -46,6 +46,7 @@
     <string name="login_fail">로그인 중 문제가 발생했습니다.</string>
     <string name="pw_fail">비밀번호 찾기 중 문제가 발생했습니다.</string>
     <string name="pw_send">임시 비밀번호를 메일로 보냈습니다.</string>
+    <string name="no_internet">서버와의 통신에 실패했습니다. 인터넷 연결을 확인하세요.</string>
 
     <string name="TEAL">#388d7f</string>
     <string name="ORANGE">#b36f28</string>
@@ -56,25 +57,22 @@
 
 
     <!-- 설명 화면 테스트 -->
-    <string name="title_activity_welcome">Home Screen</string>
-    <string name="next">NEXT</string>
-    <string name="skip">SKIP</string>
-    <string name="start">GOT IT</string>
+    <string name="title_activity_welcome">나날 캘린더</string>
+    <string name="next">다음</string>
+    <string name="skip">스킵</string>
+    <string name="start">시작할까요?</string>
 
-    <string name="slide_1_title">Hello Food!</string>
-    <string name="slide_1_desc">The easiest way to order food from your favourite restaurant!</string>
+    <string name="slide_1_title">매일 하루에 하나씩</string>
+    <string name="slide_1_desc">서버에 자동 저장되는 일기</string>
 
-    <string name="slide_2_title">Movie Tickets</string>
-    <string name="slide_2_desc">Book movie tickets for your family and friends!</string>
+    <string name="slide_2_title">오늘의 일정을 간편하게^^</string>
+    <string name="slide_2_desc">오늘 탭 좋아요 아직 구현 안 햇지만</string>
 
-    <string name="slide_3_title">Great Discounts</string>
-    <string name="slide_3_desc">Best discounts on every single service we offer!</string>
+    <string name="slide_3_title">가족, 친구들과 함께</string>
+    <string name="slide_3_desc">그룹에 가입해서 일정이랑 일기 써 보세요</string>
 
-    <string name="slide_4_title">World Travel</string>
-    <string name="slide_4_desc">Book tickets of any transportation and travel the world!</string>
-
-    <string name="play_again_desc">To see the welcome slider again, goto Settings -> apps -> welcome slider -> clear data</string>
-    <string name="play_again">Play Again</string>
+    <string name="slide_4_title">웹에서도 편리하게</string>
+    <string name="slide_4_desc">웹에서도 써 보세용</string>
 
 
     <!-- 하단 내비게이션 -->
@@ -82,6 +80,7 @@
     <string name="menu_today">오늘</string>
     <string name="menu_group">그룹</string>
     <string name="menu_settings">설정</string>
+
 
     <!-- 타임존피커 -->
 

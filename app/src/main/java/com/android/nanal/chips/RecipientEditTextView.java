@@ -50,7 +50,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Layout;
@@ -87,6 +87,7 @@ import android.widget.Filterable;
 import android.widget.ListAdapter;
 import android.widget.ListPopupWindow;
 import android.widget.ListView;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.PopupWindow;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -108,11 +109,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.validation.Validator;
+
 /**
  * RecipientEditTextView is an auto complete text view for use with applications
  * that use the new Chips UI for addressing a message to recipients.
  */
-public class RecipientEditTextView extends android.support.v7.widget.AppCompatMultiAutoCompleteTextView implements
+public class RecipientEditTextView extends androidx.appcompat.widget.AppCompatMultiAutoCompleteTextView implements
         OnItemClickListener, Callback, RecipientAlternatesAdapter.OnCheckedItemChangedListener,
         GestureDetector.OnGestureListener, TextView.OnEditorActionListener,
         DropdownChipLayouter.ChipDeleteListener, PermissionRequestDismissedListener {
@@ -168,7 +171,7 @@ public class RecipientEditTextView extends android.support.v7.widget.AppCompatMu
 
     private Paint mWorkPaint = new Paint();
 
-    private Tokenizer mTokenizer;
+    private MultiAutoCompleteTextView.Tokenizer mTokenizer;
     private Validator mValidator;
     private Handler mHandler;
     private TextWatcher mTextWatcher;
@@ -3386,7 +3389,7 @@ public class RecipientEditTextView extends android.support.v7.widget.AppCompatMu
     /**
      * Drag shadow for a {@link DrawableRecipientChip}.
      */
-    private final class RecipientChipShadow extends DragShadowBuilder {
+    private final class RecipientChipShadow extends View.DragShadowBuilder {
         private final DrawableRecipientChip mChip;
 
         public RecipientChipShadow(DrawableRecipientChip chip) {

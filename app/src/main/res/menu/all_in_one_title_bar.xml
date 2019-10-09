@@ -17,25 +17,18 @@
 <menu
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <!--<item-->
-        <!--android:id="@+id/action_today"-->
-        <!--android:alphabeticShortcut="t"-->
-        <!--android:icon="@drawable/today_icon"-->
-        <!--android:orderInCategory="1"-->
-        <!--android:title="@string/goto_today"-->
-        <!--app:showAsAction="ifRoom" />-->
+    <item
+        android:id="@+id/action_refresh"
+        android:alphabeticShortcut="r"
+        android:icon="@drawable/ic_menu_refresh"
+        android:orderInCategory="1"
+        android:title="@string/calendar_refresh"
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_goto"
         android:alphabeticShortcut="g"
         android:orderInCategory="2"
         android:title="@string/goto_date"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_refresh"
-        android:alphabeticShortcut="r"
-        android:icon="@drawable/ic_menu_refresh"
-        android:orderInCategory="3"
-        android:title="@string/calendar_refresh"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_search"
@@ -44,7 +37,7 @@
         android:imeOptions="actionSearch"
         android:orderInCategory="4"
         android:title="@string/search"
-        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="never|collapseActionView" />
     <item
         android:id="@+id/action_import"

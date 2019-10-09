@@ -22,7 +22,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.CalendarContract.Calendars;
-import android.support.v7.widget.SearchView;
+import androidx.appcompat.widget.SearchView;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -2403,6 +2403,13 @@ public class Utils {
     public static class DNAStrand {
         public float[] points;
         public int[] allDays; // color for the allday, 0 means no event
+        public int color;
+        int position;
+        int count;
+    }
+
+    public static class DNADiary {
+        public float[] points;
         public int color;
         int position;
         int count;

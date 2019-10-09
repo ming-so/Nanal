@@ -16,6 +16,7 @@ package com.android.nanal.activity;
  * limitations under the License.
  */
 
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -31,9 +32,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.CalendarContract.Events;
 import android.provider.SearchRecentSuggestions;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
+import androidx.core.view.MenuItemCompat;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.Menu;
@@ -100,6 +101,7 @@ public class SearchActivity extends AppCompatActivity implements CalendarControl
     private ContentResolver mContentResolver;
     private final DynamicTheme dynamicTheme = new DynamicTheme();
 
+    @SuppressLint("WrongConstant")
     @Override
     protected void onCreate(Bundle icicle) {
         super.onCreate(icicle);

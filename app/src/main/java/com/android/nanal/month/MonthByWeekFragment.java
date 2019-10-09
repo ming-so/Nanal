@@ -51,6 +51,7 @@ import com.android.nanal.calendar.CalendarController;
 import com.android.nanal.calendar.CalendarController.EventInfo;
 import com.android.nanal.calendar.CalendarController.EventType;
 import com.android.nanal.calendar.CalendarController.ViewType;
+import com.android.nanal.diary.Diary;
 import com.android.nanal.event.CreateEventDialogFragment;
 import com.android.nanal.event.Event;
 import com.android.nanal.event.Utils;
@@ -410,6 +411,12 @@ public class MonthByWeekFragment extends SimpleDayPickerFragment implements
                     events, data, mContext, mFirstLoadedJulianDay, mLastLoadedJulianDay);
             ((MonthByWeekAdapter) mAdapter).setEvents(mFirstLoadedJulianDay,
                     mLastLoadedJulianDay - mFirstLoadedJulianDay + 1, events);
+
+            ArrayList<Diary> diaries = new ArrayList<Diary>();
+            Diary.buildDiariesFromCursor(
+                    diaries, data, mContext, mFirstLoadedJulianDay, mLastLoadedJulianDay);
+            ((MonthByWeekAdapter) mAdapter).setDiaries(mFirstLoadedJulianDay,
+                    mLastLoadedJulianDay - mFirstLoadedJulianDay + 1, diaries);
         }
     }
 

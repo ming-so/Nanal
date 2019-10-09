@@ -30,7 +30,7 @@ import android.os.Build;
 import android.os.Debug;
 import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Instances;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -161,7 +161,7 @@ public class Diary implements Cloneable {
      * startDay에서 시작하는 인스턴스의 days일 단위 로드
      */
 
-    public static void loadDiaries(Context context, ArrayList<Diary> diaries, int day,
+    public static void loadDiaries(Context context, ArrayList<Diary> diaries, int startDay, int days,
                                    int requestId, AtomicInteger sequenceNumber) {
 
         if (PROFILE) {
@@ -181,7 +181,7 @@ public class Diary implements Cloneable {
 
         diaries.clear();
         try {
-
+            int endDay = startDay + days - 1;
             // We use the byDay instances query to get a list of all events for
             // the days we're interested in.
             // The sort order is: events with an earlier start time occur
@@ -204,8 +204,8 @@ public class Diary implements Cloneable {
             String whereAllday = ALLDAY_WHERE;
 
 
-            cEvents = instancesQuery(context.getContentResolver(), DIARY_PROJECTION, day, where, null, SORT_EVENTS_BY);
-            cAllday = instancesQuery(context.getContentResolver(), DIARY_PROJECTION, day, whereAllday, null, SORT_ALLDAY_BY);
+            cEvents = instancesQuery(context.getContentResolver(), DIARY_PROJECTION, startDay, where, null, SORT_EVENTS_BY);
+            cAllday = instancesQuery(context.getContentResolver(), DIARY_PROJECTION, startDay, whereAllday, null, SORT_ALLDAY_BY);
 
             // Check if we should return early because there are more recent
             // load requests waiting.
@@ -214,8 +214,8 @@ public class Diary implements Cloneable {
                 return;
             }
 
-            buildDiariesFromCursor(diaries, cEvents, context, day);
-            buildDiariesFromCursor(diaries, cAllday, context, day);
+            buildDiariesFromCursor(diaries, cEvents, context, startDay, endDay);
+            buildDiariesFromCursor(diaries, cAllday, context, startDay, endDay);
 
         } finally {
             if (cEvents != null) {
@@ -289,12 +289,12 @@ public class Diary implements Cloneable {
      * @param diaries The list of events
      * @param cDiaries Events to add to the list
      * @param context
-     * @param day
+     *
      */
     public static void buildDiariesFromCursor(
-            ArrayList<Diary> diaries, Cursor cDiaries, Context context, int day) {
+            ArrayList<Diary> diaries, Cursor cDiaries, Context context, int startDay, int endDay) {
         if (cDiaries == null || diaries == null) {
-            Log.e(TAG, "buildEventsFromCursor: null cursor or null events list!");
+            Log.e(TAG, "buildDiariesFromCursor: null cursor or null diaries list!");
             return;
         }
 
@@ -314,12 +314,10 @@ public class Diary implements Cloneable {
         cDiaries.moveToPosition(-1);
         while (cDiaries.moveToNext()) {
             Diary e = generateDiaryFromCursor(cDiaries);
-            if(e.day < day) {
+
+            if (e.day > endDay || e.day < startDay) {
                 continue;
             }
-//            if (e.startDay > endDay || e.endDay < startDay) {
-//                continue;
-//            }
             diaries.add(e);
         }
     }

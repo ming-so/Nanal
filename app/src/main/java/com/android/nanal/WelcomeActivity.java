@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +15,9 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.viewpager.widget.PagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 public class WelcomeActivity extends Activity {
 
@@ -33,7 +34,7 @@ public class WelcomeActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         // Checking for first time launch - before calling setContentView()
-        prefManager = new PrefManager(this);
+        prefManager = new PrefManager(getApplicationContext());
         if (!prefManager.isFirstTimeLaunch()) {
             launchHomeScreen();
             finish();
@@ -58,7 +59,8 @@ public class WelcomeActivity extends Activity {
                 R.layout.welcome_slide1,
                 R.layout.welcome_slide2,
                 R.layout.welcome_slide3,
-                R.layout.welcome_slide4};
+                R.layout.welcome_slide4
+        };
 
         // adding bottom dots
         addBottomDots(0);
@@ -91,7 +93,6 @@ public class WelcomeActivity extends Activity {
                 }
             }
         });
-//        CreateNanalCalendar.DeleteCalendar(this.getApplicationContext(), "test", "test");
     }
 
     private void addBottomDots(int currentPage) {

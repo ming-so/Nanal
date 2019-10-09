@@ -18,6 +18,7 @@ package com.android.nanal.datetimepicker.time;
 
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.app.ActionBar.LayoutParams;
 import android.app.DialogFragment;
 import android.content.Context;
@@ -36,10 +37,12 @@ import android.view.Window;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.nanal.DynamicTheme;
+import com.android.nanal.R;
 import com.android.nanal.datetimepicker.HapticFeedbackController;
 import com.android.nanal.datetimepicker.Utils;
 import com.android.nanal.datetimepicker.time.RadialPickerLayout.OnValueSelectedListener;
-import com.android.nanal.R;
+import com.android.nanal.event.GeneralPreferences;
 
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
@@ -117,6 +120,8 @@ public class TimePickerDialog extends DialogFragment implements OnValueSelectedL
     private String mMinutePickerDescription;
     private String mSelectMinutes;
 
+
+
     /**
      * The callback interface used to indicate the user is done filling in
      * the time (they clicked on the 'Set' button).
@@ -140,6 +145,7 @@ public class TimePickerDialog extends DialogFragment implements OnValueSelectedL
         // 다이얼로그 프래그먼트에 필요한 빈 생성자
     }
 
+    @SuppressLint("ValidFragment")
     public TimePickerDialog(Context context, int theme, OnTimeSetListener callback,
                             int hourOfDay, int minute, boolean is24HourMode) {
         // Empty constructor required for dialog fragment.
@@ -213,7 +219,9 @@ public class TimePickerDialog extends DialogFragment implements OnValueSelectedL
         mSelectHours = res.getString(R.string.select_hours);
         mMinutePickerDescription = res.getString(R.string.minute_picker_description);
         mSelectMinutes = res.getString(R.string.select_minutes);
-        mSelectedColor = res.getColor(mThemeDark? R.color.red : R.color.blue);
+
+        String selectedColorName = com.android.nanal.event.Utils.getSharedPreference(getActivity().getApplicationContext(), GeneralPreferences.KEY_COLOR_PREF, "teal");
+        mSelectedColor = res.getColor(DynamicTheme.getColorId(selectedColorName));
         mUnselectedColor =
                 res.getColor(mThemeDark? android.R.color.white : R.color.numbers_text_color);
 
