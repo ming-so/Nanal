@@ -569,7 +569,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                         Log.w(TAG, "getDynamicLink:onFailure", e);
                     }
                 });
-        openDatabase();
     }
 
     public void openDatabase() {
