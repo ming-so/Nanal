@@ -3,10 +3,11 @@ package com.android.nanal;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.nanal.group.GroupListAdapter;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class GroupActivity extends Activity {
     @Override
@@ -16,7 +17,7 @@ public class GroupActivity extends Activity {
 
         RecyclerView recyclerView = findViewById(R.id.rv_group);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        GroupListAdapter groupListAdapter = new GroupListAdapter();
+        GroupListAdapter groupListAdapter = new GroupListAdapter(getApplicationContext());
         recyclerView.setAdapter(groupListAdapter);
     }
 

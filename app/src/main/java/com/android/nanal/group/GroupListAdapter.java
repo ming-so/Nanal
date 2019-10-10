@@ -1,9 +1,6 @@
 package com.android.nanal.group;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +15,14 @@ import com.android.nanal.activity.AllInOneActivity;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
 public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.ViewHolder> {
     private List<Group> groupList;
     private NanalDBHelper helper;
+    private Context mContext;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         LinearLayout group_wrapper;
@@ -34,9 +36,14 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
         }
     }
 
-    public GroupListAdapter() {
-        helper = AllInOneActivity.helper;
-        groupList = helper.getGroupList();
+    public GroupListAdapter(Context context) {
+        mContext = context;
+        try {
+            helper = AllInOneActivity.helper;
+            groupList = helper.getGroupList();
+        } catch(Exception e) {
+            Toast.makeText(mContext, "그룹을 불러오는 데 오류가 발생했습니다. 다시 시도하세요.", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
