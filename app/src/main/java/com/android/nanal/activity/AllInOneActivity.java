@@ -534,7 +534,9 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         prefs = this.getApplicationContext().getSharedPreferences("login_setting", MODE_PRIVATE);
         connectId = prefs.getString("loginId", null);
 
-/*        // 다이나믹 링크 설정
+        openDatabase();
+
+        // 다이나믹 링크 설정
         // ATTENTION: This was auto-generated to handle app links.
         Intent appLinkIntent = getIntent();
         String appLinkAction = appLinkIntent.getAction();
@@ -568,7 +570,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                     }
                 });
 
-        openDatabase();*/
+
     }
 
     public void openDatabase() {
@@ -1292,7 +1294,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 break;
             case R.id.grouptest:
                 // 다이나믹 링크 공유
-                /*DynamicLinkManager dynamicLinkManager = new DynamicLinkManager();
+                DynamicLinkManager dynamicLinkManager = new DynamicLinkManager();
                 Uri dynamicLink = dynamicLinkManager.createDynamicLink();
 
                 Intent dynaminLinkIntent = new Intent(Intent.ACTION_SEND);
@@ -1300,7 +1302,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 dynaminLinkIntent.putExtra(Intent.EXTRA_TEXT, dynamicLink.toString());
 
                 startActivity(Intent.createChooser(dynaminLinkIntent, "링크 공유"));
-                break;*/
+                break;
         }
         mDrawerLayout.closeDrawers();
         return false;

@@ -4,22 +4,6 @@
     package="com.android.nanal"
     android:installLocation="auto">
 
-    <uses-permission
-        android:name="android.permission.MANAGE_ACCOUNTS"
-        android:maxSdkVersion="22" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-    <!-- <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" /> -->
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.READ_CALENDAR" />
-    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <!-- <uses-permission android:name="android.permission.USE_CREDENTIALS" /> -->
-    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
-    <uses-permission android:name="android.permission.INTERNET" />
-
-    <!-- <uses-permission android:name="com.google.android.googleapps.permission.GOOGLE_AUTH.mail" /> -->
     <application
         android:name=".CalendarApplication"
         android:hardwareAccelerated="true"
@@ -30,6 +14,7 @@
         android:theme="@style/CalendarAppTheme"
         android:usesCleartextTraffic="true"
         tools:replace="android:label">
+        <activity android:name=".GroupInvitation"></activity>
         <activity
             android:name=".activity.AllInOneActivity"
             android:exported="true"
@@ -37,10 +22,12 @@
             android:theme="@style/CalendarTheme.WithoutActionBar"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
-                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <!--<category android:name="android.intent.category.DEFAULT" />-->
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+                <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+                <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+                <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
                 <category android:name="android.intent.category.APP_CALENDAR" />
             </intent-filter>
             <intent-filter>
@@ -59,15 +46,10 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="nanal"
-                    android:host="group_invite" />
+                    android:host="group_invite"
+                    android:scheme="nanal" />
             </intent-filter>
         </activity>
-
-        <activity-alias
-            android:name=".LaunchActivity"
-            android:exported="true"
-            android:targetActivity=".activity.AllInOneActivity" />
 
         <activity
             android:name=".activity.EventInfoActivity"
@@ -77,42 +59,20 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            <!--<intent-filter>-->
-            <!--<action android:name="android.intent.action.VIEW" />-->
-            <!--<category android:name="android.intent.category.DEFAULT" />-->
-            <!--<data android:mimeType="vnd.android.cursor.item/event" />-->
-            <!--</intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.VIEW" /> -->
+            <!-- <category android:name="android.intent.category.DEFAULT" /> -->
+            <!-- <data android:mimeType="vnd.android.cursor.item/event" /> -->
+            <!-- </intent-filter> -->
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.android.nanal.activity.AllInOneActivity" />
         </activity>
+
         <activity
             android:name=".activity.EditEventActivity"
             android:theme="@style/Base.CalendarAppThemeWithActionBar" />
-
-        <activity-alias
-            android:name=".activity.EditEventActivity"
-            android:exported="true"
-            android:targetActivity=".activity.EditEventActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.EDIT" />
-                <action android:name="android.intent.action.INSERT" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="vnd.android.cursor.item/event" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.EDIT" />
-                <action android:name="android.intent.action.INSERT" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="vnd.android.cursor.dir/event" />
-            </intent-filter>
-        </activity-alias>
-
         <activity
             android:name=".calendar.GoogleCalendarUriIntentFilter"
             android:configChanges="orientation|keyboardHidden"
@@ -125,9 +85,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="http"
                     android:host="www.google.com"
-                    android:pathPrefix="/calendar/event" />
+                    android:pathPrefix="/calendar/event"
+                    android:scheme="http" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -136,9 +96,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="http"
                     android:host="www.google.com"
-                    android:pathPattern="/calendar/hosted/.*/event" />
+                    android:pathPattern="/calendar/hosted/.*/event"
+                    android:scheme="http" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -147,9 +107,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="http"
                     android:host="www.google.com"
-                    android:pathPrefix="/calendar/event" />
+                    android:pathPrefix="/calendar/event"
+                    android:scheme="http" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -158,9 +118,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="http"
                     android:host="www.google.com"
-                    android:pathPattern="/calendar/hosted/.*/event" />
+                    android:pathPattern="/calendar/hosted/.*/event"
+                    android:scheme="http" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -169,9 +129,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="http"
                     android:host="www.google.com"
-                    android:pathPrefix="/calendar/event" />
+                    android:pathPrefix="/calendar/event"
+                    android:scheme="http" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -180,9 +140,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="http"
                     android:host="www.google.com"
-                    android:pathPattern="/calendar/hosted/.*/event" />
+                    android:pathPattern="/calendar/hosted/.*/event"
+                    android:scheme="http" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -191,9 +151,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="http"
                     android:host="www.google.com"
-                    android:pathPrefix="/calendar/event" />
+                    android:pathPrefix="/calendar/event"
+                    android:scheme="http" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -202,9 +162,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="http"
                     android:host="www.google.com"
-                    android:pathPattern="/calendar/hosted/.*/event" />
+                    android:pathPattern="/calendar/hosted/.*/event"
+                    android:scheme="http" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -213,9 +173,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
                     android:host="www.google.com"
-                    android:pathPrefix="/calendar/event" />
+                    android:pathPrefix="/calendar/event"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -224,9 +184,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
                     android:host="www.google.com"
-                    android:pathPattern="/calendar/hosted/.*/event" />
+                    android:pathPattern="/calendar/hosted/.*/event"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -235,9 +195,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
                     android:host="www.google.com"
-                    android:pathPrefix="/calendar/event" />
+                    android:pathPrefix="/calendar/event"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -246,9 +206,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
                     android:host="www.google.com"
-                    android:pathPattern="/calendar/hosted/.*/event" />
+                    android:pathPattern="/calendar/hosted/.*/event"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -257,9 +217,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
                     android:host="www.google.com"
-                    android:pathPrefix="/calendar/event" />
+                    android:pathPrefix="/calendar/event"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -268,9 +228,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
                     android:host="www.google.com"
-                    android:pathPattern="/calendar/hosted/.*/event" />
+                    android:pathPattern="/calendar/hosted/.*/event"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -279,9 +239,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
                     android:host="www.google.com"
-                    android:pathPrefix="/calendar/event" />
+                    android:pathPrefix="/calendar/event"
+                    android:scheme="https" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -290,15 +250,17 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:scheme="https"
                     android:host="www.google.com"
-                    android:pathPattern="/calendar/hosted/.*/event" />
+                    android:pathPattern="/calendar/hosted/.*/event"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activity.SelectVisibleCalendarsActivity"
             android:label="@string/select_visible_calendars_title"
             android:theme="@style/Base.CalendarAppThemeWithActionBar" />
+
         <activity
             android:name=".activity.SelectSyncedCalendarsMultiAccountActivity"
             android:label="@string/select_synced_calendars_title"
@@ -307,13 +269,6 @@
             android:name=".activity.CalendarSettingsActivity"
             android:label="@string/preferences_title"
             android:parentActivityName=".activity.AllInOneActivity" />
-
-        <!-- Declarations for search -->
-        <!-- Make all activities a searchable context -->
-        <meta-data
-            android:name="android.app.default_searchable"
-            android:value="com.android.nanal.activity.SearchActivity" />
-
         <activity
             android:name=".activity.SearchActivity"
             android:exported="true"
@@ -343,8 +298,76 @@
                 <data android:mimeType="text/x-vcalendar" />
                 <data android:mimeType="text/calendar" />
             </intent-filter>
-        </activity>
+        </activity> <!-- Declarations for search -->
+        <!-- Make all activities a searchable context -->
+        <activity
+            android:name=".activity.AlertActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:theme="@android:style/Theme.Holo.Dialog" />
 
+        <activity
+            android:name=".alerts.QuickResponseActivity"
+            android:excludeFromRecents="true"
+            android:label="@string/quick_response_dialog_title"
+            android:launchMode="singleInstance"
+            android:theme="@android:style/Theme.Holo.Dialog" />
+        <activity
+            android:name=".alerts.SnoozeDelayActivity"
+            android:excludeFromRecents="true"
+            android:launchMode="singleInstance"
+            android:theme="@android:style/Theme.Holo.Dialog" />
+
+        <activity
+            android:name=".activity.SplashActivity"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.APP_CALENDAR" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".WelcomeActivity" /> <!-- Declarations for alerts/reminders -->
+        <activity android:name=".LoginActivity" />
+        <activity
+            android:name=".activity.SettingsActivity"
+            android:label="@string/preferences_title"
+            android:parentActivityName=".activity.AllInOneActivity" />
+        <activity android:name=".activity.EditDiaryActivity" />
+
+        <activity android:name=".GroupActivity" />
+        <activity android:name=".activity.EditGroupActivity" />
+
+        <activity-alias
+            android:name=".LaunchActivity"
+            android:exported="true"
+            android:targetActivity=".activity.AllInOneActivity" />
+        <activity-alias
+            android:name=".activity.EditEventActivity"
+            android:exported="true"
+            android:targetActivity=".activity.EditEventActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.EDIT" />
+                <action android:name="android.intent.action.INSERT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="vnd.android.cursor.item/event" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.EDIT" />
+                <action android:name="android.intent.action.INSERT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="vnd.android.cursor.dir/event" />
+            </intent-filter>
+        </activity-alias>
+        <meta-data
+            android:name="android.app.default_searchable"
+            android:value="com.android.nanal.activity.SearchActivity" /> <!-- Declarations for the widget -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
@@ -358,24 +381,6 @@
             android:name=".CalendarRecentSuggestionsProvider"
             android:authorities="com.android.nanal.CalendarRecentSuggestionsProvider"
             android:exported="false" />
-
-        <!-- Declarations for alerts/reminders -->
-        <activity
-            android:name=".activity.AlertActivity"
-            android:excludeFromRecents="true"
-            android:launchMode="singleInstance"
-            android:theme="@android:style/Theme.Holo.Dialog" />
-        <activity
-            android:name=".alerts.QuickResponseActivity"
-            android:excludeFromRecents="true"
-            android:label="@string/quick_response_dialog_title"
-            android:launchMode="singleInstance"
-            android:theme="@android:style/Theme.Holo.Dialog" />
-        <activity
-            android:name=".alerts.SnoozeDelayActivity"
-            android:excludeFromRecents="true"
-            android:launchMode="singleInstance"
-            android:theme="@android:style/Theme.Holo.Dialog" />
 
         <receiver android:name=".alerts.AlertReceiver">
             <intent-filter>
@@ -398,11 +403,6 @@
             android:name=".alerts.GlobalDismissManager"
             android:exported="false" />
 
-        <service android:name=".alerts.AlertService" />
-        <service android:name=".alerts.DismissAlarmsService" />
-        <service android:name=".alerts.SnoozeAlarmsService" />
-
-        <!-- Declarations for the widget -->
         <receiver
             android:name=".widget.CalendarAppWidgetProvider"
             android:label="@string/gadget_title">
@@ -436,31 +436,27 @@
                 <data android:mimeType="vnd.android.data/update" />
             </intent-filter>
         </receiver>
-
+        <service android:name=".alerts.AlertService" />
+        <service android:name=".alerts.DismissAlarmsService" />
+        <service android:name=".alerts.SnoozeAlarmsService" />
         <service
             android:name=".widget.CalendarAppWidgetService"
             android:exported="false"
-            android:permission="android.permission.BIND_REMOTEVIEWS"></service>
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
         <service android:name=".query.AsyncQueryServiceHelper" />
-        <activity android:name=".activity.SplashActivity"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.LAUNCHER" />
-                <category android:name="android.intent.category.APP_CALENDAR" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".WelcomeActivity"/>
-        <activity android:name=".LoginActivity" />
-        <activity
-            android:name=".activity.SettingsActivity"
-            android:label="@string/preferences_title"
-            android:parentActivityName=".activity.AllInOneActivity" />
-        <activity android:name=".activity.EditDiaryActivity" />
-        <activity android:name=".GroupActivity" />
-        <activity android:name=".activity.EditGroupActivity" />
     </application>
+    <uses-permission
+        android:name="android.permission.MANAGE_ACCOUNTS"
+        android:maxSdkVersion="22" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" /> -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" /> <!-- <uses-permission android:name="android.permission.USE_CREDENTIALS" /> -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>
