@@ -16,6 +16,7 @@ package com.android.nanal.activity;
  * limitations under the License.
  */
 
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Intent;
@@ -23,7 +24,7 @@ import android.database.ContentObserver;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.CalendarContract;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -102,6 +103,7 @@ public class SelectVisibleCalendarsActivity extends AbstractCalendarActivity {
         startActivity(intent);
     }
 
+    @SuppressLint("WrongConstant")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         if (getSupportActionBar() != null) {

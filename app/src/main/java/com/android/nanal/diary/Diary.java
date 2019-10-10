@@ -30,7 +30,7 @@ import android.os.Build;
 import android.os.Debug;
 import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Instances;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 

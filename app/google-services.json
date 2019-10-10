@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "558470895697",
+    "firebase_url": "https://calendarnanal.firebaseio.com",
+    "project_id": "calendarnanal",
+    "storage_bucket": "calendarnanal.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:558470895697:android:a6f8d3bb6a68c1e6834070",
+        "android_client_info": {
+          "package_name": "com.android.nanal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "558470895697-2es3rc6toia5qrb32kg89f41m9a0k4uj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.android.nanal",
+            "certificate_hash": "380f391f9fe47e117f8972a519cda0ed4279ff44"
+          }
+        },
+        {
+          "client_id": "558470895697-lekb4uuq8og9tar48moaf9ut11g15v4c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbJYdC8gkryiTBMH3w37nBY2UpQzAA3z8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "558470895697-lekb4uuq8og9tar48moaf9ut11g15v4c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

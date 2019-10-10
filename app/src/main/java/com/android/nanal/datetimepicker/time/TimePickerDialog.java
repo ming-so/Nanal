@@ -18,6 +18,7 @@ package com.android.nanal.datetimepicker.time;
 
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.app.ActionBar.LayoutParams;
 import android.app.DialogFragment;
 import android.content.Context;
@@ -144,6 +145,7 @@ public class TimePickerDialog extends DialogFragment implements OnValueSelectedL
         // 다이얼로그 프래그먼트에 필요한 빈 생성자
     }
 
+    @SuppressLint("ValidFragment")
     public TimePickerDialog(Context context, int theme, OnTimeSetListener callback,
                             int hourOfDay, int minute, boolean is24HourMode) {
         // Empty constructor required for dialog fragment.

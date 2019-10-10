@@ -20,7 +20,7 @@ package com.android.nanal.chips;
 import android.net.Uri;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.DisplayNameSources;
-import android.support.annotation.DrawableRes;
+import androidx.annotation.DrawableRes;
 import android.text.util.Rfc822Token;
 import android.text.util.Rfc822Tokenizer;
 
@@ -91,6 +91,7 @@ public class RecipientEntry {
     private String mIndicatorText;
 
     /** See {@link android.provider.ContactsContract.ContactsColumns#LOOKUP_KEY} */
+    @SuppressWarnings("JavadocReference")
     private final String mLookupKey;
 
     /** Should be used when type is {@link #ENTRY_TYPE_PERMISSION_REQUEST}. */

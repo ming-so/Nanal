@@ -19,7 +19,7 @@ import android.widget.ImageView;
  * An ImageView class with a circle mask so that all images are drawn in a
  * circle instead of a square.
  */
-public class CircularImageView extends android.support.v7.widget.AppCompatImageView {
+public class CircularImageView extends 	androidx.appcompat.widget.AppCompatImageView {
     private static float circularImageBorder = 1f;
 
     private final Matrix matrix;

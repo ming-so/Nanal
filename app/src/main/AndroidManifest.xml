@@ -52,6 +52,16 @@
                 <data android:host="com.android.nanal" />
                 <data android:scheme="content" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="nanal"
+                    android:host="group_invite" />
+            </intent-filter>
         </activity>
 
         <activity-alias
@@ -68,9 +78,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.VIEW" />-->
-                <!--<category android:name="android.intent.category.DEFAULT" />-->
-                <!--<data android:mimeType="vnd.android.cursor.item/event" />-->
+            <!--<action android:name="android.intent.action.VIEW" />-->
+            <!--<category android:name="android.intent.category.DEFAULT" />-->
+            <!--<data android:mimeType="vnd.android.cursor.item/event" />-->
             <!--</intent-filter>-->
 
             <meta-data
@@ -108,28 +118,181 @@
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_label"
             android:theme="@android:style/Theme.NoDisplay">
-            <intent-filter android:priority="50">
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
+                    android:scheme="http"
                     android:host="www.google.com"
-                    android:pathPrefix="/calendar/event"
-                    android:scheme="http" />
+                    android:pathPrefix="/calendar/event" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
+                    android:scheme="http"
                     android:host="www.google.com"
-                    android:pathPrefix="/calendar/event"
-                    android:scheme="https" />
+                    android:pathPattern="/calendar/hosted/.*/event" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
+                    android:scheme="http"
                     android:host="www.google.com"
-                    android:pathPattern="/calendar/hosted/.*/event"
-                    android:scheme="http" />
+                    android:pathPrefix="/calendar/event" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
+                    android:scheme="http"
                     android:host="www.google.com"
-                    android:pathPattern="/calendar/hosted/.*/event"
-                    android:scheme="https" />
+                    android:pathPattern="/calendar/hosted/.*/event" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="http"
+                    android:host="www.google.com"
+                    android:pathPrefix="/calendar/event" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="http"
+                    android:host="www.google.com"
+                    android:pathPattern="/calendar/hosted/.*/event" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="http"
+                    android:host="www.google.com"
+                    android:pathPrefix="/calendar/event" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="http"
+                    android:host="www.google.com"
+                    android:pathPattern="/calendar/hosted/.*/event" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="www.google.com"
+                    android:pathPrefix="/calendar/event" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="www.google.com"
+                    android:pathPattern="/calendar/hosted/.*/event" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="www.google.com"
+                    android:pathPrefix="/calendar/event" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="www.google.com"
+                    android:pathPattern="/calendar/hosted/.*/event" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="www.google.com"
+                    android:pathPrefix="/calendar/event" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="www.google.com"
+                    android:pathPattern="/calendar/hosted/.*/event" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="www.google.com"
+                    android:pathPrefix="/calendar/event" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:scheme="https"
+                    android:host="www.google.com"
+                    android:pathPattern="/calendar/hosted/.*/event" />
             </intent-filter>
         </activity>
         <activity
@@ -183,7 +346,7 @@
         </activity>
 
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
             android:exported="false"
             android:grantUriPermissions="true">
@@ -291,13 +454,13 @@
         </activity>
         <activity android:name=".WelcomeActivity"/>
         <activity android:name=".LoginActivity" />
-        <activity android:name=".activity.SettingsActivity"
+        <activity
+            android:name=".activity.SettingsActivity"
             android:label="@string/preferences_title"
-            android:parentActivityName=".activity.AllInOneActivity"
-            />
-        <activity android:name=".activity.EditDiaryActivity"/>
-        <activity android:name=".GroupActivity"/>
-        <activity android:name=".activity.EditGroupActivity"/>
+            android:parentActivityName=".activity.AllInOneActivity" />
+        <activity android:name=".activity.EditDiaryActivity" />
+        <activity android:name=".GroupActivity" />
+        <activity android:name=".activity.EditGroupActivity" />
     </application>
 
 </manifest>

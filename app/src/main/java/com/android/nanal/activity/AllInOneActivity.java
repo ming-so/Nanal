@@ -40,16 +40,23 @@ import android.preference.PreferenceActivity;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Attendees;
 import android.provider.CalendarContract.Events;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.NonNull;
+
+import com.android.nanal.DynamicLinkManager;
+import com.android.nanal.LoginActivity;
+import com.android.nanal.NanalDBHelper;
+import com.android.nanal.PrefManager;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuItemCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.text.format.DateUtils;
@@ -72,9 +79,6 @@ import com.android.nanal.DayFragment;
 import com.android.nanal.DayOfMonthDrawable;
 import com.android.nanal.DynamicTheme;
 import com.android.nanal.ExtensionsFactory;
-import com.android.nanal.LoginActivity;
-import com.android.nanal.NanalDBHelper;
-import com.android.nanal.PrefManager;
 import com.android.nanal.R;
 import com.android.nanal.TodayFragment;
 import com.android.nanal.ViewDetailsPreferences;
@@ -101,6 +105,8 @@ import com.android.nanal.month.MonthByWeekFragment;
 import com.android.nanal.query.GroupAsyncTask;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
+import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 
 import java.io.File;
 import java.io.IOException;
@@ -311,8 +317,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         super.onCreate(icicle);
         dynamicTheme.onCreate(this);
 
-        mContext = AllInOneActivity.this;
-        mActivity = AllInOneActivity.this;
 
 
 //        if (icicle != null && icicle.containsKey(BUNDLE_KEY_CHECK_ACCOUNTS)) {
@@ -492,7 +496,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 switch (item.getItemId()) {
                     case R.id.action_calendar:
                         // mode 1
-                        if (selectedMode == 1) {
+                        if(selectedMode == 1) {
                             // 오늘 날짜로 갱신
                             Time t = new Time(mTimeZone);
                             t.setToNow();
@@ -530,7 +534,41 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         prefs = this.getApplicationContext().getSharedPreferences("login_setting", MODE_PRIVATE);
         connectId = prefs.getString("loginId", null);
 
-        openDatabase();
+/*        // 다이나믹 링크 설정
+        // ATTENTION: This was auto-generated to handle app links.
+        Intent appLinkIntent = getIntent();
+        String appLinkAction = appLinkIntent.getAction();
+        Uri appLinkData = appLinkIntent.getData();
+
+        if (Intent.ACTION_VIEW.equals(appLinkAction) && appLinkData != null){
+//            String recipeId = appLinkData.getLastPathSegment();
+//            Uri appData = Uri.parse("content://com.recipe_app/recipe/").buildUpon()
+//                    .appendPath(recipeId).build();
+//            showRecipe(appData);
+            // 링크 연결됐을 때 실행될 코드 작성하기 (위 코드는 예시)
+        }
+
+        FirebaseDynamicLinks.getInstance()
+                .getDynamicLink(getIntent())
+                .addOnSuccessListener(this, new OnSuccessListener<PendingDynamicLinkData>() {
+                    @Override
+                    public void onSuccess(PendingDynamicLinkData pendingDynamicLinkData) {
+                        // Get deep link from result (may be null if no link is found)
+                        Uri deepLink = null;
+                        if (pendingDynamicLinkData != null) {
+                            deepLink = pendingDynamicLinkData.getLink();
+                        }
+                        Toast.makeText(AllInOneActivity.this, "다이나믹 링크 테스트", Toast.LENGTH_LONG).show();
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "getDynamicLink:onFailure", e);
+                    }
+                });
+
+        openDatabase();*/
     }
 
     public void openDatabase() {
@@ -691,21 +729,21 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             @Override
             public void onClick(View v) {
                 //Create new Event
-                Time t = new Time();
-                t.set(mController.getTime());
-                t.second = 0;
-                if (t.minute > 30) {
-                    t.hour++;
-                    t.minute = 0;
-                } else if (t.minute > 0 && t.minute < 30) {
-                    t.minute = 30;
-                }
-                if (createLocalCalendar()) {
-                    mController.sendEventRelatedEvent(
-                            this, EventType.CREATE_EVENT, -1, t.toMillis(true), 0, 0, 0, -1);
-                } else {
+                    Time t = new Time();
+                    t.set(mController.getTime());
+                    t.second = 0;
+                    if (t.minute > 30) {
+                        t.hour++;
+                        t.minute = 0;
+                    } else if (t.minute > 0 && t.minute < 30) {
+                        t.minute = 30;
+                    }
+                    if(createLocalCalendar()) {
+                        mController.sendEventRelatedEvent(
+                                this, EventType.CREATE_EVENT, -1, t.toMillis(true), 0, 0, 0, -1);
+                    } else {
 
-                }
+                    }
             }
         });
 
@@ -1252,6 +1290,17 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 CreateNanalCalendar.DeleteColors(AllInOneActivity.this.getApplicationContext(), connectId);
                 Toast.makeText(AllInOneActivity.this.getApplicationContext(), "삭제", Toast.LENGTH_LONG).show();
                 break;
+            case R.id.grouptest:
+                // 다이나믹 링크 공유
+                /*DynamicLinkManager dynamicLinkManager = new DynamicLinkManager();
+                Uri dynamicLink = dynamicLinkManager.createDynamicLink();
+
+                Intent dynaminLinkIntent = new Intent(Intent.ACTION_SEND);
+                dynaminLinkIntent.setType("text/plain");
+                dynaminLinkIntent.putExtra(Intent.EXTRA_TEXT, dynamicLink.toString());
+
+                startActivity(Intent.createChooser(dynaminLinkIntent, "링크 공유"));
+                break;*/
         }
         mDrawerLayout.closeDrawers();
         return false;
@@ -1412,6 +1461,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         if (!mIsTabletConfig) {
             refreshActionbarTitle(timeMillis);
         }
+
 
 
         // Show date only on tablet configurations in views different than Agenda

@@ -23,6 +23,8 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.appcompat.widget.AppCompatTextView;
+
 /**
  * Fake Button class, used so TextViews can announce themselves as Buttons, for accessibility.
  * TextView가 접근성을 위해 버튼으로 자신을 알릴 수 있도록 사용되는 가짜 버튼 클래스
@@ -30,7 +32,7 @@ import android.widget.TextView;
  * @deprecated This module is deprecated. Do not use this class.
  */
 @Deprecated
-public class AccessibleTextView extends TextView {
+public class AccessibleTextView extends AppCompatTextView {
 
     public AccessibleTextView(Context context, AttributeSet attrs) {
         super(context, attrs);
