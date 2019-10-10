@@ -3,15 +3,15 @@ package com.android.nanal.group;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-
 import com.android.nanal.R;
 import com.android.nanal.calendar.CalendarController;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class GroupFragment extends Fragment implements CalendarController.EventHandler {
     protected static final String BUNDLE_KEY_RESTORE_TIME = "key_restore_time";
@@ -33,7 +33,7 @@ public class GroupFragment extends Fragment implements CalendarController.EventH
         View v = inflater.inflate(R.layout.group_activity, null);
         recyclerView = v.findViewById(R.id.rv_group);
 
-        recyclerView.setAdapter(new GroupListAdapter());
+        recyclerView.setAdapter(new GroupListAdapter(v.getContext()));
         recyclerView.setLayoutManager(new LinearLayoutManager(v.getContext()));
         return v;
     }

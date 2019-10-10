@@ -3,14 +3,15 @@ package com.android.nanal.group;
 import android.content.Context;
 import android.content.res.Resources;
 import android.os.Handler;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.PopupWindow;
 import android.widget.ViewSwitcher;
 
 import com.android.nanal.R;
 import com.android.nanal.calendar.CalendarController;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class GroupView extends View {
     private static final int INVALID_GROUP_ID = -1;

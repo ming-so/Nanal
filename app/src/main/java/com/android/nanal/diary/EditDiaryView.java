@@ -9,7 +9,6 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.provider.CalendarContract;
-import com.google.android.material.snackbar.Snackbar;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.format.Time;
@@ -43,6 +42,7 @@ import com.android.nanal.diary.EditDiaryHelper.EditDoneRunnable;
 import com.android.nanal.event.Utils;
 import com.android.nanal.timezonepicker.TimeZoneInfo;
 import com.android.nanal.timezonepicker.TimeZonePickerDialog;
+import com.google.android.material.snackbar.Snackbar;
 import com.jaredrummler.materialspinner.MaterialSpinner;
 
 import java.sql.Date;
