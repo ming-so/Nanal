@@ -4,8 +4,6 @@ import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 
@@ -16,6 +14,9 @@ import com.android.nanal.calendar.CalendarController.DiaryInfo;
 import com.android.nanal.diary.EditDiaryFragment;
 
 import java.sql.Date;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.widget.Toolbar;
 
 public class EditDiaryActivity extends AbstractCalendarActivity {
     public static final String EXTRA_DIARY_COLOR = "diary_color";
@@ -38,7 +39,6 @@ public class EditDiaryActivity extends AbstractCalendarActivity {
     private EditDiaryFragment mEditFragment;
 
     private int mDiaryColor;
-    private boolean mDiaryColorInitialized;
 
     private DiaryInfo mDiaryInfo;
 
@@ -49,7 +49,6 @@ public class EditDiaryActivity extends AbstractCalendarActivity {
         dynamicTheme.onCreate(this);
         setContentView(R.layout.simple_frame_layout_material);
         mDiaryInfo = getmDiaryInfoFromIntent(icicle);
-        mDiaryColorInitialized = getIntent().hasExtra(EXTRA_DIARY_COLOR);
         mDiaryColor = getIntent().getIntExtra(EXTRA_DIARY_COLOR, -1);
         Toolbar myToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(myToolbar);
@@ -77,8 +76,7 @@ public class EditDiaryActivity extends AbstractCalendarActivity {
                 readOnly = intent.getBooleanExtra(EXTRA_READ_ONLY, false);
             }
 
-            mEditFragment = new EditDiaryFragment(mDiaryInfo, mDiaryColorInitialized,
-                    mDiaryColor, readOnly, intent);
+            mEditFragment = new EditDiaryFragment(mDiaryInfo, mDiaryColor, readOnly, intent);
 
             mEditFragment.mShowModifyDialogOnLaunch = getIntent().getBooleanExtra(
                     CalendarController.EVENT_EDIT_ON_LAUNCH, false);

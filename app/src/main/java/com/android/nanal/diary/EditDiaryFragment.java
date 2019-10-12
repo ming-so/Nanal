@@ -14,13 +14,6 @@ import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.CalendarContract;
-
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-//import android.support.v7.app.ActionBar;
-//import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -44,11 +37,17 @@ import com.android.nanal.event.Utils;
 
 import java.io.Serializable;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+//import android.support.v7.app.ActionBar;
+//import android.support.v7.app.AppCompatActivity;
+
 public class EditDiaryFragment extends Fragment implements CalendarController.DiaryHandler, ColorPickerSwatch.OnColorSelectedListener {
     private static final String TAG = "EditDiaryActivity";
     private static final String COLOR_PICKER_DIALOG_TAG = "ColorPickerDialog";
-
-    private static final int REQUEST_CODE_COLOR_PICKER = 0;
 
     private static final String BUNDLE_KEY_MODEL = "key_model";
     private static final String BUNDLE_KEY_EDIT_STATE = "key_edit_state";
@@ -105,7 +104,14 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
     private View.OnClickListener mOnColorPickerClicked = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            int[] colors = mModel.getGroupColors();
+            int[] colors = { getResources().getColor(R.color.colorPrimary),
+                    getResources().getColor(R.color.colorBluePrimary),
+                    getResources().getColor(R.color.colorPurplePrimary),
+                    getResources().getColor(R.color.colorGreenPrimary),
+                    getResources().getColor(R.color.colorOrangePrimary),
+                    getResources().getColor(R.color.colorRedPrimary)
+            };
+//            mModel.getGroupColors();
             if (mColorPickerDialog == null) {
                 mColorPickerDialog = DiaryColorPickerDialog.newInstance(colors,
                         mModel.getDiaryColor(), mView.mIsMultipane);
@@ -122,19 +128,14 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
     };
 
     public EditDiaryFragment() {
-        this(null, false, -1, false, null);
+        this(null, -1, false, null);
     }
 
     @SuppressLint("ValidFragment")
-    public EditDiaryFragment(DiaryInfo diary, boolean diaryColorInitialized, int diaryColor, boolean readOnly, Intent intent) {
+    public EditDiaryFragment(DiaryInfo diary, int diaryColor, boolean readOnly, Intent intent) {
         mDiary = diary;
         mIsReadOnly = readOnly;
         mIntent = intent;
-
-        mDiaryColorInitialized = diaryColorInitialized;
-        if (diaryColorInitialized) {
-            mDiaryColor = diaryColor;
-        }
         setHasOptionsMenu(true);
     }
 
@@ -184,18 +185,19 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
 
         // Kick off the query for the event
         boolean newDiary = mDiary.id == -1;
+
         if (!newDiary) {
             // 수정해야 하는 경우
             mOutstandingQueries = TOKEN_ALL;
             mHandler.startQuery(TOKEN_DIARY, null, null, EditDiaryHelper.DIARY_PROJECTION,
                     null /* selection */, null /* selection args */, null /* sort order */);
         } else {
+            mModel.mDiaryUserId = AllInOneActivity.connectId;
             mOutstandingQueries = TOKEN_COLORS;
             if (DEBUG) {
                 Log.d(TAG, "startQuery: Editing a new event.");
             }
             mModel.mDiaryDay = mDay;
-            //todo: 캘린더 삭제했음 필요한 경우 추가
             mHandler.startQuery(TOKEN_COLORS, null, CalendarContract.Colors.CONTENT_URI,
                     EditDiaryHelper.COLORS_PROJECTION,
                     CalendarContract.Colors.COLOR_TYPE + "=" + CalendarContract.Colors.TYPE_EVENT, null, null);
@@ -325,17 +327,20 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
 
     private boolean onActionBarItemSelected(int itemId) {
         if (itemId == R.id.action_done) {
-            if (mModel.mDiaryId >= 0 && mView != null && mView.prepareForSave()) {
+            if (mView != null && mView.prepareForSave()) {
+                Log.d(TAG, "onActionBarItemSelected: 완료");
                 if (mModification == Utils.MODIFY_UNINITIALIZED) {
                     mModification = Utils.MODIFY_ALL;
                 }
                 mOnDone.setDoneCode(Utils.DONE_SAVE | Utils.DONE_EXIT);
                 mOnDone.run();
             } else {
+                Log.d(TAG, "onActionBarItemSelected: 완료 else문");
                 mOnDone.setDoneCode(Utils.DONE_REVERT);
                 mOnDone.run();
             }
         } else if (itemId == R.id.action_cancel) {
+            Log.d(TAG, "onActionBarItemSelected: 취소");
             mOnDone.setDoneCode(Utils.DONE_REVERT);
             mOnDone.run();
         }
@@ -428,6 +433,7 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
         if (mModel.getDiaryColor() != color) {
             mModel.setDiaryColor(color);
             mView.updateHeadlineColor(mModel, color);
+            mView.mIvColor.setColorFilter(color);
         }
     }
 
@@ -461,7 +467,6 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
             }
             int diaryId;
             switch (token) {
-
                 case TOKEN_DIARY:
                     if (cursor.getCount() == 0) {
                         // The cursor is empty. This can happen if the event
@@ -556,7 +561,6 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
 
             if ((mCode & Utils.DONE_SAVE) != 0 && mModel != null
                     && mView.prepareForSave()
-                    && !isEmptyNewDiary()
                     && mHelper.saveDiary(mModel, mOriginalModel)) {
                 int stringResource;
                 if (mModel.mDiaryId != -1) {
@@ -567,7 +571,7 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
 
                 Toast.makeText(mContext, stringResource, Toast.LENGTH_SHORT).show();
             } else if ((mCode & Utils.DONE_SAVE) != 0 && mModel != null && isEmptyNewDiary()) {
-                Toast.makeText(mContext, R.string.empty_event, Toast.LENGTH_SHORT).show();
+                Toast.makeText(mContext, R.string.empty_diary, Toast.LENGTH_SHORT).show();
             }
 
             if ((mCode & Utils.DONE_DELETE) != 0 && mOriginalModel != null) {

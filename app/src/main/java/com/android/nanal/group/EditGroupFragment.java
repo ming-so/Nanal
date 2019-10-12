@@ -16,10 +16,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.CalendarContract;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,6 +37,11 @@ import com.android.nanal.diary.DiaryColorCache;
 import com.android.nanal.event.Utils;
 
 import java.io.Serializable;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 public class EditGroupFragment extends Fragment implements CalendarController.GroupHandler, ColorPickerSwatch.OnColorSelectedListener {
     private static final String TAG = "EditGroupActivity";
@@ -195,11 +196,6 @@ public class EditGroupFragment extends Fragment implements CalendarController.Gr
             if (DEBUG) {
                 Log.d(TAG, "startQuery: Editing a new group.");
             }
-//            String group_name = mGroup.group_name;
-//            String group_color = Integer.toString(mGroup.group_color);
-//            String account_id = AllInOneActivity.connectId;
-//
-//            CreateNewGroup.CreateGroup(new String[]{group_name, group_color, account_id});
             mHandler.startQuery(TOKEN_COLORS, null, CalendarContract.Colors.CONTENT_URI,
                     EditGroupHelper.COLORS_PROJECTION,
                     CalendarContract.Colors.COLOR_TYPE + "=" + CalendarContract.Colors.TYPE_EVENT, null, null);

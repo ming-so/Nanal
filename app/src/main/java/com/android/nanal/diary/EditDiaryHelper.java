@@ -1,22 +1,18 @@
 package com.android.nanal.diary;
 
-import android.content.ContentProviderOperation;
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Colors;
 import android.text.format.Time;
 import android.util.Log;
 
 import com.android.nanal.activity.AbstractCalendarActivity;
+import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.calendar.CalendarDiaryModel;
-import com.android.nanal.event.Utils;
 import com.android.nanal.query.AsyncQueryService;
 
-import java.util.ArrayList;
-import java.util.TimeZone;
+import java.util.concurrent.ExecutionException;
 
 public class EditDiaryHelper {
     private static final String TAG = "EditDiaryHelper";
@@ -120,6 +116,7 @@ public class EditDiaryHelper {
     }
 
     public boolean saveDiary(CalendarDiaryModel model, CalendarDiaryModel originalModel) {
+        Log.d(TAG, "saveDiary");
         if (!mDiaryOk) {
             return false;
         }
@@ -138,41 +135,42 @@ public class EditDiaryHelper {
             return false;
         }
 
-        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
-        int diaryIdIndex = -1;
+//        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+//        int diaryIdIndex = -1;
 
-        ContentValues values = getContentValuesFromModel(model);
+//        ContentValues values = getContentValuesFromModel(model);
 
-        if (model.mUri != null && originalModel == null) {
-            Log.e(TAG, "Existing event but no originalModel provided. Aborting save.");
+//        if (model.mUri != null && originalModel == null) {
+//            Log.e(TAG, "Existing event but no originalModel provided. Aborting save.");
+//            return false;
+//        }
+
+        CreateNewDiary mCreateDiaryTask = new CreateNewDiary();
+        String receiveMsg;
+        String diary_id = "";
+        try {
+            Log.d(TAG, "서버 DB에 데이터 전송하여 insert하고 그룹 아이디 받아오기");
+            receiveMsg = mCreateDiaryTask.execute(model.mDiaryUserId, Integer.toString(model.mDiaryColor),
+                    model.mDiaryLocation, Long.toString(model.mDiaryDay), model.mDiaryTitle,
+                    model.mDiaryContent, model.mDiaryWeather, model.mDiaryImg, Integer.toString(model.mDiaryGroupId)).get();
+            diary_id = receiveMsg.trim();
+            AllInOneActivity.helper.addDiary(Integer.parseInt(diary_id), model.mDiaryUserId, model.mDiaryColor,
+                    model.mDiaryLocation, model.mDiaryDay, model.mDiaryTitle,
+                    model.mDiaryContent, model.mDiaryWeather, model.mDiaryImg, model.mDiaryGroupId);
+            Log.d(TAG, "DB에 일기 추가! diary_id="+diary_id);
+        } catch (InterruptedException e) {
+            Log.e(TAG, e.getMessage());
+        } catch (ExecutionException e) {
+            Log.e(TAG, e.getMessage());
+        } catch (NumberFormatException e) {
+            Log.e(TAG, e.getMessage());
+        }
+
+        if(diary_id == "") {
+            Log.d(TAG, "receiveMsg 없음");
             return false;
         }
-
-        Uri uri = null;
-        if (model.mUri != null) {
-            uri = Uri.parse(model.mUri);
-        }
-
-        diaryIdIndex = ops.size();
-
-        if(uri == null) {
-            Uri CONTENT_URI = Uri.parse("content://" + "com.android.nanal" + "/diary");
-            //todo:수정
-            ContentProviderOperation.Builder b = ContentProviderOperation.newInsert(CONTENT_URI).withValues(values);
-            ops.add(b.build());
-        } else {
-            ContentProviderOperation.Builder b = ContentProviderOperation.newInsert(uri).withValues(values);
-            ops.add(b.build());
-        }
-
-        // New Event or New Exception to an existing event
-        boolean newDiary = (diaryIdIndex != -1);
-
-        ContentProviderOperation.Builder b;
-
-        mService.startBatch(mService.getNextToken(), null, android.provider.CalendarContract.AUTHORITY, ops,
-                Utils.UNDO_DELAY);
-
+        mCreateDiaryTask.cancel(true);
         return true;
     }
 
@@ -211,65 +209,6 @@ public class EditDiaryHelper {
         model.mDiaryGroupId = cursor.getInt(PROJECTION_GROUP_ID_INDEX);
 
         model.mModelUpdatedWithDiaryCursor = true;
-    }
-
-    ContentValues getContentValuesFromModel(CalendarDiaryModel model) {
-        String timezone = model.mTimezone;
-        if (timezone == null) {
-            timezone = TimeZone.getDefault().getID();
-        }
-        Time time = new Time(timezone);
-        time.set(model.mDiaryDay);
-
-        ContentValues values = new ContentValues();
-
-        values.put("diary_id", model.mDiaryId);
-        values.put("account_id", model.mDiaryUserId);
-        values.put("connect_type", model.mConnectType);
-        values.put("day", model.mDiaryDay);
-
-        if (model.mDiaryColor > 0) {
-            values.put("color", model.mDiaryColor);
-        }
-        if (model.mDiaryLocation != null) {
-            values.put("location", model.mDiaryLocation);
-        }
-        if (model.mDiaryTitle != null) {
-            values.put("title", model.mDiaryTitle);
-        }
-        if (model.mDiaryContent != null) {
-            values.put("content", model.mDiaryContent);
-        }
-        if (model.mDiaryWeather != null) {
-            values.put("weather", model.mDiaryWeather);
-        }
-        if (model.mDiaryGroupId > 0) {
-            values.put("group_id", model.mDiaryGroupId);
-        }
-        return values;
-    }
-
-    public static boolean setModelFromCalendarCursor(CalendarDiaryModel model, Cursor cursor) {
-        if (model == null || cursor == null) {
-            Log.wtf(TAG, "Attempted to build non-existent model or from an incorrect query.");
-            return false;
-        }
-
-
-        if (!model.mModelUpdatedWithDiaryCursor) {
-            Log.wtf(TAG,
-                    "Can't update model with a Calendar cursor until it has seen an Event cursor.");
-            return false;
-        }
-
-        cursor.moveToPosition(-1);
-        while (cursor.moveToNext()) {
-            model.mCalendarDisplayName = cursor.getString(CALENDARS_INDEX_DISPLAY_NAME);
-            model.mCalendarAccountName = cursor.getString(CALENDARS_INDEX_ACCOUNT_NAME);
-            model.mCalendarAccountType = cursor.getString(CALENDARS_INDEX_ACCOUNT_TYPE);
-            return true;
-        }
-        return false;
     }
 
     public interface EditDoneRunnable extends Runnable {

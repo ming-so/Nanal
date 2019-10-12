@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.android.nanal.diary.DiaryColorCache;
-import com.android.nanal.event.Utils;
 
 import java.io.Serializable;
 import java.util.Calendar;
@@ -38,13 +37,11 @@ public class CalendarDiaryModel implements Serializable {
 
     public DiaryColorCache mDiaryColorCache;
     public boolean mModelUpdatedWithDiaryCursor;
-    public String mTimezone = null;
 
     public boolean mDiaryColorInitialized = false;
 
     public CalendarDiaryModel(Context context){
         this();
-        mTimezone = Utils.getTimeZone(context, null);
         // Preference 불필요할 것 같음
 
     }
@@ -101,7 +98,6 @@ public class CalendarDiaryModel implements Serializable {
         mDiaryWeather = null;
         mDiaryImg = null;
         mDiaryGroupId = -1;
-        mTimezone = null;
 
         mSyncId = null;
         mSyncAccount = null;
