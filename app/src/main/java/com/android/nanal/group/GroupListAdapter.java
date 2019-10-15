@@ -1,6 +1,7 @@
 package com.android.nanal.group;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,7 +96,12 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
                 Context context = v.getContext();
                 Toast.makeText(context, "선택 > "+group.group_id + ", hexColor > "+hexColor, Toast.LENGTH_LONG).show();
 
-                //todo: groupId 가지고 그룹 상세 보기 화면으로 전환
+                // todo: groupId 가지고 그룹 상세 보기 화면으로 전환
+
+                String groupId = String.valueOf(group.group_id);
+                Intent intent = new Intent(context, GroupDetail.class);
+                intent.putExtra("groupId", groupId);
+                context.startActivity(intent);
             }
         });
     }
@@ -104,4 +110,6 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
     public int getItemCount() {
         return groupList.size();
     }
+
+
 }

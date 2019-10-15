@@ -45,9 +45,5 @@
             android:id="@+id/test3"
             android:icon="@drawable/ic_cancel_wht_24dp"
             android:title="계정 삭제"   />
-        <item
-            android:id="@+id/grouptest"
-            android:icon="@drawable/ic_add_event"
-            android:title="그룹 초대 테스트"   />
     </group>
 </menu>
