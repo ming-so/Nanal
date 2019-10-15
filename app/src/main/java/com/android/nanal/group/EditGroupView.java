@@ -100,11 +100,6 @@ public class EditGroupView implements DialogInterface.OnCancelListener {
 
 
     public boolean prepareForSave() {
-//        if (mModel == null || (mGroupsCursor == null && mModel.mUri == null)) {
-//        if (mModel == null) {
-//            //todo: mModel이 계속 null임
-//            return false;
-//        }
         return fillModelFromUI();
     }
 

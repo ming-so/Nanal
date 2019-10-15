@@ -1,6 +1,7 @@
 package com.android.nanal.diary;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.Service;
 import android.content.Context;
@@ -23,21 +24,17 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.ResourceCursorAdapter;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.nanal.EmailAddressAdapter;
 import com.android.nanal.R;
 import com.android.nanal.Rfc822InputFilter;
 import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.calendar.CalendarDiaryModel;
-import com.android.nanal.chips.AccountSpecifier;
 import com.android.nanal.diary.EditDiaryHelper.EditDoneRunnable;
 import com.android.nanal.event.Utils;
 import com.android.nanal.timezonepicker.TimeZoneInfo;
@@ -94,7 +91,6 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
     private View mView;
     private CalendarDiaryModel mModel;
     private Cursor mGroupsCursor;
-    private AccountSpecifier mAddressAdapter;
 
     private boolean mSaveAfterQueryComplete = false;
     private String mStringDay;
@@ -103,9 +99,6 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
     private Time mTime;
     private String mTimezone;
     private int mModification = EditDiaryHelper.MODIFY_UNINITIALIZED;
-
-    private int selectPosition = -1;
-    public String connectID = "test";
 
     List<String> mGroupsName;
 
@@ -138,10 +131,32 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
             @Override
             public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
                 if(position == 0) {
-                    Snackbar.make(view, "작성하신 일기가 나만 볼 수 있게 저장됩니다.", Snackbar.LENGTH_LONG).show();
+                    if(true) {
+                        // 만약 오늘의 개인 일기가 존재한다면
+                        mModel.mDiaryGroupId = -1;
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(mActivity, android.R.style.Theme_DeviceDefault_Light_Dialog);
+                        dialog.setMessage("오늘은 일기를 이미 작성하셨습니다. 작성하신 일기를 수정하시겠습니까?")
+                                .setPositiveButton("수정", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // todo:해당 일기 불러와서 ui에 붙여야 함
+                                    }
+                                })
+                                .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        mActivity.finish();
+                                    }
+                                })
+                                .setCancelable(false)
+                                .show();
+                    } else {
+                        Snackbar.make(view, "작성하신 일기가 나만 볼 수 있게 저장됩니다.", Snackbar.LENGTH_LONG).show();
+                        mModel.mDiaryGroupId = -1;
+                    }
                 } else {
                     Snackbar.make(view, "작성하신 일기가 [" + item + "] 그룹에 저장됩니다.", Snackbar.LENGTH_LONG).show();
-                    position = position;
+                    mModel.mDiaryGroupId = AllInOneActivity.mGroups.get(position-1).getGroup_id();
                 }
             }
         });
@@ -162,9 +177,6 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
         mColorPickerExistingEvent = view.findViewById(R.id.tv_edit_diary_color);
 
         mCalendarSelectorGroup = view.findViewById(R.id.ll_edit_diary_group);
-        View mCalendarStaticGroup;
-        View mLocationGroup;
-        View mDescriptionGroup;
 
         mTimezone = Utils.getTimeZone(activity, null);
         mDay = new Date(System.currentTimeMillis());
@@ -174,14 +186,6 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
         mTvDay.setText(mStringDay);
 
         setModel(null);
-
-        LinearLayout test = view.findViewById(R.id.ll_edit_diary_group);
-        test.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(mActivity, "클릭", Toast.LENGTH_LONG).show();
-            }
-        });
     }
 
     private String SetStringDay(Date day) {
@@ -222,7 +226,7 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
     }
 
     public boolean prepareForSave() {
-        if (mModel == null || (mGroupsCursor == null && mModel.mUri == null)) {
+        if (mModel == null) {
             return false;
         }
         return fillModelFromUI();
@@ -236,28 +240,11 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
             mLoadingCalendarsDialog = null;
             mSaveAfterQueryComplete = false;
         }
-//        else if (dialog == mNoAccountAccessDialog) {
-//            mDone.setDoneCode(Utils.DONE_REVERT);
-//            mDone.run();
-//            return;
-//        }
     }
 
     // This is called if the user clicks on a dialog button.
     @Override
     public void onClick(DialogInterface dialog, int which) {
-//        if (dialog == mNoAccountAccessDialog) {
-//            mDone.setDoneCode(Utils.DONE_REVERT);
-//            mDone.run();
-//            if (which == DialogInterface.BUTTON_POSITIVE) {
-                //todo:인증받는? 인증 안내하는? 화면으로 이동
-//                Intent nextIntent = new Intent(Settings.ACTION_ADD_ACCOUNT);
-//                final String[] array = {"com.android.nanal"};
-//                nextIntent.putExtra(Settings.EXTRA_AUTHORITIES, array);
-//                nextIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-//                mActivity.startActivity(nextIntent);
-//            }
-//        }
     }
 
     // Goes through the UI elements and updates the model as necessary
@@ -275,13 +262,7 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
         if(TextUtils.isEmpty(mModel.mDiaryContent)) {
             mModel.mDiaryContent = null;
         }
-
-        // If this was a new event
-        if (mModel.mUri == null) {
-            mModel.mDiaryGroupId = (int) AllInOneActivity.mGroups.get(mGroupSpinner.getSelectedIndex()-1).getGroup_id();
-        }
         mModel.mDiaryDay = mLongDay;
-        mModel.mTimezone = mTimezone;
         return true;
     }
 
@@ -296,12 +277,6 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
     public void setModel(CalendarDiaryModel model) {
         mModel = model;
 
-        // Need to close the autocomplete adapter to prevent leaking cursors.
-        if (mAddressAdapter != null && mAddressAdapter instanceof EmailAddressAdapter) {
-            ((EmailAddressAdapter)mAddressAdapter).close();
-            mAddressAdapter = null;
-        }
-
         if (model == null) {
             // Display loading screen
             mLoadingMessage.setVisibility(View.VISIBLE);
@@ -310,7 +285,6 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
         }
 
         long day = model.mDiaryDay;
-        mTimezone = model.mTimezone; // this will be UTC for all day events
 
         if (model.mDiaryTitle != null) {
             mTitleTextView.setTextKeepState(model.mDiaryTitle);
@@ -324,7 +298,7 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
             mEtContent.setTextKeepState(model.mDiaryContent);
         }
 
-        if (model.mUri != null) {
+        if (model.mDiaryGroupId == -1) {
             // This is an existing event so hide the calendar spinner
             // since we can't change the calendar.
 //            View calendarGroup = mView.findViewById(R.id.sp_edit_diary_group);
@@ -354,13 +328,7 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
             } else {
                 mView.findViewById(R.id.calendar_group).setBackgroundColor(displayColor);
             }
-        } else {
-            setSpinnerBackgroundColor(displayColor);
         }
-    }
-
-    private void setSpinnerBackgroundColor(int displayColor) {
-        mCalendarSelectorGroup.setBackgroundColor(displayColor);
     }
 
     private void sendAccessibilityEvent() {
@@ -432,25 +400,7 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
             }
         }
 
-        int selection;
-        if (selectedGroupId != -1) {
-            selection = findSelectedGroupPosition(cursor, selectedGroupId);
-        } else {
-            //todo:기본(로컬) 다이어리 설정을 해 줘야 함...
-            selection = findSelectedGroupPosition(cursor, selectedGroupId);
-        }
-
-        // populate the calendars spinner
-//        ArrayAdapter arrayAdapter = new ArrayAdapter(mActivity.getApplicationContext(), R.layout.groups_spinner_item,
-//                AllInOneActivity.mGroups);
-//        mGroupSpinner.setAdapter(arrayAdapter);
-//        mGroupSpinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Toast.makeText(mActivity.getApplicationContext(), AllInOneActivity.mGroups.get(position)+" 선택", Toast.LENGTH_LONG).show();
-//            }
-//        });
-//        mGroupSpinner.setSelection(selection);
+        int selection = findSelectedGroupPosition(cursor, selectedGroupId);
 
         if (mSaveAfterQueryComplete) {
             mLoadingCalendarsDialog.cancel();
@@ -493,14 +443,6 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
                 v.setEnabled(false);
                 v.setBackgroundDrawable(null);
             }
-            mCalendarSelectorGroup.setVisibility(View.GONE);
-
-            if (TextUtils.isEmpty(mLocationTextView.getText())) {
-                mTvLocation.setVisibility(View.GONE);
-            }
-            if (TextUtils.isEmpty(mEtContent.getText())) {
-                mEtContent.setVisibility(View.GONE);
-            }
         } else {
             for (View v : mViewOnlyList) {
                 v.setVisibility(View.GONE);
@@ -517,12 +459,12 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
                 }
             }
             if (mModel.mUri == null) {
-                mCalendarSelectorGroup.setVisibility(View.VISIBLE);
+//                mCalendarSelectorGroup.setVisibility(View.VISIBLE);
             } else {
-                mCalendarSelectorGroup.setVisibility(View.GONE);
+//                mCalendarSelectorGroup.setVisibility(View.GONE);
             }
-            mTvLocation.setVisibility(View.VISIBLE);
-            mEtContent.setVisibility(View.VISIBLE);
+//            mTvLocation.setVisibility(View.VISIBLE);
+//            mEtContent.setVisibility(View.VISIBLE);
         }
     }
 

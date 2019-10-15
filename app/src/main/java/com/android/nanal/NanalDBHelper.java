@@ -14,7 +14,6 @@ import com.android.nanal.query.GroupAsyncTask;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class NanalDBHelper  extends SQLiteOpenHelper {
     public static int DB_VERSION = 1;
@@ -58,7 +57,7 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
     }
 
     public void addDiary(int diary_id, String account_id, int color,
-                        String location, Date day, String title, String content,
+                        String location, long day, String title, String content,
                          String weather, String image, int group_id) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         // long을 넘겨야 할 경우 이거 사용하기
@@ -154,6 +153,16 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
             mGroupList.add(g);
         }
         return mGroupList;
+    }
+
+    public int getDiaryLargestNumber() {
+        SQLiteDatabase db = getReadableDatabase();
+        String sql = "SELECT MAX(diary_id) FROM diary";
+        Cursor cursor = db.rawQuery(sql, null);
+        if(cursor.moveToNext()) {
+            return cursor.getInt(0);
+        }
+        return -1;
     }
 
     public int getGroupColor(int id) {

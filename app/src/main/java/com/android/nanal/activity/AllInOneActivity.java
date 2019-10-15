@@ -89,6 +89,7 @@ import com.android.nanal.group.Group;
 import com.android.nanal.group.GroupFragment;
 import com.android.nanal.interfaces.AllInOneMenuExtensionsInterface;
 import com.android.nanal.month.MonthByWeekFragment;
+import com.android.nanal.query.DiaryAsyncTask;
 import com.android.nanal.query.GroupAsyncTask;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
@@ -96,6 +97,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 import com.google.firebase.dynamiclinks.PendingDynamicLinkData;
 
@@ -720,6 +722,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             @Override
             public void onClick(View v) {
                 GroupSync();
+                DiarySync();
                 Time t = new Time();
                 t.set(mController.getTime());
                 mController.sendEventRelatedEvent(
@@ -1117,14 +1120,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         updateViewSettingsVisibility();
 
 
-//        MenuItem menuItem = menu.findItem(R.id.action_today);
-
-        // replace the default top layer drawable of the today icon with a
-        // custom drawable that shows the day of the month of today
-        // 오늘 아이콘의 기본 상단 레이어 drawable을 오늘이 속한 달의 일자를 표시하는? 커스텀 drawable로 교체
-//        LayerDrawable icon = (LayerDrawable) menuItem.getIcon();
-//        Utils.setTodayIcon(icon, this, mTimeZone);
-
         return true;
     }
 
@@ -1132,6 +1127,11 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         GroupAsyncTask mTask = new GroupAsyncTask(AllInOneActivity.this, AllInOneActivity.this);
         mTask.execute(connectId);
         mGroups = helper.getGroupList();
+    }
+
+    public void DiarySync() {
+        DiaryAsyncTask mTask = new DiaryAsyncTask(AllInOneActivity.this, AllInOneActivity.this);
+        mTask.execute(connectId);
     }
 
     @Override
@@ -1144,8 +1144,9 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             mController.refreshCalendars();
             mGroups = helper.getGroupList();
             Log.i(TAG, "mGroups.size() " + mGroups.size());
+            Snackbar.make(getCurrentFocus(), "서버와 동기화를 진행합니다.", Snackbar.LENGTH_SHORT).show();
             GroupSync();
-            //todo: 상단바에 알림 띄우든가 버튼 돌아가게끔 하면 괜찮을 듯
+            DiarySync();
             return true;
         } else if (itemId == R.id.action_today) {
             viewType = ViewType.CURRENT;

@@ -247,8 +247,8 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
                     // start_time time -> long(milli) 변환 필요
 
                     mHelper.saveEvent(model, null, 3);
-                    Toast.makeText(mContext, "동기화를 성공적으로 마쳤습니다.", Toast.LENGTH_LONG).show();
                 }
+                Toast.makeText(mContext, "동기화를 성공적으로 마쳤습니다.", Toast.LENGTH_LONG).show();
                 Log.i("GroupAsyncTask: ",eventArray.length()+"개의 다이어리 작업 완료");
             }
         } catch (JSONException e) {
