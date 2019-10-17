@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.android.nanal.NanalDBHelper;
 import com.android.nanal.R;
 import com.android.nanal.activity.AllInOneActivity;
+import com.android.nanal.calendar.CalendarController;
 
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
     private List<Group> groupList;
     private NanalDBHelper helper;
     private Context mContext;
+    private CalendarController mController;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         LinearLayout group_wrapper;
@@ -38,6 +40,7 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
 
     public GroupListAdapter(Context context) {
         mContext = context;
+        mController = CalendarController.getInstance(context);
         try {
             helper = AllInOneActivity.helper;
             groupList = helper.getGroupList();
@@ -93,9 +96,10 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
             public void onClick(View v) {
                 String hexColor = String.format("#%06X", (0xFFFFFF & group.group_color));
                 Context context = v.getContext();
+                AllInOneActivity.mGroupId = group.group_id;
+                AllInOneActivity.mGroupName = group.group_name;
+                mController.sendEvent(this, CalendarController.EventType.GO_TO, null, null, group.group_id, CalendarController.ViewType.GROUP_DETAIL);
                 Toast.makeText(context, "선택 > "+group.group_id + ", hexColor > "+hexColor, Toast.LENGTH_LONG).show();
-
-                //todo: groupId 가지고 그룹 상세 보기 화면으로 전환
             }
         });
     }

@@ -248,11 +248,19 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
 
                     mHelper.saveEvent(model, null, 3);
                 }
-                Toast.makeText(mContext, "동기화를 성공적으로 마쳤습니다.", Toast.LENGTH_LONG).show();
+                try {
+                    Toast.makeText(mContext, "동기화를 성공적으로 마쳤습니다.", Toast.LENGTH_LONG).show();
+                } catch (RuntimeException ex) {
+
+                }
                 Log.i("GroupAsyncTask: ",eventArray.length()+"개의 다이어리 작업 완료");
             }
         } catch (JSONException e) {
-            Toast.makeText(mContext, "동기화 중 문제가 발생했습니다.", Toast.LENGTH_LONG).show();
+            try {
+                Toast.makeText(mContext, "동기화 중 문제가 발생했습니다.", Toast.LENGTH_LONG).show();
+            } catch (RuntimeException ex) {
+
+            }
             e.printStackTrace();
         }
     }

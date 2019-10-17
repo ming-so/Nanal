@@ -24,9 +24,9 @@ import com.android.nanal.GroupActivity;
 import com.android.nanal.activity.AlertActivity;
 import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.activity.CalendarSettingsActivity;
-import com.android.nanal.activity.EditGroupActivity;
 import com.android.nanal.activity.EditDiaryActivity;
 import com.android.nanal.activity.EditEventActivity;
+import com.android.nanal.activity.EditGroupActivity;
 import com.android.nanal.activity.SelectVisibleCalendarsActivity;
 import com.android.nanal.activity.SettingsActivity;
 import com.android.nanal.event.DeleteEventHelper;
@@ -877,6 +877,7 @@ public class CalendarController {
         final long LAUNCH_GROUP = 1L << 14;
         final long CREATE_GROUP = 1L << 16;
         final long GROUPS_CHANGED = 1L << 17;
+        final long SHOW_GROUP = 1L << 18;
 
     }
 
@@ -894,7 +895,8 @@ public class CalendarController {
         final int EDIT = 5;
         final int TODAY = 6;
         final int GROUP = 7;
-        final int MAX_VALUE = 7;
+        final int GROUP_DETAIL = 8;
+        final int MAX_VALUE = 8;
 
     }
 

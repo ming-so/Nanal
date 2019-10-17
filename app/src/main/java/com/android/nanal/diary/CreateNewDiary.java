@@ -21,7 +21,7 @@ public class CreateNewDiary extends AsyncTask<String, String, String> {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             conn.setRequestMethod("POST");//데이터를 POST 방식으로 전송합니다.
-
+            Log.i("CreateNewDiary", "그룹 아이디 = "+strings[8]);
             OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream());
             sendMsg = "account_id=" + strings[0] + "&color=" + strings[1] +
                       "&location=" + strings[2] + "&day=" + strings[3] + "&title=" + strings[4] +

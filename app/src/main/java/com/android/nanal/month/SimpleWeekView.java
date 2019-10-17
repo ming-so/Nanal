@@ -126,7 +126,7 @@ public class SimpleWeekView extends View {
     // affects the padding on the sides of this view
     // 이 view의 측면에 있는 padding에 영향을 미침
     protected int mPadding = 0;
-    protected int mDiaryPadding = 5;
+    protected int mDiaryPadding = 24;
 
     protected Rect r = new Rect();
     protected Paint p = new Paint();

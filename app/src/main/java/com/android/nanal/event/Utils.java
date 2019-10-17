@@ -22,7 +22,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.CalendarContract.Calendars;
-import androidx.appcompat.widget.SearchView;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -36,10 +35,11 @@ import android.util.Log;
 
 import com.android.nanal.DayOfMonthDrawable;
 import com.android.nanal.R;
-import com.android.nanal.calendar.CalendarController.ViewType;
-import com.android.nanal.calendar.CalendarUtils.TimeZoneUtils;
-import com.android.nanal.calendar.CalendarEventModel.ReminderEntry;
 import com.android.nanal.activity.AllInOneActivity;
+import com.android.nanal.calendar.CalendarController.ViewType;
+import com.android.nanal.calendar.CalendarEventModel.ReminderEntry;
+import com.android.nanal.calendar.CalendarUtils.TimeZoneUtils;
+import com.android.nanal.diary.Diary;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,6 +56,8 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import androidx.appcompat.widget.SearchView;
 
 import static android.provider.CalendarContract.EXTRA_EVENT_BEGIN_TIME;
 
@@ -1351,6 +1353,50 @@ public class Utils {
         }
     }
 
+    private static void weaveDNADiaries(LinkedList<DNASegmentD> segments, int firstJulianDay,
+                                        HashMap<Integer, DNADiary> strands, int top, int bottom, int[] dayXs) {
+        // First, get rid of any colors that ended up with no segments
+        // 첫번째, 세그먼트가 없이 끝나 버린 색상을 처리함
+        Iterator<DNADiary> diaryIterator = strands.values().iterator();
+        while (diaryIterator.hasNext()) {
+            DNADiary strand = diaryIterator.next();
+            if (strand.count < 1) {
+                diaryIterator.remove();
+                continue;
+            }
+            strand.points = new float[strand.count * 4];
+            strand.position = 0;
+        }
+        // Go through each segment and compute its points
+        // 각 세그먼트를 살펴보고 해당 포인트를 계산함
+        for (DNASegmentD segment : segments) {
+            // Add the points to the strand of that color
+            // 그 색상의 strand에 포인트를 추가함
+            DNADiary strand = strands.get(segment.color);
+            int dayIndex = (int)(segment.day - firstJulianDay);
+            int dayStartMinute = segment.startMinute % DAY_IN_MINUTES;
+            int dayEndMinute = segment.endMinute % DAY_IN_MINUTES;
+            int height = bottom - top;
+            int workDayHeight = height * 3 / 4;
+            int remainderHeight = (height - workDayHeight) / 2;
+
+            int x = dayXs[dayIndex];
+            int y0 = 0;
+            int y1 = 0;
+
+            y0 = top + getPixelOffsetFromMinutes(dayStartMinute, workDayHeight, remainderHeight);
+            y1 = top + getPixelOffsetFromMinutes(dayEndMinute, workDayHeight, remainderHeight);
+            if (DEBUG) {
+                Log.d(TAG, "Adding " + Integer.toHexString(segment.color) + " at x,y0,y1: " + x
+                        + " " + y0 + " " + y1 + " for " + dayStartMinute + " " + dayEndMinute);
+            }
+            strand.points[strand.position++] = x;
+            strand.points[strand.position++] = y0;
+            strand.points[strand.position++] = x;
+            strand.points[strand.position++] = y1;
+        }
+    }
+
 
     /**
      * Compute a pixel offset from the top for a given minute from the work day
@@ -1440,6 +1486,25 @@ public class Utils {
         strand.count++;
     }
 
+    private static void addNewSegment(LinkedList<DNASegmentD> segments, Diary diary,
+                                      HashMap<Integer, DNADiary> strands, int firstJulianDay) {
+        // Create the new segment and compute its fields
+        // 새로운 세그먼트 생성 및 해당 필드 계산
+        DNASegmentD segment = new DNASegmentD();
+        long dayOffset = diary.day - firstJulianDay;
+//        int dayOffset = (event.startDay - firstJulianDay) * DAY_IN_MINUTES;
+
+        segment.color = diary.color;
+        segment.day = diary.day;
+        segments.add(segment);
+        // increment the count for the correct color or add a new strand if we
+        // don't have that color yet
+        // 올바른 색에 대한 카운트를 늘리거나, 아직 색상이 없다면 새 strand를 추가함
+        DNADiary strand = getOrCreateDiary(strands, segment.color);
+
+        strand.count++;
+    }
+
 
     /**
      * Try to get a strand of the given color. Create it if it doesn't exist.
@@ -1454,6 +1519,17 @@ public class Utils {
             strands.put(strand.color, strand);
         }
         return strand;
+    }
+
+    private static DNADiary getOrCreateDiary(HashMap<Integer, DNADiary> diaries, int color) {
+        DNADiary diary = diaries.get(color);
+        if (diary == null) {
+            diary = new DNADiary();
+            diary.color = color;
+            diary.count = 0;
+            diaries.put(diary.color, diary);
+        }
+        return diary;
     }
 
 
@@ -2423,6 +2499,13 @@ public class Utils {
         int endMinute;
         int color; // Calendar color or black for conflicts 충돌에 대한 캘린더 색상 또는 검정색
         int day; // quick reference to the day this segment is on 이 세그먼트가 있는 날짜에 대한 빠른 참조
+    }
+
+    private static class DNASegmentD {
+        int startMinute; // in minutes since the start of the week 주의 시작일 기준으로 분 단위
+        int endMinute;
+        int color;
+        long day;
     }
 
 

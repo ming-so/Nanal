@@ -39,6 +39,9 @@ import com.android.nanal.event.Event;
 import com.android.nanal.event.Utils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 
@@ -203,6 +206,7 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
         for (Event event : events) {
             int startDay = event.startDay - mFirstJulianDay;
             int endDay = event.endDay - mFirstJulianDay + 1;
+            Log.i(TAG, "event.startDay="+event.startDay+", startDay="+startDay+", mFirstJulianDay="+mFirstJulianDay);
             if (startDay < numDays || endDay >= 0) {
                 if (startDay < 0) {
                     startDay = 0;
@@ -260,8 +264,18 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
         // 이벤트를 사용하여 이벤트가 있는 일의 새로운 집합을 계산
         for (Diary diary : diaries) {
             long day = diary.day;
+
+            GregorianCalendar cal = new GregorianCalendar();
+            cal.setTimeInMillis(day);
+            cal.setGregorianChange(new Date(Long.MAX_VALUE));
+            int julianDay = cal.get(Calendar.DAY_OF_MONTH);
+            // mFirstJulianDay의 DAY_OF_MONTH를 구해서 빼면 되나?
+            // mFirstJulianDay: 2019/9/28일
+            // startDay 3이면 10월 1일
+
             long startDay = day - mFirstJulianDay;
-            diaryDayList.get((int)day).add(diary);
+            Log.i(TAG, "long day="+day+", int day="+(int)day+", julianDay="+julianDay);
+//            diaryDayList.get((int)day).add(diary);
         }
         if(Log.isLoggable(TAG, Log.DEBUG)) {
             Log.d(TAG, "Processed " + diaries.size() + " diaries.");
@@ -340,6 +354,7 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
 
         v.setWeekParams(drawingParams, mSelectedDay.timezone);
         sendEventsToView(v);
+        sendDiariesToView(v);
         return v;
     }
 
@@ -366,25 +381,25 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
     }
 
     private void sendDiariesToView(MonthWeekEventsView v) {
-        if (mEventDayList.size() == 0) {
+        if (mDiaryDayList.size() == 0) {
             if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "No events loaded, did not pass any events to view.");
             }
-            v.setEvents(null, null);
+            v.setDiaries(null, null);
             return;
         }
         int viewJulianDay = v.getFirstJulianDay();
         int start = viewJulianDay - mFirstJulianDay;
         int end = start + v.mNumDays;
-        if (start < 0 || end > mEventDayList.size()) {
+        if (start < 0 || end > mDiaryDayList.size()) {
             if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "Week is outside range of loaded events. viewStart: " + viewJulianDay
                         + " eventsStart: " + mFirstJulianDay);
             }
-            v.setEvents(null, null);
+            v.setDiaries(null, null);
             return;
         }
-        v.setEvents(mEventDayList.subList(start, end), mEvents);
+        v.setDiaries(mDiaryDayList.subList(start, end), mDiaries);
     }
 
     @Override
