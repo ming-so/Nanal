@@ -287,6 +287,8 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     public static Activity mActivity;
     public static Context mContext;
 
+    private final long INTERVAL_TIME = 1000;
+    private long previousTime = 0;
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -1063,6 +1065,14 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             mController.sendEvent(this, EventType.GO_TO, null, null, -1, mPreviousView);
         } else {
             super.onBackPressed();
+            /*long currentTime = System.currentTimeMillis();
+
+            if ((currentTime - previousTime) <= INTERVAL_TIME) {
+                super.onBackPressed();
+            } else {
+                previousTime = currentTime;
+                Toast.makeText(this, R.string.close_app, Toast.LENGTH_SHORT).show();
+            }*/
         }
     }
 

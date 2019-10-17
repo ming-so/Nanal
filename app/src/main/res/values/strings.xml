@@ -161,6 +161,12 @@
     <string name="dialog_cancel">닫기</string>
     <string name="dialog_message">\n로그인을 5회 실패하여 계정이 잠겼습니다.\n전송된 인증 메일을 확인해주세요.</string>
 
+    <string name="close_app">\'뒤로\' 버튼 한번 더 누르시면 종료됩니다.</string>
+
+
+    <!-- 그룹 가입 메시지 -->
+    <string name="join_success">그룹에 가입되었습니다.</string>
+    <string name="join_fail">그룹 가입 처리 중 오류가 발생하였습니다.</string>
 
     <!-- 타임존피커 -->
 

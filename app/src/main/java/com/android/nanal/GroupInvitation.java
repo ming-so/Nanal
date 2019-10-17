@@ -44,9 +44,10 @@ public class GroupInvitation extends AppCompatActivity {
 
                     if(result.equals("1")) {
                         // 그룹 가입 성공했을 경우
-                        Toast.makeText(GroupInvitation.this, "그룹 가입 성공!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(GroupInvitation.this, R.string.join_success, Toast.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(GroupInvitation.this, "그룹 가입 실패ㅠㅠ", Toast.LENGTH_LONG).show();
+                        // 그룹 가입 실패했을 경우
+                        Toast.makeText(GroupInvitation.this, R.string.join_fail, Toast.LENGTH_LONG).show();
                     }
                 } catch (ExecutionException e) {
                     e.printStackTrace();
