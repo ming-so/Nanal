@@ -60,9 +60,9 @@ import android.widget.Toast;
 import com.android.nanal.CreateNanalCalendar;
 import com.android.nanal.DayFragment;
 import com.android.nanal.DayOfMonthDrawable;
-import com.android.nanal.DynamicLinkManager;
 import com.android.nanal.DynamicTheme;
 import com.android.nanal.ExtensionsFactory;
+import com.android.nanal.GroupInvitation;
 import com.android.nanal.LoginActivity;
 import com.android.nanal.NanalDBHelper;
 import com.android.nanal.PrefManager;
@@ -251,7 +251,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         }
     };
     // runs every midnight/time changes and refreshes the today icon
-    // 매일 자정에 변경 내용을 변경 내용을 실행하고 오늘 아이콘 새로고침
+    // 매일 자정에 변경 내용을 실행하고 오늘 아이콘 새로고침
     private final Runnable mTimeChangesUpdater = new Runnable() {
         @Override
         public void run() {
@@ -543,39 +543,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
         openDatabase();
 
-        // 다이나믹 링크 설정
-        // ATTENTION: This was auto-generated to handle app links.
-        Intent appLinkIntent = getIntent();
-        String appLinkAction = appLinkIntent.getAction();
-        Uri appLinkData = appLinkIntent.getData();
-
-        if (Intent.ACTION_VIEW.equals(appLinkAction) && appLinkData != null){
-//            String recipeId = appLinkData.getLastPathSegment();
-//            Uri appData = Uri.parse("content://com.recipe_app/recipe/").buildUpon()
-//                    .appendPath(recipeId).build();
-//            showRecipe(appData);
-            // 링크 연결됐을 때 실행될 코드 작성하기 (위 코드는 예시)
-        }
-
-        FirebaseDynamicLinks.getInstance()
-                .getDynamicLink(getIntent())
-                .addOnSuccessListener(this, new OnSuccessListener<PendingDynamicLinkData>() {
-                    @Override
-                    public void onSuccess(PendingDynamicLinkData pendingDynamicLinkData) {
-                        // Get deep link from result (may be null if no link is found)
-                        Uri deepLink = null;
-                        if (pendingDynamicLinkData != null) {
-                            deepLink = pendingDynamicLinkData.getLink();
-                        }
-                        Toast.makeText(AllInOneActivity.this, "다이나믹 링크 테스트", Toast.LENGTH_LONG).show();
-                    }
-                })
-                .addOnFailureListener(this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "getDynamicLink:onFailure", e);
-                    }
-                });
+        handleDynamicLink();
     }
 
     public void openDatabase() {
@@ -1105,7 +1073,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         }
     }
 
-    protected void updateViewSettingsVisiblility() {
+    protected void updateViewSettingsVisibility() {
         if (mViewSettings != null) {
             boolean viewSettingsVisible = mController.getViewType() == ViewType.MONTH;
             mViewSettings.setVisible(viewSettingsVisible);
@@ -1156,7 +1124,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         }
 
         mViewSettings = menu.findItem(R.id.action_view_settings);
-        updateViewSettingsVisiblility();
+        updateViewSettingsVisibility();
 
 
         return true;
@@ -1303,20 +1271,49 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 CreateNanalCalendar.DeleteColors(AllInOneActivity.this.getApplicationContext(), connectId);
                 Toast.makeText(AllInOneActivity.this.getApplicationContext(), "삭제", Toast.LENGTH_LONG).show();
                 break;
-            case R.id.grouptest:
-                // 다이나믹 링크 공유
-                DynamicLinkManager dynamicLinkManager = new DynamicLinkManager();
-                Uri dynamicLink = dynamicLinkManager.createDynamicLink();
-
-                Intent dynaminLinkIntent = new Intent(Intent.ACTION_SEND);
-                dynaminLinkIntent.setType("text/plain");
-                dynaminLinkIntent.putExtra(Intent.EXTRA_TEXT, dynamicLink.toString());
-
-                startActivity(Intent.createChooser(dynaminLinkIntent, "링크 공유"));
-                break;
         }
         mDrawerLayout.closeDrawers();
         return false;
+    }
+
+
+    private void handleDynamicLink() {
+        FirebaseDynamicLinks.getInstance()
+                .getDynamicLink(getIntent())
+                .addOnSuccessListener(this, new OnSuccessListener<PendingDynamicLinkData>() {
+                    @Override
+                    public void onSuccess(PendingDynamicLinkData pendingDynamicLinkData) {
+                        Uri deepLink = null;
+                        if (pendingDynamicLinkData == null) {
+                            Log.d(TAG, "No have dynamic link");
+                            return;
+                        } else {
+                            deepLink = pendingDynamicLinkData.getLink();
+                        }
+
+                        Log.d(TAG, "deepLink: " + deepLink);
+
+                        String segment = deepLink.getLastPathSegment();
+                        switch (segment) {
+                            case "nanal":
+                                String code = deepLink.getQueryParameter("groupId");
+                                showGroupDialog(code);
+                                break;
+                        }
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "getDynamicLink:onFailure", e);
+                    }
+                });
+    }
+
+    private void showGroupDialog(String code) {
+        Intent intent = new Intent(this, GroupInvitation.class);
+        intent.putExtra("groupId", code);
+        startActivity(intent);
     }
 
     /**
@@ -1703,7 +1700,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                     }
                 }
             }
-            updateViewSettingsVisiblility();
+            updateViewSettingsVisibility();
             displayTime = event.selectedTime != null ? event.selectedTime.toMillis(true)
                     : event.startTime.toMillis(true);
             if (!mIsTabletConfig) {

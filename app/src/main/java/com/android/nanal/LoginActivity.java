@@ -1,6 +1,8 @@
 package com.android.nanal;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Paint;
@@ -204,7 +206,8 @@ public class LoginActivity extends Activity {
                                     btn_login.stopProgress();
                                 } else if (result.equals("2")) {
                                     // 로그인 실패 횟수가 5 이상인 경우
-                                    Toast.makeText(LoginActivity.this, R.string.pw_out, Toast.LENGTH_LONG).show();
+                                    showDialog();
+                                    //Toast.makeText(LoginActivity.this, R.string.pw_out, Toast.LENGTH_LONG).show();
                                     btn_login.setButtonState(ProcessButton.state.FAILURE);
                                     btn_login.stopProgress();
                                 } else {
@@ -295,5 +298,17 @@ public class LoginActivity extends Activity {
             btn_login.setBtnText(getString(R.string.pw));
         }
         isPass = !isPass;
+    }
+
+    public AlertDialog showDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.dialog_message)
+                .setNegativeButton(R.string.dialog_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+        return builder.show();
     }
 }
