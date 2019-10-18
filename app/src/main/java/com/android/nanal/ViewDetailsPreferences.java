@@ -12,8 +12,6 @@ import android.preference.PreferenceScreen;
 import com.android.nanal.event.GeneralPreferences;
 import com.android.nanal.event.Utils;
 
-
-
 public class ViewDetailsPreferences extends PreferenceFragment {
     protected final static boolean DISPLAY_LOCATION_DEFAULT = false;
 

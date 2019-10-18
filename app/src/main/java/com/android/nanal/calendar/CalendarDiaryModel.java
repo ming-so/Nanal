@@ -70,6 +70,9 @@ public class CalendarDiaryModel implements Serializable {
         if(mDiaryUserId != null && mDiaryUserId.trim().length() > 0) {
             return false;
         }
+        if(mDiaryContent != null && mDiaryContent.trim().length() > 0) {
+            return false;
+        }
         if(mConnectType != null && mConnectType.trim().length() > 0) {
             return false;
         }

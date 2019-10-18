@@ -176,6 +176,7 @@
         android:layout_height="wrap_content"
         android:minHeight="64dip"
         android:orientation="vertical">
+
         <TextView
             android:id="@+id/from_label"
             style="@style/TextAppearance.EditEvent_LabelSmall"
@@ -189,6 +190,7 @@
             android:layout_marginTop="-6dip"
             android:animateLayoutChanges="false"
             android:orientation="horizontal">
+
             <Button
                 android:id="@+id/start_date"
                 style="@style/TextAppearance.EditEvent_SpinnerButton"
@@ -199,6 +201,7 @@
                 android:contentDescription="@string/accessibility_pick_start_date"
                 android:paddingEnd="4dp"
                 android:singleLine="true" />
+
             <Button
                 android:id="@+id/start_time"
                 style="@style/TextAppearance.EditEvent_SpinnerButton"
