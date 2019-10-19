@@ -59,9 +59,6 @@ public class DiaryAsyncTask extends AsyncTask<String, String, String> {
             일기 목록이랑 일정 목록 둘 다 반환해 줄 수가 없으니까/반환해도 또 따로 처리해야 하니까
             return 값은 OK ERROR 정도만 알려 주고 json 파싱하는 메소드 만들어서
             onPostExecute에서 직접 갱신해 주면 될 것 같음
-
-            기본적으로 앱 켤 때마다 한 번씩 갱신
-            그룹 상단에 싱크 버튼 만들어도 괜찮을 듯
              */
 
             OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream());

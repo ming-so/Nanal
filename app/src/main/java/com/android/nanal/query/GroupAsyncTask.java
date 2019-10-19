@@ -145,6 +145,8 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
                 String group_name = subObject.getString("group_name");
                 int group_color = subObject.getInt("group_color");
                 String account_id = subObject.getString("account_id");
+                String str_sync_time = subObject.getString("sync_time");
+
                 int group_id = subObject.getInt("group_id");
                 if (AllInOneActivity.helper.checkGroup(group_id)) {
                     // 그룹이 있다면 업데이트해야 함
@@ -152,6 +154,15 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
                         // 버전이 옳게 들어간 경우에만 업데이트 후 return
                         Log.i("GroupAsyncTask: ","그룹 존재, 업데이트 진행");
                         try {
+                            /*
+                            업데이트시 그룹 아이디와 현재 디비 싱크 날짜를 전송함
+                            새 그룹/일정/일기
+                            그룹 { }
+                            일정 { }
+                            일기 { }
+
+                            서버에서는 디비 버전을 받아서 history 테이블 select 해서 JSON으로 전송해야 함
+                             */
                             String str;
                             URL url = new URL("http://ci2019nanal.dongyangmirae.kr/GroupAsyncUpdate.jsp");
 
@@ -161,7 +172,7 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
 
                             OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream());
                             Log.i("GroupAsyncTask Update Group: ", Integer.toString(group_id).trim());
-                            sendMsg = "&group_id=" + Integer.toString(group_id).trim();
+                            sendMsg = "&group_id=" + Integer.toString(group_id).trim()+"&sync_time="+AllInOneActivity.helper.getGroupSync(group_id);
                             osw.write(sendMsg);
                             osw.flush();
                             osw.close();
@@ -175,7 +186,7 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
                                 }
                                 receiveMsg = buffer.toString();
                                 Log.i("GroupAsyncTask Update Group: ", receiveMsg);
-                                parseJSON(receiveMsg);
+                                parseJSONUpdate(receiveMsg);
                                 tmp.close();
                                 reader.close();
                             } else {
@@ -196,7 +207,7 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
                 } else {
                     Log.i("GroupAsyncTask: ","그룹 없음, 테이블 생성 group_id="+group_id);
                     // 그룹이 없다면 생성해야 함
-                    AllInOneActivity.helper.addGroup(group_id, group_name, group_color, account_id);
+                    AllInOneActivity.helper.addGroup(group_id, group_name, group_color, str_sync_time, account_id);
                     CreateNanalCalendar.CreateCalendar(mContext, group_name, account_id, true);
                 }
                 // 그룹이 존재하지 않거나 버전이 옳지 않은 경우에는 받아온 다이어리와 이벤트를 모두 저장한다
@@ -263,6 +274,10 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
             }
             e.printStackTrace();
         }
+    }
+
+    protected void parseJSONUpdate(String msg) {
+
     }
 
     private void startQuery(CalendarController.EventInfo mEvent) {

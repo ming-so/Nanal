@@ -44,7 +44,7 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
                 "'group_id' INTEGER PRIMARY KEY NOT NULL, " +
                 "'group_name' VARCHAR(15) NOT NULL, " +
                 "'group_color' INTEGER NOT NULL, " +
-                "'sync_version' INTEGER NOT NULL, " +
+                "'sync_time' TIMESTAMP NOT NULL, " +
                 "'account_id' VARCHAR(320) NOT NULL" +
                 ")";
         db.execSQL(CREATE_TABLE_COMMUNITY);
@@ -102,14 +102,14 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
 
     }
 
-    public void addGroup(int group_id, String group_name, int group_color, String account_id) {
+    public void addGroup(int group_id, String group_name, int group_color, String sync_time, String account_id) {
         Log.i("NanalDBHelper", "그룹 추가 시도 "+group_id+", "+group_name+", "+group_color+", "+account_id);
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("group_id", group_id);
         values.put("group_name", group_name);
         values.put("group_color", group_color);
-        values.put("sync_version", DB_VERSION);
+        values.put("sync_time", sync_time);
         values.put("account_id", account_id);
         db.insert("community", null, values);
         db.close();
@@ -138,7 +138,7 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
         String sql = "SELECT * FROM community WHERE group_id='"+group_id+"'";
         Cursor cursor = db.rawQuery(sql, null);
         if(cursor.moveToNext()) {
-            return cursor.getInt(cursor.getColumnIndex("sync_version"));
+            return cursor.getInt(cursor.getColumnIndex("sync_time"));
         }
         return -1;
     }
