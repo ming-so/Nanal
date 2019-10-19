@@ -12,8 +12,10 @@ import com.android.nanal.diary.Diary;
 import com.android.nanal.group.Group;
 import com.android.nanal.query.GroupAsyncTask;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class NanalDBHelper  extends SQLiteOpenHelper {
     public static int DB_VERSION = 1;
@@ -31,7 +33,7 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
                 "'location' VARCHAR(20), " +
                 "'day' DATE NOT NULL, " +
                 "'title' VARCHAR(10), "+
-                "'content' TEXT, "+
+                "'content' TEXT NOT NULL, "+
                 "'weather' VARCHAR(10), "+
                 "'image' VARCHAR(20)"+
                 ")";
@@ -59,7 +61,7 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
     public void addDiary(int diary_id, String account_id, int color,
                         String location, long day, String title, String content,
                          String weather, String image, int group_id) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         // long을 넘겨야 할 경우 이거 사용하기
         // String dateString = new SimpleDateFormat("MM/dd/yyyy").format(new Date(TimeinMilliSeccond));
         SQLiteDatabase db = getWritableDatabase();
@@ -155,6 +157,84 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
         return mGroupList;
     }
 
+    public String convertJulian(int julianDay) {
+        SQLiteDatabase db = getReadableDatabase();
+        String sql = "SELECT DATE('"+julianDay+"', 'localtime');";
+        Cursor cursor = db.rawQuery(sql, null);
+        String date = "";
+        if(cursor.moveToNext()) {
+            date = cursor.getString(0);
+            Log.i("NanalDBHelper", "date="+date);
+        }
+        if(date == "" || date.isEmpty()) {
+            long now = System.currentTimeMillis();
+            Date d = new Date(now);
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            date = simpleDateFormat.format(d);
+        }
+        return date;
+    }
+
+    public ArrayList<Diary> getDiariesList(int startDay, int endDay) {
+        ArrayList<Diary> diaryList = new ArrayList<>();
+//        LocalDate ld = LocalDate.MIN.with(JulianFields.JULIAN_DAY, startDay);
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//        String str_start = dateFormat.format(startDay);
+//        String str_end = dateFormat.format(endDay);
+        String str_start = convertJulian(startDay);
+        String str_end = convertJulian(endDay);
+        getAllDiaries();
+        Log.i("NanalDBHelper", "str_start="+str_start+", str_end="+str_end);
+
+        SQLiteDatabase db = getReadableDatabase();
+        String sql = "SELECT * FROM diary WHERE day BETWEEN '"+str_start+"' AND '"+str_end+"';";
+        Cursor cursor = db.rawQuery(sql, null);
+        while(cursor.moveToNext()) {
+            Log.i("NanalDBHelper", "커서 있음");
+            Diary diary = new Diary();
+            diary.id = cursor.getInt(cursor.getColumnIndex("diary_id"));
+            diary.account_id = cursor.getString(cursor.getColumnIndex("account_id"));
+            String str_day = cursor.getString(cursor.getColumnIndex("day"));
+            try {
+                Date d = dateFormat.parse(str_day);
+                diary.day = d.getTime();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            diary.content = cursor.getString(cursor.getColumnIndex("content"));
+
+            // 혹시나 모를 오류를 방지하기 위해 값이 유효하지 않은 경우에는 초기화를 하지 않고 초기값을 유지함
+            int group_id = cursor.getInt(cursor.getColumnIndex("group_id"));
+            if(group_id > 0) {
+                diary.group_id = group_id;
+            }
+            int color = cursor.getInt(cursor.getColumnIndex("color"));
+            if(!(color != -1)) {
+                diary.color = color;
+            }
+            String location = cursor.getString(cursor.getColumnIndex("location"));
+            if(location != "" || !location.isEmpty()) {
+                diary.location = location;
+            }
+            String title = cursor.getString(cursor.getColumnIndex("title"));
+            if(title != "" || !title.isEmpty()) {
+                diary.title = title;
+            }
+            String weather = cursor.getString(cursor.getColumnIndex("weather"));
+            if(weather != "" || !weather.isEmpty()) {
+                diary.weather = weather;
+            }
+            String image = cursor.getString(cursor.getColumnIndex("image"));
+            if(image != "" || !image.isEmpty()) {
+                diary.img = image;
+            }
+            diaryList.add(diary);
+            Log.i("NanalDBHelper", "getDiariesList - 다이어리 추가 완료 diary_id="+diary.id+", content="+diary.content);
+        }
+        return diaryList;
+    }
+
     public int getDiaryLargestNumber() {
         SQLiteDatabase db = getReadableDatabase();
         String sql = "SELECT MAX(diary_id) FROM diary";
@@ -173,5 +253,17 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
             return cursor.getInt(1);
         }
         return -1;
+    }
+
+    public void getAllDiaries() {
+        SQLiteDatabase db = getReadableDatabase();
+        String sql = "SELECT * FROM diary";
+        Cursor cursor = db.rawQuery(sql, null);
+        while(cursor.moveToNext()) {
+            Log.i("NanalDBHelper", "diary_id="+cursor.getInt(cursor.getColumnIndex("diary_id"))
+                    +", account_id="+cursor.getString(cursor.getColumnIndex("account_id"))+
+            ", day="+cursor.getString(cursor.getColumnIndex("day"))+", content=" +
+                    cursor.getString(cursor.getColumnIndex("content")));
+        }
     }
 }

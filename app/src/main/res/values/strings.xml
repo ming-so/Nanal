@@ -204,6 +204,7 @@
     <string name="pw_fail">비밀번호 찾기 중 문제가 발생했습니다.</string>
     <!-- Description for the delete button that removes the selected contact from the recipients [CHAR LIMIT=100] -->
     <string name="pw_send">임시 비밀번호를 메일로 보냈습니다.</string>
+    <string name="pw_unvalid">인증되지 않은 이메일입니다.\n관리자에게 문의하세요.</string>
     <!-- Text displayed as the primary action for a dialog to copy text. [CHAR LIMIT=25] -->
     <string name="no_internet">서버와의 통신에 실패했습니다. 인터넷 연결을 확인하세요.</string>
     <!-- Text displayed as the secondary action for a dialog to cancel. [CHAR LIMIT=25] -->
@@ -457,6 +458,7 @@
     <string name="diary_delete">"일기 삭제"</string>
     <string name="group_create">"그룹 생성"</string>
     <string name="group_edit">"그룹 수정"</string>
+    <string name="group_detail">"그룹 상세보기"</string>
 
     <!-- Toast message displayed when a new event is created -->
     <string name="group_delete">"그룹 삭제"</string>

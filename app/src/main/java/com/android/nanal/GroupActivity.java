@@ -3,6 +3,7 @@ package com.android.nanal;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.android.nanal.group.GroupListAdapter;
 
@@ -19,6 +20,8 @@ public class GroupActivity extends Activity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         GroupListAdapter groupListAdapter = new GroupListAdapter(getApplicationContext());
         recyclerView.setAdapter(groupListAdapter);
+
+        Log.i("GroupActivity", "");
     }
 
     class GroupTask extends AsyncTask<Void, Void, Void> {

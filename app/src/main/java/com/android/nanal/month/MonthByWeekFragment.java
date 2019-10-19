@@ -47,6 +47,7 @@ import android.widget.AbsListView.OnScrollListener;
 
 import com.android.nanal.DynamicTheme;
 import com.android.nanal.R;
+import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.calendar.CalendarController;
 import com.android.nanal.calendar.CalendarController.EventInfo;
 import com.android.nanal.calendar.CalendarController.EventType;
@@ -413,10 +414,14 @@ public class MonthByWeekFragment extends SimpleDayPickerFragment implements
                     mLastLoadedJulianDay - mFirstLoadedJulianDay + 1, events);
 
             ArrayList<Diary> diaries = new ArrayList<Diary>();
-            Diary.buildDiariesFromCursor(
-                    diaries, data, mContext, mFirstLoadedJulianDay, mLastLoadedJulianDay);
+            Log.i(TAG, "mFirstLoadedJulianDay="+mFirstLoadedJulianDay+", mLastLoadedJulianDay="+mLastLoadedJulianDay);
+            diaries = AllInOneActivity.helper.getDiariesList(mFirstLoadedJulianDay, mLastLoadedJulianDay);
+//            Diary.buildDiariesFromCursor(
+//                    diaries, data, mContext, mFirstLoadedJulianDay, mLastLoadedJulianDay);
             ((MonthByWeekAdapter) mAdapter).setDiaries(mFirstLoadedJulianDay,
                     mLastLoadedJulianDay - mFirstLoadedJulianDay + 1, diaries);
+
+            Log.i(TAG, "events.size()="+events.size()+", diaries.size()="+diaries.size());
         }
     }
 

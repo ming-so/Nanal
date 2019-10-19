@@ -14,7 +14,6 @@
         android:theme="@style/CalendarAppTheme"
         android:usesCleartextTraffic="true"
         tools:replace="android:label">
-        <activity android:name=".group.GroupDetail"></activity>
         <activity android:name=".GroupInvitation" />
         <activity
             android:name=".activity.AllInOneActivity"

@@ -95,6 +95,7 @@ public class EditGroupHelper {
             Log.d(TAG, "서버 DB에 데이터 전송하여 insert하고 그룹 아이디 받아오기");
             receiveMsg = mCreateGroupTask.execute(model.group_name, Integer.toString(model.group_color), model.account_id).get();
             group_id = receiveMsg.trim();
+            Log.i(TAG, "receiveMsg="+group_id);
             AllInOneActivity.helper.addGroup(Integer.parseInt(group_id), model.group_name, model.group_color, model.account_id);
             Log.d(TAG, "DB에 그룹 추가! group_id="+group_id+", group_name="+model.group_name);
         } catch (InterruptedException e) {

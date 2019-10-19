@@ -86,6 +86,7 @@ import com.android.nanal.event.EventInfoFragment;
 import com.android.nanal.event.GeneralPreferences;
 import com.android.nanal.event.Utils;
 import com.android.nanal.group.Group;
+import com.android.nanal.group.GroupDetailFragment;
 import com.android.nanal.group.GroupFragment;
 import com.android.nanal.interfaces.AllInOneMenuExtensionsInterface;
 import com.android.nanal.month.MonthByWeekFragment;
@@ -287,8 +288,9 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     public static Activity mActivity;
     public static Context mContext;
 
-    private final long INTERVAL_TIME = 1000;
-    private long previousTime = 0;
+    public static int mGroupId = -1;
+    public static String mGroupName = "";
+
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -643,6 +645,9 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                     break;
                 case ViewType.GROUP:
                     titleResource = R.string.group_view;
+                    break;
+                case ViewType.GROUP_DETAIL:
+                    titleResource = R.string.group_detail;
                     break;
                 case ViewType.WEEK:
                 default:
@@ -1065,14 +1070,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             mController.sendEvent(this, EventType.GO_TO, null, null, -1, mPreviousView);
         } else {
             super.onBackPressed();
-            /*long currentTime = System.currentTimeMillis();
-
-            if ((currentTime - previousTime) <= INTERVAL_TIME) {
-                super.onBackPressed();
-            } else {
-                previousTime = currentTime;
-                Toast.makeText(this, R.string.close_app, Toast.LENGTH_SHORT).show();
-            }*/
         }
     }
 
@@ -1154,7 +1151,11 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             mController.refreshCalendars();
             mGroups = helper.getGroupList();
             Log.i(TAG, "mGroups.size() " + mGroups.size());
-            Snackbar.make(getCurrentFocus(), "서버와 동기화를 진행합니다.", Snackbar.LENGTH_SHORT).show();
+            try{
+                Snackbar.make(getCurrentFocus(), "서버와 동기화를 진행합니다.", Snackbar.LENGTH_SHORT).show();
+            } catch(IllegalArgumentException e) {
+
+            }
             GroupSync();
             DiarySync();
             return true;
@@ -1438,15 +1439,27 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 break;
             case ViewType.TODAY:
                 isGroupMenu = false;
+                mToolbar.setTitle(R.string.today_view);
                 frag = new TodayFragment(timeMillis);
                 mFAB.setVisibility(View.GONE);
                 mFABGroup.setVisibility(View.GONE);
                 break;
             case ViewType.GROUP:
+                mToolbar.setTitle(R.string.group_view);
                 frag = new GroupFragment();
                 setAgainFAB(true);
                 mFAB.setVisibility(View.GONE);
                 mFABGroup.setVisibility(View.VISIBLE);
+                break;
+            case ViewType.GROUP_DETAIL:
+                if(mGroupId < 0 || mGroupName == "" || mGroupName.isEmpty()) {
+                   return;
+                }
+                mToolbar.setTitle(mGroupName);
+                frag = new GroupDetailFragment(mGroupId);
+                setAgainFAB(false);
+                mFAB.setVisibility(View.GONE);
+                mFABGroup.setVisibility(View.GONE);
                 break;
             case ViewType.WEEK:
             default:

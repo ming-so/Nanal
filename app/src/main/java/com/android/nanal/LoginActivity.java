@@ -161,6 +161,10 @@ public class LoginActivity extends Activity {
                                     Toast.makeText(LoginActivity.this, R.string.email_diff, Toast.LENGTH_LONG).show();
                                     btn_login.setButtonState(ProcessButton.state.FAILURE);
                                     btn_login.stopProgress();
+                                } else if (result.equals("2")) {
+                                    Toast.makeText(LoginActivity.this, R.string.pw_unvalid, Toast.LENGTH_LONG).show();
+                                    btn_login.setButtonState(ProcessButton.state.FAILURE);
+                                    btn_login.stopProgress();
                                 } else {
                                     // 비밀번호 찾기 실패했을 경우
                                     pwdFail();

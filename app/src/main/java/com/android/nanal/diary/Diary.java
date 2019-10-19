@@ -30,7 +30,6 @@ import android.os.Build;
 import android.os.Debug;
 import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Instances;
-import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -41,6 +40,8 @@ import com.android.nanal.event.Utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import androidx.core.content.ContextCompat;
 
 
 // TODO: should Event be Parcelable so it can be passed via Intents?
@@ -459,6 +460,19 @@ public class Diary implements Cloneable {
         d.img = img;
 
         return d;
+    }
+
+    public final void copyTo(Diary dest) {
+        dest.id = id;
+        dest.account_id = account_id;
+        dest.group_id = group_id;
+        dest.color = color;
+        dest.location = location;
+        dest.day = day;
+        dest.title = title;
+        dest.content = content;
+        dest.weather = weather;
+        dest.img = img;
     }
 
 

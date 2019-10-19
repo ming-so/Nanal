@@ -150,14 +150,18 @@ public class EditDiaryHelper {
         String diary_id = "";
         try {
             Log.d(TAG, "서버 DB에 데이터 전송하여 insert하고 그룹 아이디 받아오기");
+            String group_id = "";
+            if(model.mDiaryGroupId > 0) {
+                group_id = Integer.toString(model.mDiaryGroupId);
+            }
             receiveMsg = mCreateDiaryTask.execute(model.mDiaryUserId, Integer.toString(model.mDiaryColor),
                     model.mDiaryLocation, Long.toString(model.mDiaryDay), model.mDiaryTitle,
-                    model.mDiaryContent, model.mDiaryWeather, model.mDiaryImg, Integer.toString(model.mDiaryGroupId)).get();
+                    model.mDiaryContent, model.mDiaryWeather, model.mDiaryImg, group_id).get();
             diary_id = receiveMsg.trim();
             AllInOneActivity.helper.addDiary(Integer.parseInt(diary_id), model.mDiaryUserId, model.mDiaryColor,
                     model.mDiaryLocation, model.mDiaryDay, model.mDiaryTitle,
                     model.mDiaryContent, model.mDiaryWeather, model.mDiaryImg, model.mDiaryGroupId);
-            Log.d(TAG, "DB에 일기 추가! diary_id="+diary_id);
+            Log.d(TAG, "DB에 일기 추가! diary_id="+diary_id+", user_id="+model.mDiaryUserId);
         } catch (InterruptedException e) {
             Log.e(TAG, e.getMessage());
         } catch (ExecutionException e) {

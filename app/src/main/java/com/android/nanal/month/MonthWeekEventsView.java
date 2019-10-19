@@ -102,9 +102,8 @@ public class MonthWeekEventsView extends SimpleWeekView {
     private static int mEventXOffsetLandscape = 38;
     private static int mEventYOffsetLandscape = 8;
     private static int mEventYOffsetPortrait = 2;
-    // EventSquare: || 이벤트이름  옆에 작은 네모인 듯
     private static int mEventSquareWidth = 3;
-    private static int mEventSquareHeight = 10;
+    private static int mEventSquareHeight = 10;     // 이벤트 상자 높이!
     private static int mEventSquareBorder = 0;
     private static int mEventLinePadding = 2;
     private static int mEventRightPadding = 4;
@@ -116,7 +115,8 @@ public class MonthWeekEventsView extends SimpleWeekView {
     private static int mDiaryCircleSize = 3;
     private static boolean mInitialized = false;
     private static boolean mShowDetailsInMonth;
-    private static int mMaxLinesInEvent = 7; //todo - should be configurable
+    private static int mMaxLinesInEvent = 8; //todo - should be configurable
+    private static int mMaxLinesInDiary = 2;
     private final TodayAnimatorListener mAnimatorListener = new TodayAnimatorListener();
     protected Time mToday = new Time();
     protected boolean mHasToday = false;
@@ -175,12 +175,14 @@ public class MonthWeekEventsView extends SimpleWeekView {
     protected int mTodayAnimateColor;
     protected final Resources mResources;
     HashMap<Integer, Utils.DNAStrand> mDna = null;
+    HashMap<Integer, Utils.DNAStrand> mDnaD = null;
     private int mClickedDayIndex = -1;
     private int mClickedDayColor;
     private boolean mAnimateToday;
     private int mAnimateTodayAlpha = 0;
     private ObjectAnimator mTodayAnimator = null;
     private int[] mDayXs;
+    private int[] mDayXsD;
 
     /**
      * Shows up as an error if we don't include this.
@@ -203,6 +205,10 @@ public class MonthWeekEventsView extends SimpleWeekView {
         // generate dna bits before its width has been fixed.
         // mMinWeekWidth는 width가 고정되기 전에 dna 비트를 생성하려는 view를 막기 위한 장치임
         createDna(unsortedEvents);
+    }
+
+    public void setDiaries(List<ArrayList<Diary>> sortedDiaries, ArrayList<Diary> unsortedDiaries) {
+        setDiaries(sortedDiaries);
     }
 
     /**
@@ -263,17 +269,17 @@ public class MonthWeekEventsView extends SimpleWeekView {
         }
     }
 
-    public void setDiaries(List<ArrayList<Diary>> diaries) {
-        mDiaries = diaries;
-        if (diaries == null) {
+    public void setDiaries(List<ArrayList<Diary>> sortedDiaries) {
+        mDiaries = sortedDiaries;
+        if(sortedDiaries == null) {
             return;
         }
-        if(diaries.size() != mNumDays) {
-            if (Log.isLoggable(TAG, Log.ERROR)) {
-                Log.wtf(TAG, "Events size must be same as days displayed: size="
-                        + diaries.size() + " days=" + mNumDays);
+        if(sortedDiaries.size() != mNumDays) {
+            if(Log.isLoggable(TAG, Log.ERROR)) {
+                Log.wtf(TAG, "Diaries size must be same as days displayed: size="
+                        + sortedDiaries.size() + " days=" + mNumDays);
             }
-            mEvents = null;
+            mDiaries = null;
             return;
         }
     }
@@ -782,7 +788,12 @@ public class MonthWeekEventsView extends SimpleWeekView {
         ArrayList<DayEventFormatter> dayFormatters = weekFormatter.prepareFormattedEvents();
         for (DayEventFormatter dayEventFormatter : dayFormatters) {
             dayEventFormatter.drawDay(canvas, boxBoundaries);
+        }
 
+        WeekDiaryFormatter weekDiaryFormatter = new WeekDiaryFormatter(boxBoundaries);
+        ArrayList<DayDiaryFormatter> dayDiaryFormatters = weekDiaryFormatter.prepareFormattedDiaries();
+        for (DayDiaryFormatter dayDiaryFormatter : dayDiaryFormatters) {
+            dayDiaryFormatter.drawDay(canvas, boxBoundaries);
         }
     }
 
@@ -819,6 +830,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
         private FormattedEventBase mVirtualEvent;
         private int mListSize;
         private int mMinItems;
+
         public DayEventSorter(BoundariesSetter boundariesSetter) {
             mRemainingEvents = new LinkedList<>();
             mFixedHeightBoundaries = boundariesSetter;
@@ -845,6 +857,23 @@ public class MonthWeekEventsView extends SimpleWeekView {
                 iterator.add(event);
             } else {
                 remainingEvents.add(event);
+            }
+        }
+
+        protected void sortedAddRemainingDiaryToList(LinkedList<FormattedDiaryBase> remainingDiaries,
+                                                     FormattedDiaryBase diary) {
+            int diarySpan = diary.getFormat().getTotalSpan();
+            if (diarySpan > 1) {
+                ListIterator<FormattedDiaryBase> iterator = remainingDiaries.listIterator();
+                while (iterator.hasNext()) {
+                    if(iterator.next().getFormat().getTotalSpan() < diarySpan) {
+                        iterator.previous();
+                        break;
+                    }
+                }
+                iterator.add(diary);
+            } else {
+                remainingDiaries.add(diary);
             }
         }
 
@@ -1033,16 +1062,10 @@ public class MonthWeekEventsView extends SimpleWeekView {
             return mRegularBoundaries;
         }
 
-        protected BoundariesSetter getBoundariesSetter(Diary diary) {
-            return mRegularBoundaries;
-        }
+
 
         protected FormattedEventBase makeFormattedEvent(Event event, EventFormat format) {
             return new FormattedEvent(event, format, getBoundariesSetter(event));
-        }
-
-        protected FormattedDiaryBase makeFormattedDiary(Diary diary, DiaryFormat format) {
-            return new FormattedDiary(diary, format, getBoundariesSetter(diary));
         }
 
         // day is provided as an optimisation to look only on a certain day
@@ -1104,6 +1127,111 @@ public class MonthWeekEventsView extends SimpleWeekView {
             final int daysInWeek = mEvents.size();
             for (ArrayList<Event> dayEvents : mEvents) {
                 mFormattedEvents.add(prepareFormattedEventDay(dayEvents, day, daysInWeek));
+                day++;
+            }
+        }
+    }
+
+    protected class WeekDiaryFormatter {
+        private List<ArrayList<FormattedDiaryBase>> mFormattedDiaries;
+        private DayBoxBoundaries mBoxBoundaries;
+        private BoundariesSetter mRegularBoundaries;
+        private BoundariesSetter mFullDayBoundaries;
+        private BoundariesSetter mDiaryBoundaries;
+
+        public WeekDiaryFormatter(DayBoxBoundaries boxBoundaries) {
+            mBoxBoundaries = boxBoundaries;
+            mRegularBoundaries = new RegularBoundariesSetter(boxBoundaries);
+            mFullDayBoundaries = new AllDayBoundariesSetter(boxBoundaries);
+            mDiaryBoundaries = new DiaryBoundariesSetter(boxBoundaries);
+        }
+
+        public ArrayList<DayDiaryFormatter> prepareFormattedDiaries() {
+            prepareFormattedDiariesWithDiaryDaySpan();
+            ViewDetailsPreferences.Preferences preferences =
+                    ViewDetailsPreferences.getPreferences(getContext());
+            setXindexInDiaries();
+            return formatDays(mBoxBoundaries.getAvailableXSpace(), preferences);
+        }
+
+        protected ArrayList<DayDiaryFormatter> formatDays(int availableSpace, ViewDetailsPreferences.Preferences preferences) {
+            int dayIndex = 0;
+            ArrayList<DayDiaryFormatter> dayDiaryFormatters = new ArrayList<>(mFormattedDiaries.size());
+            for(ArrayList<FormattedDiaryBase> dayDiaries : mFormattedDiaries) {
+                DayDiaryFormatter dayDiaryFormatter = new DayDiaryFormatter(dayDiaries, dayIndex, preferences);
+                dayDiaryFormatter.formatDay(availableSpace);
+                dayDiaryFormatters.add(dayDiaryFormatter);
+                dayIndex++;
+            }
+            return dayDiaryFormatters;
+        }
+
+        protected void setXindexInDiaries() {
+            ArrayList<ArrayList<FormattedDiaryBase>> newFormattedDiaries = new ArrayList<>(mFormattedDiaries.size());
+            DayDiarySorter sorter = new DayDiarySorter(
+                    new FixedWidthRegularBoundariesSetter(mBoxBoundaries));
+            for (ArrayList<FormattedDiaryBase> dayDiaries : mFormattedDiaries) {
+                newFormattedDiaries.add(sorter.sort(dayDiaries));
+            }
+            mFormattedDiaries = newFormattedDiaries;
+        }
+
+        protected BoundariesSetter getBoundariesSetter(Diary diary) {
+            return mDiaryBoundaries;
+        }
+
+        protected FormattedDiaryBase makeFormattedDiary(Diary diary, DiaryFormat format) {
+            return new FormattedDiary(diary, format, getBoundariesSetter(diary));
+        }
+
+        protected DiaryFormat getFormatByDiary(Diary diary, int day) {
+            if(day < 0 || mFormattedDiaries.size() <= day) {
+                return null;
+            }
+            for(FormattedDiaryBase formattedDiary : mFormattedDiaries.get(day)) {
+                if(formattedDiary.containsDiary(diary)) {
+                    return formattedDiary.getFormat();
+                }
+            }
+            return null;
+        }
+
+        protected ArrayList<FormattedDiaryBase> prepareFormattedDiaryDay(ArrayList<Diary> dayDiaries,
+                                                                         int day,
+                                                                         int daysInWeek) {
+            final int diaryCount = (dayDiaries == null) ? 0 : dayDiaries.size();
+            ArrayList<FormattedDiaryBase> formattedDayDiaries = new ArrayList<>(diaryCount);
+            if(diaryCount == 0) {
+                return formattedDayDiaries;
+            }
+            for(Diary diary : dayDiaries) {
+                if (diary == null) {
+                    DiaryFormat format = new DiaryFormat(day, daysInWeek);
+                    format.hide(day);
+                    formattedDayDiaries.add(new NullFormattedDiary(format, mDiaryBoundaries));
+                    continue;
+                }
+                DiaryFormat lastFormat = getFormatByDiary(diary, day-1);
+                if ((lastFormat != null)) {
+                    lastFormat.extendDaySpan(day);
+                    formattedDayDiaries.add(makeFormattedDiary(diary,lastFormat));
+                } else if(lastFormat == null) {
+                    DiaryFormat format = new DiaryFormat(day, daysInWeek);
+                    formattedDayDiaries.add(makeFormattedDiary(diary, format));
+                }
+            }
+            return formattedDayDiaries;
+        }
+
+        protected void prepareFormattedDiariesWithDiaryDaySpan() {
+            mFormattedDiaries = new ArrayList<>(mDiaries.size());
+            if (mDiaries == null || mDiaries.isEmpty()) {
+                return;
+            }
+            int day = 0;
+            final int daysInWeek = mDiaries.size();
+            for (ArrayList<Diary> dayDiaries : mDiaries) {
+                mFormattedDiaries.add(prepareFormattedDiaryDay(dayDiaries, day, daysInWeek));
                 day++;
             }
         }
@@ -1201,14 +1329,15 @@ public class MonthWeekEventsView extends SimpleWeekView {
                     event.skip(mViewPreferences);
                 } else {
                     event.draw(canvas, mViewPreferences, mDay);
-//                    canvas.drawCircle(x, mWeekNumAscentHeight + mTopPaddingWeekNumber, mDiaryCircleSize, mWeekNumPaint);
-//                    x += mEventSquareHeight;
                 }
+                canvas.drawCircle(x, mWeekNumAscentHeight + mTopPaddingWeekNumber, mDiaryCircleSize, mWeekNumPaint);
+                x += boxBoundaries.mXWidth;
             }
             if (moreLinesWillBeDisplayed()) {
                 int hiddenEvents = mEventsByHeight.get(0).size();
                 drawMoreEvents(canvas, hiddenEvents, boxBoundaries.getX());
             }
+
             boxBoundaries.nextDay();
         }
 
@@ -1408,6 +1537,336 @@ public class MonthWeekEventsView extends SimpleWeekView {
         }
     }
 
+    protected class DayDiaryFormatter {
+        private ArrayList<FormattedDiaryBase> mDiaryDay;
+        private int mDay;
+        private ViewDetailsPreferences.Preferences mViewPreferences;
+        private ArrayList<ArrayList<FormattedDiaryBase>> mDiariesByWidth;
+        private int mMaxNumberOfLines;
+        private int mVisibleDiaries;
+
+        public DayDiaryFormatter(ArrayList<FormattedDiaryBase> diaryDay,
+                                 int day,
+                                 ViewDetailsPreferences.Preferences viewPreferences) {
+            mDiaryDay = diaryDay;
+            mDay = day;
+            mViewPreferences = viewPreferences;
+            init();
+        }
+
+        protected void init() {
+            mMaxNumberOfLines = mMaxLinesInDiary;
+            mDiariesByWidth = new ArrayList<>(mMaxLinesInDiary + 1);
+            for (int i = 0; i < mMaxNumberOfLines + 1; i++) {
+                mDiariesByWidth.add(new ArrayList<FormattedDiaryBase>());
+            }
+            ListIterator<FormattedDiaryBase> iterator = mDiaryDay.listIterator();
+            while(iterator.hasNext()) {
+                FormattedDiaryBase diary = iterator.next();
+                final int diaryWidth = diary.getFormat().getDiaryLines();
+                if (diaryWidth > 0) {
+                    mVisibleDiaries++;
+                }
+                mDiariesByWidth.get(diaryWidth).add(diary);
+            }
+        }
+
+        protected boolean diaryShouldBeSkipped(FormattedDiaryBase diary) {
+            return diary.getFormat().getDaySpan(mDay) <= 0;
+        }
+
+        public void drawDay(Canvas canvas, DayBoxBoundaries boxBoundaries) {
+            for (FormattedDiaryBase diary : mDiaryDay) {
+                if (diaryShouldBeSkipped(diary)) {
+                    diary.skip(mViewPreferences);
+                } else {
+                    diary.draw(canvas, mViewPreferences, mDay);
+                }
+            }
+            if(moreLinesWillBeDisplayed()) {
+                int hiddenDiaries = mDiariesByWidth.get(0).size();
+//                drawMoreDiaries(canvas, hiddenDiaries, boxBoundaries.getX());
+            }
+
+            boxBoundaries.nextDay();
+        }
+
+        protected void hideTimeRangeIfNeeded(int availableSpace) {
+            if(mViewPreferences.isTimeShownBelow() &&
+                    (getMaxNumberOfLines(availableSpace) < mVisibleDiaries)) {
+                mViewPreferences = mViewPreferences.hideTime();
+            }
+        }
+
+        protected void reduceNumberOfLines() {
+            if(mMaxNumberOfLines > 0) {
+                final int index = mMaxNumberOfLines;
+                mMaxNumberOfLines--;
+                for (FormattedDiaryBase diary : mDiariesByWidth.get(index)) {
+                    diary.getFormat().capDiaryLinesAt(mMaxNumberOfLines);
+                }
+                mDiariesByWidth.get(index - 1).addAll(mDiariesByWidth.get(index));
+                mDiariesByWidth.get(index).clear();
+            }
+        }
+
+        protected void reduceWidthOfDiaries(int numberOfDiariesToReduce) {
+            final int nonReducedDiaries = getNumberOfHighestDiaries() - numberOfDiariesToReduce;
+            ListIterator<FormattedDiaryBase> iterator =
+                    mDiariesByWidth.get(mMaxNumberOfLines).listIterator(nonReducedDiaries);
+            final int cap = mMaxNumberOfLines - 1;
+            while (iterator.hasNext()) {
+                FormattedDiaryBase event = iterator.next();
+                event.getFormat().capDiaryLinesAt(cap);
+                mDiariesByWidth.get(cap).add(event);
+                iterator.remove();
+            }
+        }
+
+        protected int getNumberOfHighestDiaries() {
+            return mDiariesByWidth.get(mMaxNumberOfLines).size();
+        }
+
+        protected int getMaxNumberOfLines(int availableSpace) {
+            final int textSpace = availableSpace - getOverheadHeight();
+            return textSpace / mEventHeight;
+        }
+
+        protected void fitAllItemsOnScrean(int availableSpace) {
+            final int maxNumberOfLines = getMaxNumberOfLines(availableSpace);
+            int numberOfLines = getTotalDiaryLines();
+            while (maxNumberOfLines < numberOfLines - getNumberOfHighestDiaries()) {
+                numberOfLines -= getNumberOfHighestDiaries();
+                reduceNumberOfLines();
+            }
+            final int linesToCut = numberOfLines - maxNumberOfLines;
+            reduceWidthOfDiaries(linesToCut);
+        }
+
+        protected void reduceHeightOfDiariesToOne() {
+            final int cap = 1;
+            for (int i = 2; i <= mMaxNumberOfLines; i++) {
+                for (FormattedDiaryBase event : mDiariesByWidth.get(i)) {
+                    event.getFormat().capDiaryLinesAt(cap);
+                }
+                mDiariesByWidth.get(cap).addAll(mDiariesByWidth.get(i));
+                mDiariesByWidth.get(i).clear();
+            }
+            mMaxNumberOfLines = cap;
+        }
+
+        protected void reduceNumberOfEventsToFit(int availableSpace) {
+            reduceHeightOfDiariesToOne();
+            int height = getDiariesHeight();
+            if (!moreLinesWillBeDisplayed())  {
+                height += mExtrasHeight;
+            }
+            ListIterator<FormattedDiaryBase> backIterator = mDiaryDay.listIterator(mDiaryDay.size());
+            while ((height > availableSpace) && backIterator.hasPrevious()) {
+                FormattedDiaryBase event = backIterator.previous();
+                if (event == null || event.getFormat().getDiaryLines() == 0) {
+                    continue;
+                }
+                height -= event.getHeight(mViewPreferences);
+                event.getFormat().hide(mDay);
+                mVisibleDiaries--;
+                mDiariesByWidth.get(0).add(event);
+                mDiariesByWidth.remove(event);
+            }
+        }
+
+        /**
+         * Formats day according to the layout given at class description
+         * 클래스 설명에서 주어진 레이아웃에 따라 날짜를 포맷함
+         * @param availableSpace
+         */
+        public void formatDay(int availableSpace) {
+            hideTimeRangeIfNeeded(availableSpace);
+            if (getDiariesHeight() > availableSpace) {
+                if (willAllItemsFitOnScreen(availableSpace)) {
+                    fitAllItemsOnScrean(availableSpace);
+                } else {
+                    reduceNumberOfEventsToFit(availableSpace);
+                }
+            }
+        }
+
+        /**
+         * Checks if all events can fit the screen (assumes that in the worst case they need to be
+         * capped at one line per event)
+         * 모든 이벤트가 화면에 맞을 수 있는지 확인 (회악의 경우, 이벤트당 한 줄로 연결해야 한다고 가정)
+         * @param availableSpace
+         * @return
+         */
+        protected boolean willAllItemsFitOnScreen(int availableSpace) {
+            return (getOverheadHeight() + mVisibleDiaries * mEventHeight <= availableSpace);
+        }
+
+        /**
+         * Checks how many lines all events would take
+         * 모든 이벤트에 소요되는 라인 수 확인
+         * @return
+         */
+        protected int getTotalDiaryLines() {
+            int lines = 0;
+            for (int i = 1; i < mDiariesByWidth.size(); i++) {
+                lines += i * mDiariesByWidth.get(i).size();
+            }
+            return lines;
+        }
+
+        protected boolean moreLinesWillBeDisplayed() {
+            return mDiariesByWidth.get(0).size() > 0;
+        }
+
+        protected int getHeightOfMoreLine() {
+            return moreLinesWillBeDisplayed() ? mExtrasHeight : 0;
+        }
+
+        /**
+         * Returns the amount of space required to fit all spacings between events
+         * 이벤트 간의 모든 간격에 맞도록 필요한 공간의 양을 반환함
+         * @return
+         */
+        protected int getOverheadHeight() {
+            return getHeightOfMoreLine() + (mVisibleDiaries - 1) * mEventLinePadding;
+        }
+
+//        protected int getHeightOfTimeRanges() {
+//            return mViewPreferences.isTimeShownBelow() ?
+//                    mExtrasHeight  * (mVisibleDiaries - mFullDayEventsCount) : 0;
+//        }
+
+        /**
+         * Returns Current height required to fit all events
+         * 모든 이벤트에 맞는 데 필요한 현재 높이 반환
+         * @return
+         */
+        protected int getDiariesHeight() {
+            return getOverheadHeight()
+                    + getTotalDiaryLines() * mEventHeight;
+        }
+    }
+
+    protected class DayDiarySorter {
+        private final DiaryFormat virtualFormat = new DiaryFormat(0, 0);
+        private LinkedList<FormattedDiaryBase> mRemainingDiaries;
+        private BoundariesSetter mFixedWidthBoundaries;
+        private FormattedDiaryBase mVirtualDiary;
+        private int mListSize;
+        private int mMinItems;
+
+        public DayDiarySorter(BoundariesSetter boundariesSetter) {
+            mRemainingDiaries = new LinkedList<>();
+            mFixedWidthBoundaries = boundariesSetter;
+            mVirtualDiary = new NullFormattedDiary(virtualFormat, boundariesSetter);
+        }
+
+        protected void sortedAddRemainingDiaryToList(LinkedList<FormattedDiaryBase> remainingDiaries,
+                                                     FormattedDiaryBase diary) {
+            int diarySpan = diary.getFormat().getTotalSpan();
+            if (diarySpan > 1) {
+                ListIterator<FormattedDiaryBase> iterator = remainingDiaries.listIterator();
+                while (iterator.hasNext()) {
+                    if(iterator.next().getFormat().getTotalSpan() < diarySpan) {
+                        iterator.previous();
+                        break;
+                    }
+                }
+                iterator.add(diary);
+            } else {
+                remainingDiaries.add(diary);
+            }
+        }
+
+        protected void init(ArrayList<FormattedDiaryBase> dayDiaries) {
+            mMinItems = -1;
+            int diariesWidth = 0;
+            for (FormattedDiaryBase diary : dayDiaries) {
+                diariesWidth += diary.getFormat().getDiaryLines();
+                int xIndex = diary.getFormat().getXIndex();
+                mMinItems = Math.max(mMinItems, xIndex);
+            }
+            mListSize = Math.max(mMinItems + 1, diariesWidth);
+            mRemainingDiaries.clear();
+        }
+
+        protected int getNextIndex(FormattedDiaryBase[] indexedEvents, int index) {
+            if (index < mMinItems) {
+                return index + 1;
+            }
+            return index + indexedEvents[index].getFormat().getDiaryLines();
+        }
+
+        protected  FormattedDiaryBase[] fillInIndexedDiaries(ArrayList<FormattedDiaryBase> dayDiaries) {
+            FormattedDiaryBase[] indexedDiaries = new FormattedDiaryBase[mListSize];
+            for(FormattedDiaryBase diary : dayDiaries) {
+                if(diary.getFormat().getXIndex() != -1) {
+                    indexedDiaries[diary.getFormat().getXIndex()] = diary;
+                } else {
+                    sortedAddRemainingDiaryToList(mRemainingDiaries, diary);
+                }
+            }
+            return indexedDiaries;
+        }
+
+        protected ArrayList<FormattedDiaryBase> getSortedDiaries(FormattedDiaryBase[] indexedDiaries,
+                                                                 int expectedSize) {
+            ArrayList<FormattedDiaryBase> sortedDiaries = new ArrayList<>(expectedSize);
+            for (FormattedDiaryBase diary : indexedDiaries) {
+                if (diary != null) {
+                    sortedDiaries.add(diary);
+                }
+            }
+            return sortedDiaries;
+        }
+
+        protected void fillInRemainingDiaries(FormattedDiaryBase[] indexedDiaries) {
+            int index = 0;
+            for(FormattedDiaryBase diary : mRemainingDiaries) {
+                if(!diary.getFormat().isVisible()) {
+                    continue;
+                }
+                while(index < indexedDiaries.length) {
+                    if(indexedDiaries[index] == null) {
+                        diary.getFormat().setXIndex(index);
+                        if (index < mMinItems) {
+                            diary.getFormat().capDiaryLinesAt(1);
+                            if(!diary.isBordered()) {
+                                diary.setBoundaries(mFixedWidthBoundaries);
+                            }
+                        }
+                        indexedDiaries[index] = diary;
+                        index =  getNextIndex(indexedDiaries, index);
+                        break;
+                    }
+                    index = getNextIndex(indexedDiaries, index);
+                }
+            }
+            addVirtualDiaries(indexedDiaries, index);
+        }
+
+        protected void addVirtualDiaries(FormattedDiaryBase[] indexedDiaries, int initialIndex)  {
+            for (int index = initialIndex; index < mMinItems; index++) {
+                if (indexedDiaries[index] == null) {
+                    indexedDiaries[index] = mVirtualDiary;
+                }
+            }
+        }
+
+        public ArrayList<FormattedDiaryBase> sort (ArrayList<FormattedDiaryBase> dayDiaries) {
+            if(dayDiaries.isEmpty()) {
+                return new ArrayList<>();
+            }
+            init(dayDiaries);
+            FormattedDiaryBase[] indexedDiaries = fillInIndexedDiaries(dayDiaries);
+            fillInRemainingDiaries(indexedDiaries);
+            return getSortedDiaries(indexedDiaries, dayDiaries.size());
+        }
+
+
+    }
+
     /**
      * Class responsible for maintaining information about box related to a given day.
      * When created it is set at first day (with index 0).
@@ -1426,7 +1885,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
             mYOffset = 0;
             mX = 1;
             mY = mEventYOffsetPortrait + mMonthNumHeight + mTopPaddingMonthNumber;
-            mRightEdge = - 1;
+            mRightEdge = -1;
         }
 
         public void nextDay() {
@@ -1438,6 +1897,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
         public int getX() { return  mX;}
         public int getY() { return  mY + mYOffset;}
         public int getRightEdge(int spanningDays) {return spanningDays * mXWidth + mRightEdge;}
+        public int getAvailableXSpace() { return  mWidth - getX();}
         public int getAvailableYSpace() { return  mHeight - getY() - mEventBottomPadding;}
         public void moveDown(int y) { mYOffset += y; }
     }
@@ -1529,6 +1989,34 @@ public class MonthWeekEventsView extends SimpleWeekView {
     protected class FixedHeightRegularBoundariesSetter extends RegularBoundariesSetter {
         public FixedHeightRegularBoundariesSetter(DayBoxBoundaries boxBoundaries) {
             super(boxBoundaries, mBorderSpace);
+        }
+    }
+
+    protected class FixedWidthRegularBoundariesSetter extends RegularBoundariesSetter {
+        public FixedWidthRegularBoundariesSetter(DayBoxBoundaries boxBoundaries) {
+            super(boxBoundaries, mBorderSpace);
+        }
+    }
+
+    protected class DiaryBoundariesSetter extends BoundariesSetter {
+        public DiaryBoundariesSetter(DayBoxBoundaries boxBoundaries) {
+            super(boxBoundaries, 0, mEventSquareWidth + mEventRightPadding);
+        }
+        protected DiaryBoundariesSetter(DayBoxBoundaries boxBoundaries, int border) {
+            super(boxBoundaries, border, mEventSquareWidth + mEventRightPadding - border);
+        }
+        @Override
+        public void setRectangle(int spanningDays, int numberOfLines) {
+            r.left = mBoxBoundaries.getX();
+            r.right = mBoxBoundaries.getX() + mEventSquareWidth;
+            r.top = mBoxBoundaries.getY();
+            r.bottom = mBoxBoundaries.getY() + mEventAscentHeight;
+        }
+
+        @Override
+        public void setCircle(int spanningDays, int numberOfLines) {
+            circleX = mBoxBoundaries.getX() + 20;
+            circleY = mBoxBoundaries.getY();
         }
     }
 
@@ -1625,7 +2113,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
     protected static class DiaryFormat {
         private int mLines;
         private int[] mDaySpan;
-//        private int mYIndex;
+        private int mXIndex;
         private boolean mPartiallyHidden;
         private final int Y_INDEX_NOT_SET = -1;
 
@@ -1635,7 +2123,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
                 mDaySpan[day] = 1;
             }
             mLines = 1;
-//            mYIndex = Y_INDEX_NOT_SET;
+            mXIndex = Y_INDEX_NOT_SET;
             mPartiallyHidden = false;
         }
 
@@ -1646,8 +2134,8 @@ public class MonthWeekEventsView extends SimpleWeekView {
          * 만약 y-order가 아직 결정되지 않은 경우 -1 반환
          * @return
          */
-//        public int getYIndex() { return mYIndex;}
-//        public void setYIndex(int index) { mYIndex = index;}
+        public int getXIndex() { return mXIndex;}
+        public void setXIndex(int index) { mXIndex = index;}
         public boolean isVisible() { return mLines > 0; }
         public void hide(int day) {
             if (mDaySpan.length <= day) {
@@ -1689,7 +2177,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
                 mLines = lines;
             }
         }
-        public void capEventLinesAt(int cap) { mLines = Math.min(mLines, cap); }
+        public void capDiaryLinesAt(int cap) { mLines = Math.min(mLines, cap); }
         public void extendDaySpan(int day) {
             for (int index = Math.min(day, mDaySpan.length - 1); index >= 0; index--) {
                 if (mDaySpan[index] > 0) {
@@ -1795,6 +2283,29 @@ public class MonthWeekEventsView extends SimpleWeekView {
         public boolean containsEvent(Event event) { return false; }
     }
 
+    protected class NullFormattedDiary extends FormattedDiaryBase {
+        NullFormattedDiary(DiaryFormat format, BoundariesSetter boundaries) {
+            super(format, boundaries);
+        }
+
+        /**
+         * Null object has no text to be formatted
+         * Null 개체에는 포맷할 텍스트가 없음
+         */
+        public void initialPreFormatText(ViewDetailsPreferences.Preferences preferences) { /*nop*/ }
+        protected boolean isTimeInNextLine(ViewDetailsPreferences.Preferences preferences) { return false; }
+
+        /**
+         * Null object won't be drawn
+         * Null 개체는 그려지지 않을 것임
+         * @param canvas
+         * @param preferences
+         * @param day
+         */
+        public void draw(Canvas canvas, ViewDetailsPreferences.Preferences preferences, int day) { /*nop*/ }
+        public boolean containsDiary(Diary diary) { return false; }
+    }
+
     protected class FormattedEvent extends FormattedEventBase {
         private Event mEvent;
         private DynamicLayout mTextLayout;
@@ -1824,6 +2335,10 @@ public class MonthWeekEventsView extends SimpleWeekView {
             mEventSquarePaint.setStyle(getRectanglePaintStyle());
             mEventSquarePaint.setColor(getRectangleColor());
             canvas.drawRect(r, mEventSquarePaint);
+//            mBoundaries.setCircle(mFormat.getDaySpan(day), mFormat.getEventLines());
+//            mDiaryCirclePaint.setStyle(Style.FILL);
+//            mDiaryCirclePaint.setColor(getRectangleColor());
+//            canvas.drawCircle(mBoundaries.getTextX() + 3, mBoundaries.getTextY() - 10, mDiaryCircleSize, mDiaryCirclePaint);
         }
 
         protected int getAvailableSpaceForText(int spanningDays) {
