@@ -29,12 +29,6 @@ import android.preference.PreferenceActivity;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Calendars;
 import android.provider.Settings;
-import androidx.appcompat.widget.AppCompatCheckBox;
-import androidx.appcompat.widget.AppCompatCheckedTextView;
-import androidx.appcompat.widget.AppCompatEditText;
-import androidx.appcompat.widget.AppCompatRadioButton;
-import androidx.appcompat.widget.AppCompatSpinner;
-import androidx.appcompat.widget.Toolbar;
 import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -44,7 +38,6 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.android.nanal.DynamicTheme;
-import com.android.nanal.ViewDetailsPreferences;
 import com.android.nanal.QuickResponseSettings;
 import com.android.nanal.R;
 import com.android.nanal.calendar.OtherPreferences;
@@ -54,6 +47,13 @@ import com.android.nanal.event.GeneralPreferences;
 import com.android.nanal.event.Utils;
 
 import java.util.List;
+
+import androidx.appcompat.widget.AppCompatCheckBox;
+import androidx.appcompat.widget.AppCompatCheckedTextView;
+import androidx.appcompat.widget.AppCompatEditText;
+import androidx.appcompat.widget.AppCompatRadioButton;
+import androidx.appcompat.widget.AppCompatSpinner;
+import androidx.appcompat.widget.Toolbar;
 
 
 public class CalendarSettingsActivity extends PreferenceActivity {
@@ -199,8 +199,7 @@ public class CalendarSettingsActivity extends PreferenceActivity {
                 || SelectCalendarsSyncFragment.class.getName().equals(fragmentName)
                 || OtherPreferences.class.getName().equals(fragmentName)
                 || AboutPreferences.class.getName().equals(fragmentName)
-                || QuickResponseSettings.class.getName().equals(fragmentName)
-                || ViewDetailsPreferences.class.getName().equals(fragmentName);
+                || QuickResponseSettings.class.getName().equals(fragmentName);
     }
 
     public void hideMenuButtons() {

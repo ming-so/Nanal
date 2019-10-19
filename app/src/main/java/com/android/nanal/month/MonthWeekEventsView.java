@@ -272,8 +272,10 @@ public class MonthWeekEventsView extends SimpleWeekView {
     public void setDiaries(List<ArrayList<Diary>> sortedDiaries) {
         mDiaries = sortedDiaries;
         if(sortedDiaries == null) {
+            Log.wtf(TAG, "setDiaries, sortedDiaries == null!!");
             return;
         }
+        Log.i(TAG, "setDiaries, mDiaries.size="+mDiaries.size());
         if(sortedDiaries.size() != mNumDays) {
             if(Log.isLoggable(TAG, Log.ERROR)) {
                 Log.wtf(TAG, "Diaries size must be same as days displayed: size="
@@ -534,6 +536,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
         }
         if (mShowDetailsInMonth) {
             drawEvents(canvas);
+            drawDiaries(canvas);
         } else {
             if (mDna == null && mUnsortedEvents != null) {
                 createDna(mUnsortedEvents);
@@ -789,9 +792,19 @@ public class MonthWeekEventsView extends SimpleWeekView {
         for (DayEventFormatter dayEventFormatter : dayFormatters) {
             dayEventFormatter.drawDay(canvas, boxBoundaries);
         }
+    }
 
+    protected void drawDiaries(Canvas canvas) {
+        Log.i(TAG, "drawDiaries 실행");
+        if (mDiaries == null || mDiaries.isEmpty()) {
+            Log.i(TAG, "drawDiaries, mDiaries == null");
+            return;
+        }
+
+        DayBoxBoundaries boxBoundaries = new DayBoxBoundaries();
         WeekDiaryFormatter weekDiaryFormatter = new WeekDiaryFormatter(boxBoundaries);
         ArrayList<DayDiaryFormatter> dayDiaryFormatters = weekDiaryFormatter.prepareFormattedDiaries();
+        Log.i(TAG, "drawDiaries, dayDiaryFormatters.size="+dayDiaryFormatters.size());
         for (DayDiaryFormatter dayDiaryFormatter : dayDiaryFormatters) {
             dayDiaryFormatter.drawDay(canvas, boxBoundaries);
         }
@@ -1135,18 +1148,15 @@ public class MonthWeekEventsView extends SimpleWeekView {
     protected class WeekDiaryFormatter {
         private List<ArrayList<FormattedDiaryBase>> mFormattedDiaries;
         private DayBoxBoundaries mBoxBoundaries;
-        private BoundariesSetter mRegularBoundaries;
-        private BoundariesSetter mFullDayBoundaries;
         private BoundariesSetter mDiaryBoundaries;
 
         public WeekDiaryFormatter(DayBoxBoundaries boxBoundaries) {
             mBoxBoundaries = boxBoundaries;
-            mRegularBoundaries = new RegularBoundariesSetter(boxBoundaries);
-            mFullDayBoundaries = new AllDayBoundariesSetter(boxBoundaries);
             mDiaryBoundaries = new DiaryBoundariesSetter(boxBoundaries);
         }
 
         public ArrayList<DayDiaryFormatter> prepareFormattedDiaries() {
+            Log.i(TAG, "prepareFormattedDiaries 실행");
             prepareFormattedDiariesWithDiaryDaySpan();
             ViewDetailsPreferences.Preferences preferences =
                     ViewDetailsPreferences.getPreferences(getContext());
@@ -1155,8 +1165,10 @@ public class MonthWeekEventsView extends SimpleWeekView {
         }
 
         protected ArrayList<DayDiaryFormatter> formatDays(int availableSpace, ViewDetailsPreferences.Preferences preferences) {
+            Log.i(TAG, "formatDays 실행");
             int dayIndex = 0;
             ArrayList<DayDiaryFormatter> dayDiaryFormatters = new ArrayList<>(mFormattedDiaries.size());
+            // mFormattedDiaries.size() : 7
             for(ArrayList<FormattedDiaryBase> dayDiaries : mFormattedDiaries) {
                 DayDiaryFormatter dayDiaryFormatter = new DayDiaryFormatter(dayDiaries, dayIndex, preferences);
                 dayDiaryFormatter.formatDay(availableSpace);
@@ -1181,6 +1193,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
         }
 
         protected FormattedDiaryBase makeFormattedDiary(Diary diary, DiaryFormat format) {
+            Log.i(TAG, "makeFormattedDiary 실행");
             return new FormattedDiary(diary, format, getBoundariesSetter(diary));
         }
 
@@ -1199,13 +1212,17 @@ public class MonthWeekEventsView extends SimpleWeekView {
         protected ArrayList<FormattedDiaryBase> prepareFormattedDiaryDay(ArrayList<Diary> dayDiaries,
                                                                          int day,
                                                                          int daysInWeek) {
+            Log.i(TAG, "prepareFormattedDiaryDay 실행, day="+day);
             final int diaryCount = (dayDiaries == null) ? 0 : dayDiaries.size();
             ArrayList<FormattedDiaryBase> formattedDayDiaries = new ArrayList<>(diaryCount);
             if(diaryCount == 0) {
+                Log.i(TAG, "prepareFormattedDiaryDay, diary 없음");
                 return formattedDayDiaries;
             }
+            Log.i(TAG, "prepareFormattedDiaryDay, diary 있음");
             for(Diary diary : dayDiaries) {
                 if (diary == null) {
+                    Log.i(TAG, "prepareFormattedDiaryDay, diary == null");
                     DiaryFormat format = new DiaryFormat(day, daysInWeek);
                     format.hide(day);
                     formattedDayDiaries.add(new NullFormattedDiary(format, mDiaryBoundaries));
@@ -1226,11 +1243,17 @@ public class MonthWeekEventsView extends SimpleWeekView {
         protected void prepareFormattedDiariesWithDiaryDaySpan() {
             mFormattedDiaries = new ArrayList<>(mDiaries.size());
             if (mDiaries == null || mDiaries.isEmpty()) {
+                Log.i(TAG, "prepareFormattedDiariesWithDiaryDaySpan, mDiaries == null");
                 return;
             }
+            //Log.i(TAG, "prepareFormattedDiariesWithDiaryDaySpan, mDiaries.size="+mDiaries.size());
+            // mDiaries.size() : 7
             int day = 0;
             final int daysInWeek = mDiaries.size();
             for (ArrayList<Diary> dayDiaries : mDiaries) {
+                Log.i(TAG, "prepareFormattedDiariesWithDiaryDaySpan, dayDiaries 추가");
+                if(!dayDiaries.isEmpty()) Log.i(TAG, "dayDiaries="+dayDiaries.get(0).content);
+                else Log.i(TAG, "dayDiaries == null");
                 mFormattedDiaries.add(prepareFormattedDiaryDay(dayDiaries, day, daysInWeek));
                 day++;
             }
@@ -1330,7 +1353,6 @@ public class MonthWeekEventsView extends SimpleWeekView {
                 } else {
                     event.draw(canvas, mViewPreferences, mDay);
                 }
-                canvas.drawCircle(x, mWeekNumAscentHeight + mTopPaddingWeekNumber, mDiaryCircleSize, mWeekNumPaint);
                 x += boxBoundaries.mXWidth;
             }
             if (moreLinesWillBeDisplayed()) {
@@ -1549,17 +1571,20 @@ public class MonthWeekEventsView extends SimpleWeekView {
                                  int day,
                                  ViewDetailsPreferences.Preferences viewPreferences) {
             mDiaryDay = diaryDay;
+            Log.i(TAG, "DayDiaryFormatter, mDiaryDay.size="+mDiaryDay.size());
             mDay = day;
             mViewPreferences = viewPreferences;
             init();
         }
 
         protected void init() {
+            Log.i(TAG, "init 실행");
             mMaxNumberOfLines = mMaxLinesInDiary;
             mDiariesByWidth = new ArrayList<>(mMaxLinesInDiary + 1);
             for (int i = 0; i < mMaxNumberOfLines + 1; i++) {
                 mDiariesByWidth.add(new ArrayList<FormattedDiaryBase>());
             }
+            Log.i(TAG, "init, mMaxNumberOfLines="+mMaxNumberOfLines+", mDiariesByWidth.size="+mDiariesByWidth.size());
             ListIterator<FormattedDiaryBase> iterator = mDiaryDay.listIterator();
             while(iterator.hasNext()) {
                 FormattedDiaryBase diary = iterator.next();
@@ -1576,10 +1601,13 @@ public class MonthWeekEventsView extends SimpleWeekView {
         }
 
         public void drawDay(Canvas canvas, DayBoxBoundaries boxBoundaries) {
+            Log.i(TAG, "drawDay 실행, mDiaryDay.size="+mDiaryDay.size());
             for (FormattedDiaryBase diary : mDiaryDay) {
                 if (diaryShouldBeSkipped(diary)) {
+                    Log.i(TAG, "drawDay, 스킵");
                     diary.skip(mViewPreferences);
                 } else {
+                    Log.i(TAG, "drawDay, 그림");
                     diary.draw(canvas, mViewPreferences, mDay);
                 }
             }
@@ -1587,7 +1615,6 @@ public class MonthWeekEventsView extends SimpleWeekView {
                 int hiddenDiaries = mDiariesByWidth.get(0).size();
 //                drawMoreDiaries(canvas, hiddenDiaries, boxBoundaries.getX());
             }
-
             boxBoundaries.nextDay();
         }
 
@@ -1896,6 +1923,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
 
         public int getX() { return  mX;}
         public int getY() { return  mY + mYOffset;}
+        public int getYOrig() { return mY; }
         public int getRightEdge(int spanningDays) {return spanningDays * mXWidth + mRightEdge;}
         public int getAvailableXSpace() { return  mWidth - getX();}
         public int getAvailableYSpace() { return  mHeight - getY() - mEventBottomPadding;}
@@ -1913,7 +1941,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
         }
         public int getY() { return mBoxBoundaries.getY(); }
         public abstract void setRectangle(int spanningDays, int numberOfLines);
-        public abstract void setCircle(int spanningDays, int numberOfLines);
+        public abstract void setCircle(int spanningDays);
         public int getTextX() { return mBoxBoundaries.getX() + mBorderThickness + mXPadding; }
         public int getTextY() {
             return mBoxBoundaries.getY() + mEventAscentHeight;
@@ -1959,9 +1987,9 @@ public class MonthWeekEventsView extends SimpleWeekView {
         }
 
         @Override
-        public void setCircle(int spanningDays, int numberOfLines) {
-            circleX = mBoxBoundaries.getX();
-            circleY = mBoxBoundaries.getY();
+        public void setCircle(int spanningDays) {
+            circleX = mBoxBoundaries.getX() + 20;
+            circleY = mBoxBoundaries.getYOrig() - 40;
         }
     }
 
@@ -1981,9 +2009,9 @@ public class MonthWeekEventsView extends SimpleWeekView {
         }
 
         @Override
-        public void setCircle(int spanningDays, int numberOfLines) {
-            circleX = mBoxBoundaries.getX();
-            circleY = mBoxBoundaries.getY();
+        public void setCircle(int spanningDays) {
+            circleX = mBoxBoundaries.getX() + 20;
+            circleY = mBoxBoundaries.getYOrig() - 40;
         }
     }
     protected class FixedHeightRegularBoundariesSetter extends RegularBoundariesSetter {
@@ -2014,9 +2042,9 @@ public class MonthWeekEventsView extends SimpleWeekView {
         }
 
         @Override
-        public void setCircle(int spanningDays, int numberOfLines) {
+        public void setCircle(int spanningDays) {
             circleX = mBoxBoundaries.getX() + 20;
-            circleY = mBoxBoundaries.getY();
+            circleY = mBoxBoundaries.getYOrig() - 40;
         }
     }
 
@@ -2335,10 +2363,6 @@ public class MonthWeekEventsView extends SimpleWeekView {
             mEventSquarePaint.setStyle(getRectanglePaintStyle());
             mEventSquarePaint.setColor(getRectangleColor());
             canvas.drawRect(r, mEventSquarePaint);
-//            mBoundaries.setCircle(mFormat.getDaySpan(day), mFormat.getEventLines());
-//            mDiaryCirclePaint.setStyle(Style.FILL);
-//            mDiaryCirclePaint.setColor(getRectangleColor());
-//            canvas.drawCircle(mBoundaries.getTextX() + 3, mBoundaries.getTextY() - 10, mDiaryCircleSize, mDiaryCirclePaint);
         }
 
         protected int getAvailableSpaceForText(int spanningDays) {
@@ -2517,10 +2541,12 @@ public class MonthWeekEventsView extends SimpleWeekView {
         }
 
         protected void drawDiaryCircle(Canvas canvas, int day) {
-            mBoundaries.setCircle(mFormat.getDaySpan(day), mFormat.getDiaryLines());
+            mBoundaries.setCircle(mFormat.getDaySpan(day));
             mDiaryCirclePaint.setStyle(getCirclePaintStyle());
             mDiaryCirclePaint.setColor(getCircleColor());
-            canvas.drawCircle(mBoundaries.getTextX(), mBoundaries.getTextY(), mDiaryCircleSize, mDiaryCirclePaint);
+            Log.i(TAG, "drawDiaryCircle, circleX="+circleX+", circleY"+circleY);
+            canvas.drawCircle(circleX, circleY, mDiaryCircleSize, mDiaryCirclePaint);
+
         }
 
         @Override
@@ -2535,6 +2561,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
 
         @Override
         public void draw(Canvas canvas, ViewDetailsPreferences.Preferences preferences, int day) {
+            Log.i(TAG, "FormattedDiary, draw 실행");
             if(mFormat.isVisible() && mDiary != null) {
                 drawDiaryCircle(canvas, day);
                 mBoundaries.moveToNextItem();

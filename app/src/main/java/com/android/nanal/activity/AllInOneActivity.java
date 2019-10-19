@@ -36,7 +36,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.preference.PreferenceActivity;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Attendees;
 import android.provider.CalendarContract.Events;
@@ -68,7 +67,6 @@ import com.android.nanal.NanalDBHelper;
 import com.android.nanal.PrefManager;
 import com.android.nanal.R;
 import com.android.nanal.TodayFragment;
-import com.android.nanal.ViewDetailsPreferences;
 import com.android.nanal.agenda.AgendaFragment;
 import com.android.nanal.alerts.AlertService;
 import com.android.nanal.alerts.NotificationMgr;
@@ -326,6 +324,8 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         mContext = AllInOneActivity.this;
         mActivity = AllInOneActivity.this;
 
+        openDatabase();
+
 //        if (icicle != null && icicle.containsKey(BUNDLE_KEY_CHECK_ACCOUNTS)) {
 //            mCheckForAccounts = icicle.getBoolean(BUNDLE_KEY_CHECK_ACCOUNTS);
 //        }
@@ -541,8 +541,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         prefs = this.getApplicationContext().getSharedPreferences("login_setting", MODE_PRIVATE);
         connectId = prefs.getString("loginId", null);
 
-        openDatabase();
-
         handleDynamicLink();
     }
 
@@ -599,6 +597,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                     permission = true;
                     // permission was granted, yay!
                     // 퍼미션 받음!
+                    createLocalCalendar();
                 } else {
                     Toast.makeText(getApplicationContext(), R.string.user_rejected_calendar_write_permission, Toast.LENGTH_LONG).show();
                     permission = false;
@@ -719,8 +718,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                     if(createLocalCalendar()) {
                         mController.sendEventRelatedEvent(
                                 this, EventType.CREATE_EVENT, -1, t.toMillis(true), 0, 0, 0, -1);
-                    } else {
-
                     }
             }
         });
@@ -760,6 +757,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                     return true;
                 } catch (IllegalArgumentException e) {
                     Toast.makeText(AllInOneActivity.this.getApplicationContext(), "로컬 캘린더 생성에 문제가 발생했습니다.", Toast.LENGTH_LONG).show();
+                    prefManager.setCalendarCreated(false);
                     return false;
                 }
             } else {
@@ -1208,11 +1206,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             return false;
         } else if (itemId == R.id.action_import) {
             ImportActivity.pickImportFile(this);
-        } else if (itemId == R.id.action_view_settings) {
-            Intent intent = new Intent(this, CalendarSettingsActivity.class);
-            intent.putExtra(PreferenceActivity.EXTRA_SHOW_FRAGMENT, ViewDetailsPreferences.class.getName());
-            intent.putExtra(PreferenceActivity.EXTRA_NO_HEADERS, true);
-            startActivity(intent);
         } else {
             return mExtensions.handleItemSelected(item, this);
         }

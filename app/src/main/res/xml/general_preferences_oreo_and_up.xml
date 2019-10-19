@@ -28,10 +28,6 @@
             android:title="@string/default_start_title"
             android:entries="@array/default_start_entries"
             android:entryValues="@array/default_start_values" />
-        <PreferenceScreen
-            android:key="pref_view_details"
-            android:title="@string/view_details"
-            android:fragment="com.android.nanal.ViewDetailsPreferences" />
         <CheckBoxPreference
             android:key="preferences_hide_declined"
             android:defaultValue="false"

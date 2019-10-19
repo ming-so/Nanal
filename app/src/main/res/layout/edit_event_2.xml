@@ -162,7 +162,7 @@
             android:text="@string/repeats_label"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:layout_marginBottom="0dip"
+            android:layout_marginBottom="2dip"
             style="@style/TextAppearance.EditEvent_LabelSmall" />
         <Button
             android:id="@+id/rrule"

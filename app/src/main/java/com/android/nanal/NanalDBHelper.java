@@ -19,8 +19,10 @@ import java.util.Date;
 
 public class NanalDBHelper  extends SQLiteOpenHelper {
     public static int DB_VERSION = 1;
+    private Context mContext;
     public NanalDBHelper(Context context) {
         super(context, "nanal", null, DB_VERSION);
+        mContext = context;
     }
 
     @Override
@@ -42,7 +44,7 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
                 "'group_id' INTEGER PRIMARY KEY NOT NULL, " +
                 "'group_name' VARCHAR(15) NOT NULL, " +
                 "'group_color' INTEGER NOT NULL, " +
-                "'sync_version' INTEGER NOT NULL, " +
+                "'sync_time' TIMESTAMP NOT NULL, " +
                 "'account_id' VARCHAR(320) NOT NULL" +
                 ")";
         db.execSQL(CREATE_TABLE_COMMUNITY);
@@ -100,14 +102,14 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
 
     }
 
-    public void addGroup(int group_id, String group_name, int group_color, String account_id) {
+    public void addGroup(int group_id, String group_name, int group_color, String sync_time, String account_id) {
         Log.i("NanalDBHelper", "그룹 추가 시도 "+group_id+", "+group_name+", "+group_color+", "+account_id);
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("group_id", group_id);
         values.put("group_name", group_name);
         values.put("group_color", group_color);
-        values.put("sync_version", DB_VERSION);
+        values.put("sync_time", sync_time);
         values.put("account_id", account_id);
         db.insert("community", null, values);
         db.close();
@@ -136,7 +138,7 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
         String sql = "SELECT * FROM community WHERE group_id='"+group_id+"'";
         Cursor cursor = db.rawQuery(sql, null);
         if(cursor.moveToNext()) {
-            return cursor.getInt(cursor.getColumnIndex("sync_version"));
+            return cursor.getInt(cursor.getColumnIndex("sync_time"));
         }
         return -1;
     }
@@ -177,11 +179,10 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
 
     public ArrayList<Diary> getDiariesList(int startDay, int endDay) {
         ArrayList<Diary> diaryList = new ArrayList<>();
-//        LocalDate ld = LocalDate.MIN.with(JulianFields.JULIAN_DAY, startDay);
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//        String str_start = dateFormat.format(startDay);
-//        String str_end = dateFormat.format(endDay);
+//        String str_start_t = dateFormat.format(startDay);
+//        String str_end_t = dateFormat.format(endDay);
         String str_start = convertJulian(startDay);
         String str_end = convertJulian(endDay);
         getAllDiaries();
@@ -256,14 +257,15 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
     }
 
     public void getAllDiaries() {
+        Log.i("NanalDBHelper", "getAllDiaries 실행");
         SQLiteDatabase db = getReadableDatabase();
         String sql = "SELECT * FROM diary";
         Cursor cursor = db.rawQuery(sql, null);
-        while(cursor.moveToNext()) {
-            Log.i("NanalDBHelper", "diary_id="+cursor.getInt(cursor.getColumnIndex("diary_id"))
-                    +", account_id="+cursor.getString(cursor.getColumnIndex("account_id"))+
-            ", day="+cursor.getString(cursor.getColumnIndex("day"))+", content=" +
-                    cursor.getString(cursor.getColumnIndex("content")));
-        }
+            while (cursor.moveToNext()) {
+                Log.i("NanalDBHelper", "diary_id=" + cursor.getInt(cursor.getColumnIndex("diary_id"))
+                        + ", account_id=" + cursor.getString(cursor.getColumnIndex("account_id")) +
+                        ", day=" + cursor.getString(cursor.getColumnIndex("day")) + ", content=" +
+                        cursor.getString(cursor.getColumnIndex("content")));
+            }
     }
 }

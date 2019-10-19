@@ -41,7 +41,6 @@ import com.android.nanal.event.Utils;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 
@@ -193,7 +192,7 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
         }
 
         if (events == null || events.size() == 0) {
-            if(Log.isLoggable(TAG, Log.DEBUG)) {
+            if (Log.isLoggable(TAG, Log.DEBUG)) {
                 Log.d(TAG, "No events. Returning early--go schedule something fun.");
             }
             mEventDayList = eventDayList;
@@ -206,7 +205,7 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
         for (Event event : events) {
             int startDay = event.startDay - mFirstJulianDay;
             int endDay = event.endDay - mFirstJulianDay + 1;
-            Log.i(TAG, "event.startDay="+event.startDay+", startDay="+startDay+", mFirstJulianDay="+mFirstJulianDay);
+            Log.i(TAG, "event.startDay=" + event.startDay + ", startDay=" + startDay + ", mFirstJulianDay=" + mFirstJulianDay);
             if (startDay < numDays || endDay >= 0) {
                 if (startDay < 0) {
                     startDay = 0;
@@ -225,7 +224,7 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
                 }
             }
         }
-        if(Log.isLoggable(TAG, Log.DEBUG)) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) {
             Log.d(TAG, "Processed " + events.size() + " events.");
         }
         mEventDayList = eventDayList;
@@ -234,10 +233,8 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
 
     public void setDiaries(int firstJulianDay, int numDays, ArrayList<Diary> diaries) {
         if (mIsMiniMonth) {
-            if (Log.isLoggable(TAG, Log.ERROR)) {
                 Log.e(TAG, "Attempted to set events for mini view. Events only supported in full"
                         + " view.");
-            }
             return;
         }
         mDiaries = diaries;
@@ -252,9 +249,7 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
         }
 
         if (diaries == null || diaries.size() == 0) {
-            if(Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "No diaries. Returning early--go schedule something fun.");
-            }
+            Log.d(TAG, "No diaries. Returning early--go schedule something fun.");
             mDiaryDayList = diaryDayList;
             refresh();
             return;
@@ -265,23 +260,42 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
         for (Diary diary : diaries) {
             long day = diary.day;
 
-            GregorianCalendar cal = new GregorianCalendar();
-            cal.setTimeInMillis(day);
-            cal.setGregorianChange(new Date(Long.MAX_VALUE));
-            int julianDay = cal.get(Calendar.DAY_OF_MONTH);
-            // mFirstJulianDay의 DAY_OF_MONTH를 구해서 빼면 되나?
-            // mFirstJulianDay: 2019/9/28일
-            // startDay 3이면 10월 1일
+            int julianDay = toJulian(new Date(day));
 
-            long startDay = day - mFirstJulianDay;
-            Log.i(TAG, "long day="+day+", int day="+(int)day+", julianDay="+julianDay);
-//            diaryDayList.get((int)day).add(diary);
+            int startDay = julianDay - mFirstJulianDay;
+            Log.i(TAG, "long day=" + day + ", int startDay=" + startDay + ", julianDay=" + julianDay+", mFirstJulianDay="+mFirstJulianDay);
+
+            if (startDay < numDays) {
+                if (startDay < 0) {
+                    startDay = 0;
+                }
+                if (startDay > numDays) {
+                    continue;
+                }
+                diaryDayList.get(startDay).add(diary);
+                Log.i(TAG, "diaryDayList.get 실행 startDay="+startDay);
+            }
         }
-        if(Log.isLoggable(TAG, Log.DEBUG)) {
-            Log.d(TAG, "Processed " + diaries.size() + " diaries.");
-        }
+        Log.d(TAG, "Processed " + diaries.size() + " diaries.");
         mDiaryDayList = diaryDayList;
         refresh();
+    }
+
+    public int toJulian(Date dd) {
+        final Calendar c = Calendar.getInstance();
+        c.setTime(dd);
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH) + 1;
+        int day = c.get(Calendar.DAY_OF_MONTH);
+        Log.i(TAG, "year=" + year + ", month=" + month + ", day=" + day);
+
+        int a = (14 - month) / 12;
+        int y = year + 4800 - a;
+        int m = month + (12 * a) - 3;
+        int JD = day + (((153 * m) + 2) / 5) + (365 * y) + (y / 4) - (y / 100) + (y / 400) - 32045;
+        Log.i(TAG, "JD=" + JD);
+
+        return JD;
     }
 
     @SuppressWarnings("unchecked")
@@ -399,6 +413,7 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
             v.setDiaries(null, null);
             return;
         }
+        Log.i(TAG, "setDiaries 실행 시도, start="+start+", end="+end+", mDiaries.size="+mDiaries.size());
         v.setDiaries(mDiaryDayList.subList(start, end), mDiaries);
     }
 
@@ -498,7 +513,7 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
     // 클릭 애니메이션 및 관련 실행 코드의 시각적 단서를 지움
     private void clearClickedView(MonthWeekEventsView v) {
         mListView.removeCallbacks(mDoClick);
-        synchronized(v) {
+        synchronized (v) {
             v.clearClickedDay();
         }
         mClickedView = null;

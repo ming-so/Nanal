@@ -416,8 +416,7 @@ public class MonthByWeekFragment extends SimpleDayPickerFragment implements
             ArrayList<Diary> diaries = new ArrayList<Diary>();
             Log.i(TAG, "mFirstLoadedJulianDay="+mFirstLoadedJulianDay+", mLastLoadedJulianDay="+mLastLoadedJulianDay);
             diaries = AllInOneActivity.helper.getDiariesList(mFirstLoadedJulianDay, mLastLoadedJulianDay);
-//            Diary.buildDiariesFromCursor(
-//                    diaries, data, mContext, mFirstLoadedJulianDay, mLastLoadedJulianDay);
+            Log.i(TAG, "가져온 다이어리 갯수: "+diaries.size());
             ((MonthByWeekAdapter) mAdapter).setDiaries(mFirstLoadedJulianDay,
                     mLastLoadedJulianDay - mFirstLoadedJulianDay + 1, diaries);
 
