@@ -168,6 +168,17 @@
     <string name="join_success">그룹에 가입되었습니다.</string>
     <string name="join_fail">그룹 가입 처리 중 오류가 발생하였습니다.</string>
 
+    <!-- 오늘 화면 -->
+    <string name="today_event">"오늘의 일정"</string>
+    <string name="today_diary">"오늘의 일기"</string>
+    <string name="today_no_event">"여기를 클릭해서 오늘의 일정을 등록하세요!"</string>
+    <string name="today_no_diary">"여기를 클릭해서 오늘의 일기를 등록하세요!"</string>
+    <!-- 그룹 상세화면 -->
+    <string name="group_event">"다가오는 일정"</string>
+    <string name="group_diary">"최근 등록된 일기"</string>
+    <string name="group_history">"그룹 히스토리"</string>
+    <string name="more">" > 전체 보기"</string>
+
     <!-- 타임존피커 -->
 
     <!-- Hint text to encourage the user to enter a country name to find a time zone

@@ -133,14 +133,36 @@ public class NanalDBHelper  extends SQLiteOpenHelper {
         return false;
     }
 
-    public int getGroupSync(int group_id) {
+    public void updateGroup(int group_id, String group_name, int group_color, String sync_time, String account_id) {
+        SQLiteDatabase db = getWritableDatabase();
+        String sql = "UPDATE community set group_name = '"+group_name+"'"
+                + ", group_color = '"+group_color+"'"
+                + ", sync_time = '"+sync_time+"'"
+                + ", account_id = '"+account_id+"' "
+                + "WHERE group_id = '"+group_id+"';";
+        db.execSQL(sql);
+        Log.i("NanalDBHelper", "updateGroup 완료");
+    }
+
+    public void deleteGroup(int group_id) {
+        SQLiteDatabase db = getWritableDatabase();
+        String sql = "DELETE FROM community WHERE group_id="+group_id;
+        db.execSQL(sql);
+        Log.i("NanalDBHelper", "deleteGroup 완료");
+    }
+
+    public void setGroupSync(int group_id, String time) {
+
+    }
+
+    public String getGroupSync(int group_id) {
         SQLiteDatabase db = getReadableDatabase();
         String sql = "SELECT * FROM community WHERE group_id='"+group_id+"'";
         Cursor cursor = db.rawQuery(sql, null);
         if(cursor.moveToNext()) {
-            return cursor.getInt(cursor.getColumnIndex("sync_time"));
+            return cursor.getString(cursor.getColumnIndex("sync_time"));
         }
-        return -1;
+        return "";
     }
 
     public ArrayList<Group> getGroupList() {

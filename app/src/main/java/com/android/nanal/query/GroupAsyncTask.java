@@ -150,18 +150,16 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
                 int group_id = subObject.getInt("group_id");
                 if (AllInOneActivity.helper.checkGroup(group_id)) {
                     // 그룹이 있다면 업데이트해야 함
-                    if (AllInOneActivity.helper.getGroupSync(group_id) != -1 && AllInOneActivity.helper.getGroupSync(group_id) > 0) {
+                    if (AllInOneActivity.helper.getGroupSync(group_id) != null &&
+                            !AllInOneActivity.helper.getGroupSync(group_id).isEmpty()) {
                         // 버전이 옳게 들어간 경우에만 업데이트 후 return
                         Log.i("GroupAsyncTask: ","그룹 존재, 업데이트 진행");
                         try {
                             /*
-                            업데이트시 그룹 아이디와 현재 디비 싱크 날짜를 전송함
-                            새 그룹/일정/일기
-                            그룹 { }
-                            일정 { }
-                            일기 { }
-
-                            서버에서는 디비 버전을 받아서 history 테이블 select 해서 JSON으로 전송해야 함
+                            각각
+                            쿼리타입이 insert인 경우 insert 메소드로 전송
+                            쿼리타입이 update인 경우 update 메소드로 전송
+                            쿼리타입이 delete인 경우 delete 메소드로 전송
                              */
                             String str;
                             URL url = new URL("http://ci2019nanal.dongyangmirae.kr/GroupAsyncUpdate.jsp");
@@ -171,8 +169,8 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
                             conn.setRequestMethod("POST");//데이터를 POST 방식으로 전송합니다.
 
                             OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream());
-                            Log.i("GroupAsyncTask Update Group: ", Integer.toString(group_id).trim());
-                            sendMsg = "&group_id=" + Integer.toString(group_id).trim()+"&sync_time="+AllInOneActivity.helper.getGroupSync(group_id);
+                            Log.i("GroupAsyncTask Update Group", Integer.toString(group_id).trim()+", "+AllInOneActivity.helper.getGroupSync(group_id));
+                            sendMsg = "&group_id=" + Integer.toString(group_id).trim()+"&sync_time="+AllInOneActivity.helper.getGroupSync(group_id)+"";
                             osw.write(sendMsg);
                             osw.flush();
                             osw.close();
@@ -185,8 +183,8 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
                                     buffer.append(str);
                                 }
                                 receiveMsg = buffer.toString();
-                                Log.i("GroupAsyncTask Update Group: ", receiveMsg);
-                                parseJSONUpdate(receiveMsg);
+                                Log.i("GroupAsyncTask Update Group", receiveMsg);
+                                //parseJSONUpdate(receiveMsg);
                                 tmp.close();
                                 reader.close();
                             } else {
@@ -277,7 +275,44 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
     }
 
     protected void parseJSONUpdate(String msg) {
+        try {
+            JSONObject jsonObject = new JSONObject(msg);
+            String group = jsonObject.getString("GROUP");
+            String diary = jsonObject.getString("EVENT");
+            String event = jsonObject.getString("DIARY");
+            String sync = jsonObject.getString("SYNC_TIME");
+            JSONArray groupArray = new JSONArray(group);
+            JSONArray diaryArray = new JSONArray(diary);
+            JSONArray eventArray = new JSONArray(event);
+            for (int i = 0; i < groupArray.length(); i++) {
+                JSONObject subObject = groupArray.getJSONObject(i);
+                String group_name = subObject.getString("group_name");
+                int group_color = subObject.getInt("group_color");
+                String account_id = subObject.getString("account_id");
+                String str_sync_time = subObject.getString("sync_time");
+                int group_id = subObject.getInt("group_id");
+                String query_type = subObject.getString("query_type");
 
+                switch (query_type) {
+                    case "I": case "i":
+                        AllInOneActivity.helper.addGroup(group_id, group_name, group_color, str_sync_time, account_id);
+                        break;
+                    case "U": case "u":
+                        AllInOneActivity.helper.updateGroup(group_id, group_name,group_color, str_sync_time, account_id);
+                        break;
+                    case "D": case "d":
+                        AllInOneActivity.helper.deleteGroup(group_id);
+                        break;
+                    default:
+                        Log.wtf("GroupAsyncTask", "query_type 문제! > "+query_type);
+                        return;
+                }
+                AllInOneActivity.helper.setGroupSync(group_id, sync);
+            }
+
+        } catch (JSONException e) {
+
+        }
     }
 
     private void startQuery(CalendarController.EventInfo mEvent) {

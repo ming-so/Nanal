@@ -135,6 +135,10 @@ public class EditDiaryHelper {
             return false;
         }
 
+        if (model.mDiaryContent.trim().length() <= 0 || model.mDiaryContent.isEmpty()) {
+            return false;
+        }
+
 //        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
 //        int diaryIdIndex = -1;
 

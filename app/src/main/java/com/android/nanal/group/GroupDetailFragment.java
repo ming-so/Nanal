@@ -11,11 +11,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.Toolbar;
-
-import androidx.annotation.NonNull;
 
 import com.android.nanal.R;
 import com.android.nanal.activity.AllInOneActivity;
@@ -26,10 +24,12 @@ import com.google.firebase.dynamiclinks.DynamicLink;
 import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 import com.google.firebase.dynamiclinks.ShortDynamicLink;
 
+import androidx.annotation.NonNull;
+
 public class GroupDetailFragment extends Fragment implements CalendarController.EventHandler {
     private int mGroupId;
     private Toolbar mToolbar;
-    private Button btnJoin;
+    private ImageButton btnJoin;
 
     public GroupDetailFragment() {
         super();
@@ -55,7 +55,7 @@ public class GroupDetailFragment extends Fragment implements CalendarController.
         final int groupId = AllInOneActivity.mGroupId;
         Toast.makeText(v.getContext(), "선택 > "+groupId, Toast.LENGTH_LONG).show();
 
-        btnJoin = (Button) v.findViewById(R.id.btn_join);
+        btnJoin = (ImageButton) v.findViewById(R.id.btn_join);
 
         btnJoin.setOnClickListener(new View.OnClickListener() {
             @Override

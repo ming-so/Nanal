@@ -275,9 +275,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
     public int selectedMode = 1;
 
-    private boolean isGroupMenu = false;
-    private boolean permission = false;
-
     public static NanalDBHelper helper = null;
     public static SQLiteDatabase nanalDB = null;
 
@@ -288,6 +285,10 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
     public static int mGroupId = -1;
     public static String mGroupName = "";
+
+    private boolean permission = false;
+    private static boolean isRequiredMenu = true;  // default: 캘린더
+    private static boolean isInGroupDetail = false;
 
 
     @Override
@@ -662,7 +663,12 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AllInOneActivity.this.openDrawer();
+                if(isInGroupDetail) {
+                    // 화면 전환
+                }
+                else {
+                    AllInOneActivity.this.openDrawer();
+                }
             }
         });
         mActionBar = getSupportActionBar();
@@ -1123,9 +1129,34 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
         mViewSettings = menu.findItem(R.id.action_view_settings);
         updateViewSettingsVisibility();
-
+        setVisiblityMenuInGroup();
 
         return true;
+    }
+
+    public void setVisiblityMenuInGroup() {
+        if(mOptionsMenu == null) {
+            return;
+        }
+        Log.i(TAG, "setVisiblityMenuInGroup() 실행");
+        MenuItem item1 = mOptionsMenu.findItem(R.id.action_goto);
+        MenuItem item2 = mOptionsMenu.findItem(R.id.action_search);
+        MenuItem item3 = mOptionsMenu.findItem(R.id.action_import);
+        if(isInGroupDetail || !isRequiredMenu) {
+            item1.setVisible(false);
+            item1.setEnabled(false);
+            item2.setVisible(false);
+            item2.setEnabled(false);
+            item3.setVisible(false);
+            item3.setEnabled(false);
+        } else {
+            item1.setVisible(true);
+            item1.setEnabled(true);
+            item2.setVisible(true);
+            item2.setEnabled(true);
+            item3.setVisible(true);
+            item3.setEnabled(true);
+        }
     }
 
     public void GroupSync() {
@@ -1398,27 +1429,34 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         switch (viewType) {
             case ViewType.AGENDA:
                 //mNavigationView.getMenu().findItem(R.id.agenda_menu_item).setChecked(true);
+                isRequiredMenu = true;
                 frag = new AgendaFragment(timeMillis, false);
+                mToolbar.setNavigationIcon(R.drawable.ic_menu_navigator);
                 if (mIsTabletConfig) {
                     mToolbar.setTitle(R.string.agenda_view);
                 }
                 setAgainFAB(false);
                 mFAB.setVisibility(View.VISIBLE);
                 mFABGroup.setVisibility(View.GONE);
+                isInGroupDetail = false;
                 break;
             case ViewType.DAY:
                 //mNavigationView.getMenu().findItem(R.id.day_menu_item).setChecked(true);
+                isRequiredMenu = true;
                 frag = new DayFragment(timeMillis, 1);
+                mToolbar.setNavigationIcon(R.drawable.ic_menu_navigator);
                 if (mIsTabletConfig) {
                     mToolbar.setTitle(R.string.day_view);
                 }
                 setAgainFAB(false);
                 mFAB.setVisibility(View.VISIBLE);
                 mFABGroup.setVisibility(View.GONE);
+                isInGroupDetail = false;
                 break;
             case ViewType.MONTH:
                 //mNavigationView.getMenu().findItem(R.id.month_menu_item).setChecked(true);
-                isGroupMenu = false;
+                isRequiredMenu = true;
+                mToolbar.setNavigationIcon(R.drawable.ic_menu_navigator);
                 frag = new MonthByWeekFragment(timeMillis, false);
                 if (mShowAgendaWithMonth) {
                     secFrag = new AgendaFragment(timeMillis, false);
@@ -1429,41 +1467,53 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 setAgainFAB(false);
                 mFAB.setVisibility(View.VISIBLE);
                 mFABGroup.setVisibility(View.GONE);
+                isInGroupDetail = false;
                 break;
             case ViewType.TODAY:
-                isGroupMenu = false;
+                isRequiredMenu = false;
+                mToolbar.setNavigationIcon(R.drawable.ic_menu_navigator);
                 mToolbar.setTitle(R.string.today_view);
                 frag = new TodayFragment(timeMillis);
                 mFAB.setVisibility(View.GONE);
                 mFABGroup.setVisibility(View.GONE);
+                isInGroupDetail = false;
                 break;
             case ViewType.GROUP:
+                isRequiredMenu = false;
                 mToolbar.setTitle(R.string.group_view);
+                mToolbar.setNavigationIcon(R.drawable.ic_menu_navigator);
                 frag = new GroupFragment();
                 setAgainFAB(true);
                 mFAB.setVisibility(View.GONE);
                 mFABGroup.setVisibility(View.VISIBLE);
+                isInGroupDetail = false;
                 break;
             case ViewType.GROUP_DETAIL:
+                isRequiredMenu = false;
                 if(mGroupId < 0 || mGroupName == "" || mGroupName.isEmpty()) {
                    return;
                 }
-                mToolbar.setTitle(mGroupName);
+                mToolbar.setTitle("그룹 > "+mGroupName);
+                mToolbar.setNavigationIcon(R.drawable.ic_settings_black_24dp);
                 frag = new GroupDetailFragment(mGroupId);
                 setAgainFAB(false);
                 mFAB.setVisibility(View.GONE);
                 mFABGroup.setVisibility(View.GONE);
+                isInGroupDetail = true;
                 break;
             case ViewType.WEEK:
             default:
+                isRequiredMenu = true;
                 //mNavigationView.getMenu().findItem(R.id.week_menu_item).setChecked(true);
                 setAgainFAB(false);
+                mToolbar.setNavigationIcon(R.drawable.ic_menu_navigator);
                 frag = new DayFragment(timeMillis, Utils.getDaysPerWeek(this));
                 if (mIsTabletConfig) {
                     mToolbar.setTitle(R.string.week_view);
                 }
                 mFAB.setVisibility(View.VISIBLE);
                 mFABGroup.setVisibility(View.GONE);
+                isInGroupDetail = false;
                 break;
         }
         // Update the current view so that the menu can update its look according to the
@@ -1477,7 +1527,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             refreshActionbarTitle(timeMillis);
         }
 
-
+        setVisiblityMenuInGroup();
 
         // Show date only on tablet configurations in views different than Agenda
         // Agenda와 다른 view의 태블릿 구성에만 날짜 표시함
@@ -1547,6 +1597,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     }
 
     private void setTitleInActionBar(EventInfo event) {
+        setVisiblityMenuInGroup();
         if (event.eventType != EventType.UPDATE_TITLE) {
             return;
         }
@@ -1694,6 +1745,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 }
             }
             updateViewSettingsVisibility();
+            setVisiblityMenuInGroup();
             displayTime = event.selectedTime != null ? event.selectedTime.toMillis(true)
                     : event.startTime.toMillis(true);
             if (!mIsTabletConfig) {
@@ -1771,6 +1823,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             displayTime = event.startTime.toMillis(true);
         } else if (event.eventType == EventType.UPDATE_TITLE) {
             setTitleInActionBar(event);
+            setVisiblityMenuInGroup();
             if (!mIsTabletConfig) {
                 refreshActionbarTitle(mController.getTime());
             }

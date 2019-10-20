@@ -252,15 +252,13 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
         if (mModel == null) {
             return false;
         }
+
         mModel.mDiaryDay = mLongDay;
         mModel.mDiaryTitle = mEtTitle.getText().toString();
         mModel.mDiaryContent = mEtContent.getText().toString();
         //todo:색상 사진 위치 날씨 등 처리
         if(TextUtils.isEmpty(mModel.mDiaryTitle)) {
             mModel.mDiaryTitle = null;
-        }
-        if(TextUtils.isEmpty(mModel.mDiaryContent)) {
-            mModel.mDiaryContent = null;
         }
         mModel.mDiaryDay = mLongDay;
         return true;
