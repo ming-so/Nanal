@@ -32,8 +32,6 @@ import android.widget.AbsListView.LayoutParams;
 
 import com.android.nanal.R;
 import com.android.nanal.calendar.CalendarController;
-import com.android.nanal.calendar.CalendarController.EventType;
-import com.android.nanal.calendar.CalendarController.ViewType;
 import com.android.nanal.diary.Diary;
 import com.android.nanal.event.Event;
 import com.android.nanal.event.Utils;
@@ -82,6 +80,8 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
     // This is done to prevent a click animation when a fling is done.
     // 탭 색을 보여 주기 전에 딜레이를 허용하려면 실행 가능한 탭 애니메이션을 수행함
     // 플링이 수행될 때 클릭 애니메이션을 방지하기 위해 수행됨
+
+    private DayDialog mDayDialog;
 
     private final Runnable mDoClick = new Runnable() {
         @Override
@@ -430,6 +430,9 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
     @Override
     protected void onDayTapped(Time day) {
         setDayParameters(day);
+        mDayDialog = new DayDialog(mContext);
+        mDayDialog.show();
+        /*
         if (mShowAgendaWithMonth || mIsMiniMonth) {
             // If agenda view is visible with month view , refresh the views
             // with the selected day's info
@@ -444,6 +447,7 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
                     CalendarController.EXTRA_GOTO_DATE
                             | CalendarController.EXTRA_GOTO_BACK_TO_PREVIOUS, null, null);
         }
+        */
     }
 
     private void setDayParameters(Time day) {
