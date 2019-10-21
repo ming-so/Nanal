@@ -84,7 +84,6 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
     private AlertDialog mModifyDialog;
     private DiaryBundle mDiaryBundle;
     private int mDiaryColor;
-    private boolean mDiaryColorInitialized = false;
     private long mDay;
     private DiaryColorPickerDialog mColorPickerDialog;
     private AppCompatActivity mContext;
@@ -111,7 +110,6 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
                     getResources().getColor(R.color.colorOrangePrimary),
                     getResources().getColor(R.color.colorRedPrimary)
             };
-//            mModel.getGroupColors();
             if (mColorPickerDialog == null) {
                 mColorPickerDialog = DiaryColorPickerDialog.newInstance(colors,
                         mModel.getDiaryColor(), mView.mIsMultipane);
@@ -198,6 +196,7 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
                 Log.d(TAG, "startQuery: Editing a new event.");
             }
             mModel.mDiaryDay = mDay;
+            mModel.mDiaryColor = mDiaryColor;
             mHandler.startQuery(TOKEN_COLORS, null, CalendarContract.Colors.CONTENT_URI,
                     EditDiaryHelper.COLORS_PROJECTION,
                     CalendarContract.Colors.COLOR_TYPE + "=" + CalendarContract.Colors.TYPE_EVENT, null, null);
@@ -430,8 +429,15 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
 
     @Override
     public void onColorSelected(int color) {
+        if (mModel.isInGroup()) {
+            Toast.makeText(getActivity(), "그룹에 있음", Toast.LENGTH_LONG).show();
+            mModel.setDiaryColor(AllInOneActivity.helper.getGroupColor(mModel.mDiaryGroupId));
+            return;
+        }
         if (mModel.getDiaryColor() != color) {
+            Toast.makeText(getActivity(), "색상 선택="+color , Toast.LENGTH_LONG).show();
             mModel.setDiaryColor(color);
+            mDiaryColor = color;
             mView.updateHeadlineColor(mModel, color);
             mView.mIvColor.setColorFilter(color);
         }
@@ -486,10 +492,6 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
                     mModel.mDiaryId = mId;
 
                     mModel.mDiaryDay = mDay;
-                    if (mDiaryColorInitialized) {
-                        mModel.setDiaryColor(mDiaryColor);
-                    }
-                    diaryId = mModel.mDiaryId;
 
                     // TOKEN_COLORS
                     mHandler.startQuery(TOKEN_COLORS, null, CalendarContract.Colors.CONTENT_URI,
@@ -515,9 +517,7 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
                         } while (cursor.moveToNext());
                         cache.sortPalettes(new HsvColorComparator());
 
-                        mModel.mDiaryColorCache = cache;
-                        mView.mColorPickerNewEvent.setOnClickListener(mOnColorPickerClicked);
-                        mView.mColorPickerExistingEvent.setOnClickListener(mOnColorPickerClicked);
+                        mView.mLlColor.setOnClickListener(mOnColorPickerClicked);
                     }
                     if (cursor != null) {
                         cursor.close();
@@ -525,11 +525,10 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
 
                     // If the account name/type is null, the calendar event colors cannot be
                     // determined, so take the default/savedInstanceState value.
-                    if (mModel.mCalendarAccountName == null
-                            || mModel.mCalendarAccountType == null) {
-                        mView.setColorPickerButtonStates(mShowColorPalette);
+                    if (mModel.mDiaryGroupId == -1) {
+                        //mView.setColorPickerButtonStates(mShowColorPalette);
                     } else {
-                        mView.setColorPickerButtonStates(mModel.getGroupColors());
+                        //mView.setColorPickerButtonStates(mModel.getGroupColors());
                     }
                     setModelIfDone(TOKEN_COLORS);
                     break;

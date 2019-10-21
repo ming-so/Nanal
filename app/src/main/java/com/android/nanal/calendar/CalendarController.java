@@ -832,6 +832,7 @@ public class CalendarController {
         // Simple view of an event
         // 이벤트 심플 view
         final long VIEW_EVENT = 1L << 1;
+        final long VIEW_DIARY = 1L << 20;
 
         // Full detail view in read only mode
         // 읽기 전용 디테일 view
@@ -848,6 +849,7 @@ public class CalendarController {
         final long LAUNCH_SETTINGS = 1L << 6;
 
         final long EVENTS_CHANGED = 1L << 7;
+        final long DIARIES_CHANGED = 1L << 19;
 
         final long SEARCH = 1L << 8;
 
@@ -1047,7 +1049,8 @@ public class CalendarController {
         public int userId; // 유저 ID
         public int groupId;
 
-        public long eventType;
+        public long eventType; // one of the EventType
+        public int viewType; // one of the ViewType
 
         public int x;
         public int y;

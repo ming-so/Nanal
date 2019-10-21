@@ -430,7 +430,7 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
     @Override
     protected void onDayTapped(Time day) {
         setDayParameters(day);
-        mDayDialog = new DayDialog(mContext);
+        mDayDialog = new DayDialog(mContext, day);
         mDayDialog.show();
         /*
         if (mShowAgendaWithMonth || mIsMiniMonth) {

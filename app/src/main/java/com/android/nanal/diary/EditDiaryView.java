@@ -24,6 +24,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.ResourceCursorAdapter;
@@ -73,13 +74,12 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
     ArrayList<View> mViewOnlyList = new ArrayList<View>();
     TextView mLoadingMessage;
     ScrollView mScrollView;
-    TextView mTvDay, mTvColor, mTvPic, mTvLocation;
+    TextView mTvDay, mTvPic, mTvLocation;
     EditText mEtTitle, mEtContent;
     ImageView mIvColor, mIvGroup, mIvPic, mIvWeather;
     MaterialSpinner mGroupSpinner;
+    LinearLayout mLlColor;
 
-    View mColorPickerNewEvent;
-    View mColorPickerExistingEvent;
     View.OnClickListener mChangeColorOnClickListener;
     TextView mTitleTextView;
     AutoCompleteTextView mLocationTextView;
@@ -113,9 +113,9 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
         mScrollView = (ScrollView) view.findViewById(R.id.d_scroll_view);
 
         mTvDay = view.findViewById(R.id.tv_edit_diary_day);
-        mTvColor = view.findViewById(R.id.tv_edit_diary_color);
         mTvPic = view.findViewById(R.id.tv_edit_diary_pic);
         mTvLocation = view.findViewById(R.id.tv_edit_diary_location);
+        mLlColor = view.findViewById(R.id.ll_edit_diary_color);
 
         mEtTitle = view.findViewById(R.id.et_edit_diary_title);
         mEtContent = view.findViewById(R.id.et_edit_diary_content);
@@ -131,6 +131,8 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
             @Override
             public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
                 if(position == 0) {
+                    mLlColor.setVisibility(View.VISIBLE);
+                    mLlColor.setEnabled(true);
                     if(true) {
                         // 만약 오늘의 개인 일기가 존재한다면
                         mModel.mDiaryGroupId = -1;
@@ -157,6 +159,9 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
                 } else {
                     Snackbar.make(view, "작성하신 일기가 [" + item + "] 그룹에 저장됩니다.", Snackbar.LENGTH_LONG).show();
                     mModel.mDiaryGroupId = AllInOneActivity.mGroups.get(position-1).getGroup_id();
+                    mModel.setDiaryColor(AllInOneActivity.helper.getGroupColor(mModel.mDiaryGroupId));
+                    mLlColor.setVisibility(View.GONE);
+                    mLlColor.setEnabled(false);
                 }
             }
         });
@@ -172,9 +177,6 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
         }
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mGroupSpinner.setAdapter(arrayAdapter);
-
-        mColorPickerNewEvent = view.findViewById(R.id.tv_edit_diary_color);
-        mColorPickerExistingEvent = view.findViewById(R.id.tv_edit_diary_color);
 
         mCalendarSelectorGroup = view.findViewById(R.id.ll_edit_diary_group);
 
@@ -487,23 +489,22 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
         return 0;
     }
 
-    public void setColorPickerButtonStates(int[] colorArray) {
-        setColorPickerButtonStates(colorArray != null && colorArray.length > 0);
-    }
-
-    public void setColorPickerButtonStates(boolean showColorPalette) {
-        if (showColorPalette) {
-            mColorPickerNewEvent.setVisibility(View.VISIBLE);
-            mColorPickerExistingEvent.setVisibility(View.VISIBLE);
-        } else {
-            mColorPickerNewEvent.setVisibility(View.INVISIBLE);
-            mColorPickerExistingEvent.setVisibility(View.GONE);
-        }
-    }
+//    public void setColorPickerButtonStates(int[] colorArray) {
+//        setColorPickerButtonStates(colorArray != null && colorArray.length > 0);
+//    }
+//
+//    public void setColorPickerButtonStates(boolean showColorPalette) {
+//        if (showColorPalette) {
+//            mColorPickerNewEvent.setVisibility(View.VISIBLE);
+//            mColorPickerExistingEvent.setVisibility(View.VISIBLE);
+//        } else {
+//            mColorPickerNewEvent.setVisibility(View.INVISIBLE);
+//            mColorPickerExistingEvent.setVisibility(View.GONE);
+//        }
+//    }
 
     public boolean isColorPaletteVisible() {
-        return mColorPickerNewEvent.getVisibility() == View.VISIBLE ||
-                mColorPickerExistingEvent.getVisibility() == View.VISIBLE;
+        return (mModel.mDiaryGroupId != -1);
     }
 
 
@@ -517,7 +518,7 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
             return;
         }
         mModel.mGroupName = c.getString(EditDiaryHelper.GROUP_INDEX_NAME);
-        setColorPickerButtonStates(mModel.getGroupColors());
+        //setColorPickerButtonStates(mModel.getGroupColors());
     }
 
     @Override

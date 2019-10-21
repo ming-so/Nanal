@@ -118,15 +118,6 @@ public class EditGroupView implements DialogInterface.OnCancelListener {
         mModel.group_id = 1;
         mModel.group_name = mEtName.getText().toString();
         mModel.account_id = account_id;
-
-        // If this was a new event we need to fill in the Calendar information
-//        if (mModel.mUri == null) {
-//                String groupName = mGroupsCursor.getString(EditGroupHelper.PROJECTION_GROUP_NAME_INDEX);
-//                //todo:기본(로컬) 캘린더 설정
-//                String defaultGroup = "Nanal";
-//                Utils.setSharedPreference(mActivity, GeneralPreferences.KEY_DEFAULT_GROUP, defaultGroup);
-//                mModel.group_id = mGroupsCursor.getInt(EditGroupHelper.PROJECTION_GROUP_ID_INDEX);
-//        }
         return true;
     }
 
