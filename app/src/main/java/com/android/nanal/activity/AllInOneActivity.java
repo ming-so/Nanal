@@ -122,7 +122,7 @@ import static android.provider.CalendarContract.EXTRA_EVENT_BEGIN_TIME;
 import static android.provider.CalendarContract.EXTRA_EVENT_END_TIME;
 import static com.android.nanal.alerts.AlertService.ALERT_CHANNEL_ID;
 
-public class AllInOneActivity extends AbstractCalendarActivity implements EventHandler,
+public class AllInOneActivity extends AbstractCalendarActivity implements EventHandler, CalendarController.DiaryHandler,
         OnSharedPreferenceChangeListener, SearchView.OnQueryTextListener, SearchView.OnSuggestionListener, NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "AllInOneActivity";
     private static final boolean DEBUG = false;
@@ -163,6 +163,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         @Override
         public void onChange(boolean selfChange) {
             eventsChanged();
+            diariesChanged();
         }
     };
 
@@ -504,7 +505,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 switch (item.getItemId()) {
                     case R.id.action_calendar:
                         // mode 1
-                        if(selectedMode == 1) {
+                        if (selectedMode == 1) {
                             // 오늘 날짜로 갱신
                             Time t = new Time(mTimeZone);
                             t.setToNow();
@@ -663,10 +664,9 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(isInGroupDetail) {
+                if (isInGroupDetail) {
                     // 화면 전환
-                }
-                else {
+                } else {
                     AllInOneActivity.this.openDrawer();
                 }
             }
@@ -712,19 +712,19 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             @Override
             public void onClick(View v) {
                 //Create new Event
-                    Time t = new Time();
-                    t.set(mController.getTime());
-                    t.second = 0;
-                    if (t.minute > 30) {
-                        t.hour++;
-                        t.minute = 0;
-                    } else if (t.minute > 0 && t.minute < 30) {
-                        t.minute = 30;
-                    }
-                    if(createLocalCalendar()) {
-                        mController.sendEventRelatedEvent(
-                                this, EventType.CREATE_EVENT, -1, t.toMillis(true), 0, 0, 0, -1);
-                    }
+                Time t = new Time();
+                t.set(mController.getTime());
+                t.second = 0;
+                if (t.minute > 30) {
+                    t.hour++;
+                    t.minute = 0;
+                } else if (t.minute > 0 && t.minute < 30) {
+                    t.minute = 30;
+                }
+                if (createLocalCalendar()) {
+                    mController.sendEventRelatedEvent(
+                            this, EventType.CREATE_EVENT, -1, t.toMillis(true), 0, 0, 0, -1);
+                }
             }
         });
 
@@ -1135,14 +1135,14 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     }
 
     public void setVisiblityMenuInGroup() {
-        if(mOptionsMenu == null) {
+        if (mOptionsMenu == null) {
             return;
         }
         Log.i(TAG, "setVisiblityMenuInGroup() 실행");
         MenuItem item1 = mOptionsMenu.findItem(R.id.action_goto);
         MenuItem item2 = mOptionsMenu.findItem(R.id.action_search);
         MenuItem item3 = mOptionsMenu.findItem(R.id.action_import);
-        if(isInGroupDetail || !isRequiredMenu) {
+        if (isInGroupDetail || !isRequiredMenu) {
             item1.setVisible(false);
             item1.setEnabled(false);
             item2.setVisible(false);
@@ -1177,16 +1177,16 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         long extras = CalendarController.EXTRA_GOTO_TIME;
         final int itemId = item.getItemId();
         if (itemId == R.id.action_refresh) {
-            mController.refreshCalendars();
             mGroups = helper.getGroupList();
             Log.i(TAG, "mGroups.size() " + mGroups.size());
-            try{
+            try {
                 Snackbar.make(getCurrentFocus(), "서버와 동기화를 진행합니다.", Snackbar.LENGTH_SHORT).show();
-            } catch(IllegalArgumentException e) {
+            } catch (IllegalArgumentException e) {
 
             }
             GroupSync();
             DiarySync();
+            mController.refreshCalendars();
             return true;
         } else if (itemId == R.id.action_today) {
             viewType = ViewType.CURRENT;
@@ -1490,10 +1490,10 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 break;
             case ViewType.GROUP_DETAIL:
                 isRequiredMenu = false;
-                if(mGroupId < 0 || mGroupName == "" || mGroupName.isEmpty()) {
-                   return;
+                if (mGroupId < 0 || mGroupName == "" || mGroupName.isEmpty()) {
+                    return;
                 }
-                mToolbar.setTitle("그룹 > "+mGroupName);
+                mToolbar.setTitle("그룹 > " + mGroupName);
                 mToolbar.setNavigationIcon(R.drawable.ic_settings_black_24dp);
                 frag = new GroupDetailFragment(mGroupId);
                 setAgainFAB(false);
@@ -1687,6 +1687,11 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     }
 
     @Override
+    public long getSupportedDiaryTypes() {
+        return EventType.GO_TO | EventType.VIEW_DIARY | EventType.UPDATE_TITLE;
+    }
+
+    @Override
     public void handleEvent(EventInfo event) {
         long displayTime = -1;
         if (event.eventType == EventType.GO_TO) {
@@ -1789,6 +1794,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                                 mCurrentView == ViewType.MONTH) && mShowEventInfoFullScreen)) {
                     // start event info as activity
                     // activity로 이벤트 정보 시작
+                    // *** 이벤트 상세 정보 ***
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     Uri eventUri = ContentUris.withAppendedId(Events.CONTENT_URI, event.id);
                     intent.setData(eventUri);
@@ -1831,6 +1837,103 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         updateSecondaryTitleFields(displayTime);
     }
 
+    @Override
+    public void handleEvent(CalendarController.DiaryInfo diary) {
+        long displayTime = -1;
+        if (diary.eventType == EventType.GO_TO) {
+            if (diary.viewType != mController.getPreviousViewType()
+                    && diary.viewType != ViewType.EDIT) {
+                mBackToPreviousView = false;
+            }
+
+            setMainPane(null, R.id.main_pane, diary.viewType, diary.day, false);
+            if (mSearchView != null) {
+                mSearchView.clearFocus();
+            }
+            if (mShowCalendarControls) {
+                int animationSize = (mOrientation == Configuration.ORIENTATION_LANDSCAPE) ?
+                        mControlsAnimateWidth : mControlsAnimateHeight;
+                boolean noControlsView = diary.viewType == ViewType.MONTH || diary.viewType == ViewType.AGENDA;
+                if (mControlsMenu != null) {
+                    mControlsMenu.setVisible(!noControlsView);
+                    mControlsMenu.setEnabled(!noControlsView);
+                }
+
+                if (noControlsView || mHideControls) {
+                    // hide minimonth and calendar frag
+                    mShowSideViews = false;
+                    if (!mHideControls) {
+                        final ObjectAnimator slideAnimation = ObjectAnimator.ofInt(this,
+                                "controlsOffset", 0, animationSize);
+                        slideAnimation.addListener(mSlideAnimationDoneListener);
+                        slideAnimation.setDuration(mCalendarControlsAnimationTime);
+                        ObjectAnimator.setFrameDelay(0);
+                        slideAnimation.start();
+                    } else {
+                        mMiniMonth.setVisibility(View.GONE);
+                        mCalendarsList.setVisibility(View.GONE);
+                        mMiniMonthContainer.setVisibility(View.GONE);
+                    }
+                } else {
+                    // show minimonth and calendar frag
+                    mShowSideViews = true;
+                    mMiniMonth.setVisibility(View.VISIBLE);
+                    mCalendarsList.setVisibility(View.VISIBLE);
+                    mMiniMonthContainer.setVisibility(View.VISIBLE);
+                    if (!mHideControls &&
+                            (mController.getPreviousViewType() == ViewType.MONTH ||
+                                    mController.getPreviousViewType() == ViewType.AGENDA)) {
+                        final ObjectAnimator slideAnimation = ObjectAnimator.ofInt(this,
+                                "controlsOffset", animationSize, 0);
+                        slideAnimation.setDuration(mCalendarControlsAnimationTime);
+                        ObjectAnimator.setFrameDelay(0);
+                        slideAnimation.start();
+                    }
+                }
+            }
+            updateViewSettingsVisibility();
+            setVisiblityMenuInGroup();
+        } else if (diary.eventType == EventType.VIEW_DIARY) {
+            if ((mCurrentView == ViewType.AGENDA && mShowEventInfoFullScreenAgenda) ||
+                    ((mCurrentView == ViewType.DAY || (mCurrentView == ViewType.WEEK) ||
+                            mCurrentView == ViewType.MONTH) && mShowEventInfoFullScreen)) {
+                // start event info as activity
+                // activity로 이벤트 정보 시작
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.putExtra("diary_id", diary.id);
+                intent.setClass(this, EventInfoActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT |
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
+            } else {
+                // start event info as a dialog
+                // dialog로 이벤트 정보 시작
+//                EventInfoFragment fragment = new EventInfoFragment(this,
+//                        diary.id, event.startTime.toMillis(false),
+//                        event.endTime.toMillis(false), response, true,
+//                        EventInfoFragment.DIALOG_WINDOW_STYLE,
+//                        null /* No reminders to explicitly pass in. */);
+//                fragment.setDialogParams(diary.x, diary.y, mActionBar.getHeight());
+//                FragmentManager fm = getFragmentManager();
+//                FragmentTransaction ft = fm.beginTransaction();
+//                // if we have an old popup replace it
+//                // 예전 팝업이 있다면 교체함
+//                Fragment fOld = fm.findFragmentByTag(EVENT_INFO_FRAGMENT_TAG);
+//                if (fOld != null && fOld.isAdded()) {
+//                    ft.remove(fOld);
+//                }
+//                ft.add(fragment, EVENT_INFO_FRAGMENT_TAG);
+//                ft.commit();
+            }
+        } else if (diary.eventType == EventType.UPDATE_TITLE) {
+            setVisiblityMenuInGroup();
+            if (!mIsTabletConfig) {
+                refreshActionbarTitle(mController.getTime());
+            }
+        }
+        updateSecondaryTitleFields(displayTime);
+    }
+
     // Needs to be in proguard whitelist
     // Specified as listener via android:onClick in a layout xml
     // proguard whitelist에 있어야 함
@@ -1844,6 +1947,11 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     @Override
     public void eventsChanged() {
         mController.sendEvent(this, EventType.EVENTS_CHANGED, null, null, -1, ViewType.CURRENT);
+    }
+
+    @Override
+    public void diariesChanged() {
+        mController.sendEvent(this, EventType.DIARIES_CHANGED, null, null, -1, ViewType.CURRENT);
     }
 
     @Override

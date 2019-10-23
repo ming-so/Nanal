@@ -795,7 +795,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
     }
 
     protected void drawDiaries(Canvas canvas) {
-        Log.i(TAG, "drawDiaries 실행");
+        //Log.i(TAG, "drawDiaries 실행");
         if (mDiaries == null || mDiaries.isEmpty()) {
             Log.i(TAG, "drawDiaries, mDiaries == null");
             return;
@@ -1503,7 +1503,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
         /**
          * Checks if all events can fit the screen (assumes that in the worst case they need to be
          * capped at one line per event)
-         * 모든 이벤트가 화면에 맞을 수 있는지 확인 (회악의 경우, 이벤트당 한 줄로 연결해야 한다고 가정)
+         * 모든 이벤트가 화면에 맞을 수 있는지 확인 (최악의 경우, 이벤트당 한 줄로 연결해야 한다고 가정)
          * @param availableSpace
          * @return
          */

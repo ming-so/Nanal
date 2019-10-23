@@ -80,7 +80,7 @@ public class EditGroupFragment extends Fragment implements CalendarController.Gr
     private int mOutstandingQueries = TOKEN_UNITIALIZED;
     private AlertDialog mModifyDialog;
     private EditGroupFragment.GroupBundle mGroupBundle;
-    private int mGroupolor;
+    private int mGroupColor;
     private Uri mUri;
     private long mDay;
     private GroupColorPickerDialog mColorPickerDialog;
@@ -133,7 +133,6 @@ public class EditGroupFragment extends Fragment implements CalendarController.Gr
         mGroup = group;
         mIsReadOnly = readOnly;
         mIntent = intent;
-
         setHasOptionsMenu(true);
     }
 

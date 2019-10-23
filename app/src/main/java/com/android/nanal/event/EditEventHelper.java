@@ -592,8 +592,6 @@ public class EditEventHelper {
                 }
             }
         }
-
-
         mService.startBatch(mService.getNextToken(), null, android.provider.CalendarContract.AUTHORITY, ops,
                 Utils.UNDO_DELAY);
 
