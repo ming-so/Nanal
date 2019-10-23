@@ -114,7 +114,7 @@ public class DeleteGroupHelper {
         String sendMsg, receiveMsg = "";
         try {
             String str;
-            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/GroupDelete.jsp");
+            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/android/GroupDelete.jsp");
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");

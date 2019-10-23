@@ -19,7 +19,7 @@ public class LoginHelper extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... strings) {
         try {
             String str;
-            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/LoginHelper.jsp");
+            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/android/LoginHelper.jsp");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             conn.setRequestMethod("POST");

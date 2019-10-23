@@ -18,7 +18,7 @@ public class CreateNewGroup extends AsyncTask<String, String, String> {
         String str, sendMsg, receiveMsg = "";
         Log.d("CreateNewGroup", "doInBackground");
         try {
-            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/GroupCreate.jsp");
+            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/android/GroupCreate.jsp");
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");

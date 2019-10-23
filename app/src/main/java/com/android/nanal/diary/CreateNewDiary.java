@@ -16,7 +16,7 @@ public class CreateNewDiary extends AsyncTask<String, String, String> {
     protected String doInBackground(String... strings) {
         String str, sendMsg, receiveMsg = "";
         try {
-            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/DiaryCreate.jsp");
+            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/android/DiaryCreate.jsp");
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");

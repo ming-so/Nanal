@@ -20,7 +20,7 @@ public class GroupInvitation extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_group_invitation);
+        setContentView(R.layout.group_invitation);
 
         tvGroupName = (TextView) findViewById(R.id.tvGroupName);
         btnJoin = (Button) findViewById(R.id.btnJoin);

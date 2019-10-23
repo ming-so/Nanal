@@ -23,7 +23,7 @@ public class GroupInvitationHelper extends AsyncTask<String, Void, String> {
     protected String doInBackground(String... strings) {
         try {
             String str;
-            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/GroupInvitationHelper.jsp");
+            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/android/GroupInvitationHelper.jsp");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             conn.setRequestMethod("POST");
