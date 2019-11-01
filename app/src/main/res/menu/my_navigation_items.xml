@@ -8,8 +8,8 @@
         android:icon="@drawable/ic_action_name" />
     <item android:id="@+id/action_group"
         android:title="@string/menu_group"
-        android:icon="@drawable/ic_action_name" />
+        android:icon="@drawable/ic_action_group" />
     <item android:id="@+id/action_settings"
         android:title="@string/menu_settings"
-        android:icon="@drawable/ic_action_name" />
+        android:icon="@drawable/ic_action_setting" />
 </menu>

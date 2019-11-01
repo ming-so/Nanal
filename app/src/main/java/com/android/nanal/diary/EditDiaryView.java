@@ -100,6 +100,8 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
     private String mTimezone;
     private int mModification = EditDiaryHelper.MODIFY_UNINITIALIZED;
 
+    boolean moveSave = false;
+
     List<String> mGroupsName;
 
 
@@ -130,6 +132,7 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
         mGroupSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
             @Override
             public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
+                moveSave = true;
                 if(position == 0) {
                     mLlColor.setVisibility(View.VISIBLE);
                     mLlColor.setEnabled(true);
@@ -404,6 +407,7 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
 
         if (mSaveAfterQueryComplete) {
             mLoadingCalendarsDialog.cancel();
+
             if (prepareForSave() && fillModelFromUI()) {
                 int exit = userVisible ? Utils.DONE_EXIT : 0;
                 mDone.setDoneCode(Utils.DONE_SAVE | exit);

@@ -64,16 +64,10 @@ public class CalendarDiaryModel implements Serializable {
     }
 
     public boolean isEmpty() {
-        if(mDiaryId > 0) {
-            return false;
-        }
         if(mDiaryUserId != null && mDiaryUserId.trim().length() > 0) {
             return false;
         }
         if(mDiaryContent != null && mDiaryContent.trim().length() > 0) {
-            return false;
-        }
-        if(mConnectType != null && mConnectType.trim().length() > 0) {
             return false;
         }
         if(mDiaryDay > 0) {
