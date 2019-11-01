@@ -78,7 +78,7 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
     protected String doInBackground(String... String) {
         try {
             String str;
-            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/GroupAsync.jsp");
+            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/android/GroupAsync.jsp");
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -162,7 +162,7 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
                             쿼리타입이 delete인 경우 delete 메소드로 전송
                              */
                             String str;
-                            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/GroupAsyncUpdate.jsp");
+                            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/android/GroupAsyncUpdate.jsp");
 
                             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");

@@ -44,7 +44,7 @@ public class DiaryAsyncTask extends AsyncTask<String, String, String> {
     protected String doInBackground(String... String) {
         try {
             String str;
-            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/DiaryAsync.jsp");
+            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/android/DiaryAsync.jsp");
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
