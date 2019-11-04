@@ -24,7 +24,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/textView"
+                android:id="@+id/tv_gname"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -34,7 +34,7 @@
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/tv_gemail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -93,6 +93,7 @@
                     android:orientation="vertical">
 
                     <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_gevent"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content">
 
@@ -101,7 +102,7 @@
             </ScrollView>
 
             <TextView
-                android:id="@+id/textView5"
+                android:id="@+id/tv_allgevent"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_gravity="right"
@@ -143,13 +144,14 @@
                     android:orientation="vertical">
 
                     <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_gdiary"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
             </ScrollView>
 
             <TextView
-                android:id="@+id/textView6"
+                android:id="@+id/tv_allgdiary"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_gravity="right"
@@ -190,13 +192,14 @@
                     android:orientation="vertical">
 
                     <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_ghistory"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
                 </LinearLayout>
             </ScrollView>
 
             <TextView
-                android:id="@+id/textView8"
+                android:id="@+id/tv_allghistory"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_gravity="right"

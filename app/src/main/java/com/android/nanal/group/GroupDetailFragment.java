@@ -12,9 +12,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.Toast;
+import android.widget.TextView;
 import android.widget.Toolbar;
 
+import com.android.nanal.NanalDBHelper;
 import com.android.nanal.R;
 import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.calendar.CalendarController;
@@ -25,11 +26,18 @@ import com.google.firebase.dynamiclinks.FirebaseDynamicLinks;
 import com.google.firebase.dynamiclinks.ShortDynamicLink;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class GroupDetailFragment extends Fragment implements CalendarController.EventHandler {
     private int mGroupId;
+
+    private NanalDBHelper helper;
+
     private Toolbar mToolbar;
-    private ImageButton btnJoin;
+    private ImageButton btn_join;
+    private RecyclerView rv_gevent, rv_gdiary, rv_ghistory;
+    private TextView tv_gname, tv_gemail, tv_allgevent, tv_allgdiary, tv_allghistory;
 
     public GroupDetailFragment() {
         super();
@@ -38,7 +46,7 @@ public class GroupDetailFragment extends Fragment implements CalendarController.
     @SuppressLint("ValidFragment")
     public GroupDetailFragment(int group_id) {
         mGroupId = group_id;
-        Log.i("GroupDetailFragment", "전송받은 group_id="+mGroupId);
+        Log.i("GroupDetailFragment", "전송받은 group_id=" + mGroupId);
     }
 
     @Override
@@ -53,17 +61,34 @@ public class GroupDetailFragment extends Fragment implements CalendarController.
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.group_detail, null);
         final int groupId = AllInOneActivity.mGroupId;
-        Toast.makeText(v.getContext(), "선택 > "+groupId, Toast.LENGTH_LONG).show();
+        final String groupName, groupEmail;
 
-        btnJoin = (ImageButton) v.findViewById(R.id.btn_join);
+        btn_join = (ImageButton) v.findViewById(R.id.btn_join);
+        rv_gevent = (RecyclerView) v.findViewById(R.id.rv_gevent);
+        rv_gdiary = (RecyclerView) v.findViewById(R.id.rv_gdiary);
+        rv_ghistory = (RecyclerView) v.findViewById(R.id.rv_ghistory);
+        tv_gname = (TextView) v.findViewById(R.id.tv_gname);
+        tv_gemail = (TextView) v.findViewById(R.id.tv_gemail);
+        tv_allgevent = (TextView) v.findViewById(R.id.tv_allgevent);
+        tv_allgdiary = (TextView) v.findViewById(R.id.tv_allgdiary);
+        tv_allghistory = (TextView) v.findViewById(R.id.tv_allghistory);
 
-        btnJoin.setOnClickListener(new View.OnClickListener() {
+        btn_join.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onGroupInvitationClick(groupId);
             }
         });
 
+        helper = AllInOneActivity.helper;
+        groupName = helper.getGroupName(groupId);
+        groupEmail = helper.getGroupEmail(groupId);
+
+        tv_gname.setText(groupName);
+        tv_gemail.setText(groupEmail);
+
+        rv_gdiary.setAdapter(new GroupDiaryListAdapter(v.getContext(), groupId));
+        rv_gdiary.setLayoutManager(new LinearLayoutManager(v.getContext()));
         return v;
     }
 
@@ -73,7 +98,6 @@ public class GroupDetailFragment extends Fragment implements CalendarController.
 
     public Uri getGroupDeepLink(int groupId) {
         // 그룹 아이디 받아오게 하기
-
         return Uri.parse("https://nanal.com/nanal?groupId=" + groupId);
     }
 
@@ -112,7 +136,7 @@ public class GroupDetailFragment extends Fragment implements CalendarController.
                                 ignored.printStackTrace();
                             }
                         } else {
-                            Log.e("GroupDetailFragment", task.toString());
+                            Log.e("GroupDetailFragment : ", task.toString());
                         }
                     }
                 });
