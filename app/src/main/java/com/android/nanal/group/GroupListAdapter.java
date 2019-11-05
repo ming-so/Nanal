@@ -99,7 +99,6 @@ public class GroupListAdapter extends RecyclerView.Adapter<GroupListAdapter.View
                 AllInOneActivity.mGroupId = group.group_id;
                 AllInOneActivity.mGroupName = group.group_name;
                 mController.sendEvent(this, CalendarController.EventType.GO_TO, null, null, group.group_id, CalendarController.ViewType.GROUP_DETAIL);
-                //Toast.makeText(context, "선택 > "+group.group_id + ", hexColor > "+hexColor, Toast.LENGTH_LONG).show();
             }
         });
     }
