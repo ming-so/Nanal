@@ -63,6 +63,21 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 
+/*
+ * Copyright (C) 2013 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 public class RecurrencePickerDialog extends DialogFragment implements OnItemSelectedListener,
         OnCheckedChangeListener, OnClickListener,
@@ -75,6 +90,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
     // in dp's
     private static final int MIN_SCREEN_WIDTH_FOR_SINGLE_ROW_WEEK = 450;
     // Update android:maxLength in EditText as needed
+    // 필요에 따라 EditText의 android:maxLength 업데이트
     private static final int INTERVAL_MAX = 99;
     private static final int INTERVAL_DEFAULT = 1;
     // Update android:maxLength in EditText as needed
@@ -102,6 +118,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
 
     // Call mStringBuilder.setLength(0) before formatting any string or else the
     // formatted text will accumulate.
+    // 문자열을 포맷하기 전에 mStringBuilder.setLength(0)를 호출하거나 그렇지 않으면 포맷된 텍스트가 누적됨
     // private final StringBuilder mStringBuilder = new StringBuilder();
     // private Formatter mFormatter = new Formatter(mStringBuilder);
     private Resources mResources;
@@ -126,14 +143,19 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
     private String mEndNeverStr;
     private String mEndDateLabel;
     private String mEndCountLabel;
-    /** Hold toggle buttons in the order per user's first day of week preference */
+    /** Hold toggle buttons in the order per user's first day of week preference
+     *  토글 버튼을 사용자의 첫 번째 요일 기본 설정 순서에 따라 유지
+     */
     private LinearLayout mWeekGroup;
     private LinearLayout mWeekGroup2;
     // Sun = 0
     private ToggleButton[] mWeekByDayButtons = new ToggleButton[7];
     /** A double array of Strings to hold the 7x5 list of possible strings of the form:
      *  "on every [Nth] [DAY_OF_WEEK]", e.g. "on every second Monday",
-     *  where [Nth] can be [first, second, third, fourth, last] */
+     *  where [Nth] can be [first, second, third, fourth, last]
+     *  매 [Nth] [DAY_OF_DAY] 마다 7x5개의 가능한 문자열 목록을 저장할 이중 문자열 배열
+     *  예를 들어 [Nth]는 [first, second, third, fourth, last]일 수 있음
+     */
     private String[][] mMonthRepeatByDayOfWeekStrs;
     private LinearLayout mMonthGroup;
     private RadioGroup mMonthRepeatByRadioGroup;
@@ -163,11 +185,15 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
 
         // Weekly: For "repeat by day of week", the day of week to repeat is in
         // er.byday[]
+        // 매주: "주일에 따라 반복"의 경우 반복할 요일은 er.bydy[]
 
         /*
          * Monthly: For "repeat by nth day of week" the day of week to repeat is
          * in er.byday[] and the "nth" is stored in er.bydayNum[]. Currently we
          * can handle only one and only in monthly
+         *
+         * 월간: "nth day by week"의 경우 반복할 요일은 er.byday[]이고 "nth"은 er.bydayNum[]에 저장됨
+         * 현재 우리는 한 달 동안만 처리할 수 있음
          */
         int numOfByDayNum = 0;
         for (int i = 0; i < er.bydayCount; i++) {
@@ -186,6 +212,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
 
         // The UI only handle repeat by one day of month i.e. not 9th and 10th
         // of every month
+        // UI는 매월 1일(즉, 9일과 10일 제외)까지 반복 처리
         if (er.bymonthdayCount > 1) {
             return false;
         }
@@ -203,6 +230,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
     }
 
     // TODO don't lose data when getting data that our UI can't handle
+    // TODO UI에서 처리할 수 없는 데이터를 가져올 때 데이터 손실 방지
     static private void copyEventRecurrenceToModel(final EventRecurrence er,
                                                    RecurrenceModel model) {
         // Freq:
@@ -248,6 +276,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
             }
 
             // LIMITATION: The UI can only handle END_BY_DATE or END_BY_COUNT
+            // 제한: UI는 END_BY_DATE 또는 END_BY_COUNT만 처리할 수 있음
             if (model.end == RecurrenceModel.END_BY_COUNT && model.endDate != null) {
                 throw new IllegalStateException("freq=" + er.freq);
             }
@@ -257,6 +286,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
 
         // Weekly: repeat by day of week or Monthly: repeat by nth day of week
         // in the month
+        // 매주: 요일별 또는 월별 반복: 월의 n번째 요일별 반복
         Arrays.fill(model.weeklyByDayOfWeek, false);
         if (er.bydayCount > 0) {
             int count = 0;
@@ -268,6 +298,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
                     // LIMITATION: Can handle only (one) weekDayNum and only
                     // when
                     // monthly
+                    // 제한: weekDatNum 또는 월 1회만 처리할 수 있음
                     model.monthlyByDayOfWeek = dayOfWeek;
                     model.monthlyByNthDayOfWeek = er.bydayNum[i];
                     model.monthlyRepeat = RecurrenceModel.MONTHLY_BY_NTH_DAY_OF_WEEK;
@@ -288,6 +319,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
         }
 
         // Monthly by day of month
+        // 월별
         if (model.freq == RecurrenceModel.FREQ_MONTHLY) {
             if (er.bymonthdayCount == 1) {
                 if (model.monthlyRepeat == RecurrenceModel.MONTHLY_BY_NTH_DAY_OF_WEEK) {
@@ -298,6 +330,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
                 model.monthlyRepeat = RecurrenceModel.MONTHLY_BY_DATE;
             } else if (er.bymonthCount > 1) {
                 // LIMITATION: Can handle only one month day
+                // 제한: 한 달만 처리할 수 있음
                 throw new IllegalStateException("Can handle only one bymonthday");
             }
         }
@@ -345,6 +378,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
         }
 
         // Weekly && monthly repeat patterns
+        // Weekly && monthly 반복 패턴
         er.bydayCount = 0;
         er.bymonthdayCount = 0;
 
@@ -534,10 +568,13 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
         mWeekGroup2 = (LinearLayout) mView.findViewById(R.id.weekGroup2);
 
         // In Calendar.java day of week order e.g Sun = 1 ... Sat = 7
+        // Calendar.java day of week 오더
+        // 예: Sun = 1 ... Sat = 7
         String[] dayOfWeekString = new DateFormatSymbols().getWeekdays();
 
         mMonthRepeatByDayOfWeekStrs = new String[7][];
         // from Time.SUNDAY as 0 through Time.SATURDAY as 6
+        // Time.SUNDAY 0 부터 Time.SATURDAY 6 임
         mMonthRepeatByDayOfWeekStrs[0] = mResources.getStringArray(R.array.repeat_by_nth_sun);
         mMonthRepeatByDayOfWeekStrs[1] = mResources.getStringArray(R.array.repeat_by_nth_mon);
         mMonthRepeatByDayOfWeekStrs[2] = mResources.getStringArray(R.array.repeat_by_nth_tues);
@@ -547,9 +584,13 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
         mMonthRepeatByDayOfWeekStrs[6] = mResources.getStringArray(R.array.repeat_by_nth_sat);
 
         // In Time.java day of week order e.g. Sun = 0
+        // Time.java day of week 오더
+        // 예: Sun = 0
         int idx = Utils.getFirstDayOfWeek(getActivity());
 
         // In Calendar.java day of week order e.g Sun = 1 ... Sat = 7
+        // Calendar.java day of week 오더
+        // 예: Sun = 1 ... Sat = 7
         dayOfWeekString = new DateFormatSymbols().getShortWeekdays();
 
         int numOfButtonsInRow1;
@@ -567,6 +608,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
             mWeekGroup2.setVisibility(View.VISIBLE);
             // Set rightmost button on the second row invisible so it takes up
             // space and everything centers properly
+            // 두 번째 행의 맨 오른쪽 버튼을 보이지 않게 설정하여 공간을 차지하고 모든 것이 적절히 중심을 잡도록 하기
             mWeekGroup2.getChildAt(3).setVisibility(View.INVISIBLE);
         }
 
@@ -702,6 +744,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
         // Interval
         // Checking before setting because this causes infinite recursion
         // in afterTextWatcher
+        // AfterTextWatch에서 무한 반복이 발생하므로 설정 전 확인
         final String intervalStr = Integer.toString(mModel.interval);
         if (!intervalStr.equals(mInterval.getText().toString())) {
             mInterval.setText(intervalStr);
@@ -819,6 +862,8 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
     /**
      * Update the "Repeat for N events" end option with the proper string values
      * based on the value that has been entered for N.
+     *
+     * "N 이벤트 반복" 종료 옵션을 N에 입력한 값을 기준으로 적절한 문자열 값으로 업데이트
      */
     private void updateEndCountText() {
         final String END_COUNT_MARKER = "%d";
@@ -894,7 +939,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
     }
 
     // Implements OnCheckedChangeListener interface
-    // Week repeat by day of week
+    // Week repeat by day of week 요일별 주간 반복
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         int itemIdx = -1;
@@ -908,7 +953,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
     }
 
     // Implements android.widget.RadioGroup.OnCheckedChangeListener interface
-    // Month repeat by radio buttons
+    // Month repeat by radio buttons 라디오 버튼에 대한 월 반복
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
         if (checkedId == R.id.repeatMonthlyByNthDayOfMonth) {
@@ -987,10 +1032,10 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
         /**
          * FREQ: Repeat pattern
          *
-         * @ see FREQ_DAILY
-         * @ see FREQ_WEEKLY
-         * @ see FREQ_MONTHLY
-         * @ see FREQ_YEARLY
+         * @see FREQ_DAILY
+         * @see FREQ_WEEKLY
+         * @see FREQ_MONTHLY
+         * @see FREQ_YEARLY
          */
         int freq = FREQ_WEEKLY;
 
@@ -1001,54 +1046,63 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
 
         /**
          * UNTIL and COUNT: How does the the event end?
+         * UNTIL and COUNT: 이벤트가 언제 끝나는지
          *
-         * @ see END_NEVER
-         * @ see END_BY_DATE
-         * @ see END_BY_COUNT
-         * @ see untilDate
-         * @ see untilCount
+         * @see END_NEVER
+         * @see END_BY_DATE
+         * @see END_BY_COUNT
+         * @see untilDate
+         * @see untilCount
          */
         int end;
 
         /**
          * UNTIL: Date of the last recurrence. Used when until == END_BY_DATE
+         * UNTIL: 마지막 반복 날짜. until == END_BY_DATE 일 때 사용됨
          */
         Time endDate;
 
         /**
          * COUNT: Times to repeat. Use when until == END_BY_COUNT
+         * COUNT: 반복할 시간. until == END_BY_COUNT 일 때 사용
          */
         int endCount = COUNT_DEFAULT;
 
         /**
          * BYDAY: Days of the week to be repeated. Sun = 0, Mon = 1, etc
+         * BYDAY: 반복해야 하는 요일. Sun = 0, Mon = 1, 등
          */
         boolean[] weeklyByDayOfWeek = new boolean[7];
 
         /**
          * BYDAY AND BYMONTHDAY: How to repeat monthly events? Same date of the
          * month or Same nth day of week.
+         * BYDAY AND BYMONTHDAY: 월별 이벤트를 어떻게 반복하는지? 같은 달의 날짜 또는 같은 주의 날짜
          *
-         * @ see MONTHLY_BY_DATE
-         * @ see MONTHLY_BY_NTH_DAY_OF_WEEK
+         * @see MONTHLY_BY_DATE
+         * @see MONTHLY_BY_NTH_DAY_OF_WEEK
          */
         int monthlyRepeat;
 
         /**
          * Day of the month to repeat. Used when monthlyRepeat ==
          * MONTHLY_BY_DATE
+         * 반복할 달의 날. monthlyRepeat == MONTHLY_BY_DATE 일 때 사용
          */
         int monthlyByMonthDay;
 
         /**
          * Day of the week to repeat. Used when monthlyRepeat ==
          * MONTHLY_BY_NTH_DAY_OF_WEEK
+         * 반복할 달의 날. monthlyRepeat == MONTHLY_BY_NTH_DAY_OF_WEEK 일 때 사용
          */
         int monthlyByDayOfWeek;
 
         /**
          * Nth day of the week to repeat. Used when monthlyRepeat ==
          * MONTHLY_BY_NTH_DAY_OF_WEEK 0=undefined, 1=1st, 2=2nd, etc
+         * 반복할 요일의 N번째 날. monthlyRepeat == MONTHLY_BY_NTH_DAY_OF_WEEK 일 때 사용.
+         * 0=undefined, 1=1st, 2=2st, 등
          */
         int monthlyByNthDayOfWeek;
 
@@ -1132,6 +1186,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
 
         /**
          * Override to be called after each key stroke
+         * 각 키 스트로크 후 호출되는 오버라이드
          */
         void onChange(int value) {
         }
@@ -1157,9 +1212,9 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
         private boolean mUseFormStrings;
 
         /**
-         * @ param context
-         * @ param textViewResourceId
-         * @ param objects
+         * @param context
+         * @param textViewResourceId
+         * @param objects
          */
         public EndSpinnerAdapter(Context context, ArrayList<CharSequence> strings,
                                  int itemResourceId, int textResourceId) {
@@ -1173,10 +1228,14 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
             // If either date or count strings don't translate well, such that we aren't assured
             // to have some text available to be placed in the spinner, then we'll have to use
             // the more form-like versions of both strings instead.
+            // 날짜 문자열이나 카운트 문자열 중 어느 하나가 번역이 잘 되지 않는 경우,
+            // 스피너에 넣을 수 있는 텍스트가 몇 개 있는지 확실하지 않은 경우,
+            // 우리는 대신 두 문자열의 형태와 유사한 버전을 사용해야 할 것임
             int markerStart = mEndDateString.indexOf(END_DATE_MARKER);
             if (markerStart <= 0) {
                 // The date string does not have any text before the "%s" so we'll have to use the
                 // more form-like strings instead.
+                // 날짜 문자열에는 "%s" 이전의 텍스트가 없으므로 대신 더 많은 양식 문자열을 사용해야 할 것임
                 mUseFormStrings = true;
             } else {
                 String countEndStr = getResources().getQuantityString(
@@ -1185,6 +1244,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
                 if (markerStart <= 0) {
                     // The count string does not have any text before the "%d" so we'll have to use
                     // the more form-like strings instead.
+                    // 숫자 문자열에는 "%d" 이전의 텍스트가 없으므로 대신 더 많은 양식 문자열을 사용해야 할 것임
                     mUseFormStrings = true;
                 }
             }
@@ -1192,6 +1252,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
             if (mUseFormStrings) {
                 // We'll have to set the layout for the spinner to be weight=0 so it doesn't
                 // take up too much space.
+                // 스피너에 대한 레이아웃을 weight=0으로 설정해야 공간이 너무 많이 차지하지 않을 수 있음
                 mEndSpinner.setLayoutParams(
                         new TableLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f));
             }
@@ -1201,6 +1262,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
         public View getView(int position, View convertView, ViewGroup parent) {
             View v;
             // Check if we can recycle the view
+            // 뷰를 재활용할 수 있는지 확인
             if (convertView == null) {
                 v = mInflater.inflate(mTextResourceId, parent, false);
             } else {
@@ -1220,6 +1282,8 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
                         if (mUseFormStrings || markerStart == 0) {
                             // If we get here, the translation of "Until" doesn't work correctly,
                             // so we'll just set the whole "Until a date" string.
+                            // 여기 오면 "Until"의 번역이 제대로 되지 않기 때문에
+                            // "Until a date" 문자열 전체를 설정하기만 하면 됨
                             item.setText(mEndDateLabel);
                         } else {
                             item.setText(mEndDateString.substring(0, markerStart).trim());
@@ -1235,6 +1299,8 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
                         if (mUseFormStrings || markerStart == 0) {
                             // If we get here, the translation of "For" doesn't work correctly,
                             // so we'll just set the whole "For a number of events" string.
+                            // 여기 오면 "For"의 번역이 제대로 되지 않기 때문에
+                            // "For a number of events" 문자열 전체를 설정하기만 하면 됨
                             item.setText(mEndCountLabel);
                             // Also, we'll hide the " events" that would have been at the end.
                             mPostEndCount.setVisibility(View.GONE);
@@ -1245,6 +1311,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
                             mPostEndCount.setText(endString.substring(postTextStart,
                                     endString.length()).trim());
                             // In case it's a recycled view that wasn't visible.
+                            // 보이지 않았던 재활용된 뷰인 경우
                             if (mModel.end == RecurrenceModel.END_BY_COUNT) {
                                 mPostEndCount.setVisibility(View.VISIBLE);
                             }
@@ -1267,6 +1334,7 @@ public class RecurrencePickerDialog extends DialogFragment implements OnItemSele
         public View getDropDownView(int position, View convertView, ViewGroup parent) {
             View v;
             // Check if we can recycle the view
+            // 뷰를 재활용할 수 있는지 확인
             if (convertView == null) {
                 v = mInflater.inflate(mItemResourceId, parent, false);
             } else {
