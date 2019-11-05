@@ -13,8 +13,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.event.GeneralPreferences;
 import com.android.nanal.event.Utils;
@@ -22,6 +20,8 @@ import com.android.nanal.event.Utils;
 import net.cryptobrewery.androidprocessingbutton.ProcessButton;
 
 import java.util.concurrent.ExecutionException;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 public class LoginActivity extends Activity {
     ConstraintLayout ll_login;
@@ -126,6 +126,13 @@ public class LoginActivity extends Activity {
                                     // 회원가입 성공했을 경우
                                     btn_login.setButtonState(ProcessButton.state.SUCCESS);
                                     btn_login.stopProgress();
+
+                                    SharedPreferences.Editor editor = loginPref.edit();
+                                    editor.putString("loginId", id);
+                                    editor.putString("loginPw", password);
+                                    editor.commit();
+
+                                    goHome();
                                 } else if (result.equals("1")) {
                                     // 이미 존재하는 아이디인 경우
                                     Toast.makeText(LoginActivity.this, R.string.email_exist, Toast.LENGTH_LONG).show();

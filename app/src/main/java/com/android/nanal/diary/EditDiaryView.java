@@ -100,6 +100,8 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
     private String mTimezone;
     private int mModification = EditDiaryHelper.MODIFY_UNINITIALIZED;
 
+    boolean moveSave = false;
+
     List<String> mGroupsName;
 
 
@@ -130,14 +132,15 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
         mGroupSpinner.setOnItemSelectedListener(new MaterialSpinner.OnItemSelectedListener() {
             @Override
             public void onItemSelected(MaterialSpinner view, int position, long id, Object item) {
+                moveSave = true;
                 if(position == 0) {
                     mLlColor.setVisibility(View.VISIBLE);
                     mLlColor.setEnabled(true);
-                    if(true) {
+                    if(false) {
                         // 만약 오늘의 개인 일기가 존재한다면
                         mModel.mDiaryGroupId = -1;
                         AlertDialog.Builder dialog = new AlertDialog.Builder(mActivity, android.R.style.Theme_DeviceDefault_Light_Dialog);
-                        dialog.setMessage("오늘은 일기를 이미 작성하셨습니다. 작성하신 일기를 수정하시겠습니까?")
+                        dialog.setMessage("오늘은 일기를 이미 작성하셨습니다. 작성하신 일기를 수정하시겠습니까? 작성 중이던 내용이 사라집니다.")
                                 .setPositiveButton("수정", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
@@ -147,7 +150,7 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
                                 .setNegativeButton("취소", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        mActivity.finish();
+                                        dialog.cancel();
                                     }
                                 })
                                 .setCancelable(false)
@@ -404,6 +407,7 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
 
         if (mSaveAfterQueryComplete) {
             mLoadingCalendarsDialog.cancel();
+
             if (prepareForSave() && fillModelFromUI()) {
                 int exit = userVisible ? Utils.DONE_EXIT : 0;
                 mDone.setDoneCode(Utils.DONE_SAVE | exit);

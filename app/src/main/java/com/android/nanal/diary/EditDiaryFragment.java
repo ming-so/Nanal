@@ -558,6 +558,11 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
                 mModification = Utils.MODIFY_ALL;
             }
 
+            if((mCode & Utils.DONE_SAVE) != 0 && !mView.moveSave && mModel != null) {
+                Toast.makeText(mContext, "개인/그룹을 선택해 주세요.", Toast.LENGTH_LONG).show();
+                return;
+            }
+
             if ((mCode & Utils.DONE_SAVE) != 0 && mModel != null
                     && mView.prepareForSave()
                     && mHelper.saveDiary(mModel, mOriginalModel)) {

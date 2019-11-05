@@ -432,7 +432,7 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
         setDayParameters(day);
         mDayDialog = new DayDialog(mContext, day);
         mDayDialog.show();
-        /*
+/*
         if (mShowAgendaWithMonth || mIsMiniMonth) {
             // If agenda view is visible with month view , refresh the views
             // with the selected day's info

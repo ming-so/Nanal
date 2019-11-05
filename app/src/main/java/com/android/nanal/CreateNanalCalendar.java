@@ -50,7 +50,6 @@ public class CreateNanalCalendar {
         } catch (IllegalArgumentException e) {
             Log.i("CreateNanalCalendar: ", "컬러 추가 에러");
         } finally {
-
             prefManager.setCalendarCreated(true);
         }
         return newCalendar;
