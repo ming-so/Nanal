@@ -44,7 +44,6 @@ import android.os.Handler;
 import android.provider.CalendarContract.Attendees;
 import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Events;
-import androidx.core.content.ContextCompat;
 import android.text.Layout.Alignment;
 import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
@@ -103,6 +102,8 @@ import java.util.Formatter;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import androidx.core.content.ContextCompat;
 
 /**
  * View for multi-day view. So far only 1 and 7 day have been tested.
@@ -1477,6 +1478,8 @@ public class DayView extends View implements View.OnCreateContextMenuListener,
      */
     private void switchViews(boolean trackBallSelection) {
         Event selectedEvent = mSelectedEvent;
+
+        Log.i(TAG, "mSelectedEvent id: "+mSelectedEvent.id);
 
         mPopup.dismiss();
         mLastPopupEventID = INVALID_EVENT_ID;
