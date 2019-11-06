@@ -2,6 +2,7 @@ package com.android.nanal.group;
 
 import android.annotation.SuppressLint;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +31,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class GroupDetailFragment extends Fragment implements CalendarController.EventHandler {
+    private static final int VIEW_ID = 3;
     private int mGroupId;
 
     private NanalDBHelper helper;
@@ -38,6 +40,8 @@ public class GroupDetailFragment extends Fragment implements CalendarController.
     private ImageButton btn_join;
     private RecyclerView rv_gevent, rv_gdiary, rv_ghistory;
     private TextView tv_gname, tv_gemail, tv_allgevent, tv_allgdiary, tv_allghistory;
+
+    private GroupHistoryListAdapter mHistoryAdapter;
 
     public GroupDetailFragment() {
         super();
@@ -60,6 +64,7 @@ public class GroupDetailFragment extends Fragment implements CalendarController.
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.group_detail, null);
+        v.setId(VIEW_ID);
         final int groupId = AllInOneActivity.mGroupId;
         final String groupName, groupEmail;
 
@@ -87,13 +92,15 @@ public class GroupDetailFragment extends Fragment implements CalendarController.
         tv_gname.setText(groupName);
         tv_gemail.setText(groupEmail);
 
+        mHistoryAdapter = new GroupHistoryListAdapter(v.getContext(), GroupDetailFragment.this, groupId);
+
+        rv_ghistory.setAdapter(mHistoryAdapter);
+        rv_ghistory.setLayoutManager(new LinearLayoutManager(v.getContext()));
+
         rv_gdiary.setAdapter(new GroupDiaryListAdapter(v.getContext(), groupId));
         rv_gdiary.setLayoutManager(new LinearLayoutManager(v.getContext()));
+
         return v;
-    }
-
-    private void goTo(int index) {
-
     }
 
     public Uri getGroupDeepLink(int groupId) {
@@ -142,6 +149,12 @@ public class GroupDetailFragment extends Fragment implements CalendarController.
                 });
     }
 
+    public void refresh() {
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.detach(this).attach(this).commit();
+        Log.wtf("", "refresh 완료!!");
+    }
+
     // 아래 세 개는 쓰지 마세용
     @Override
     public long getSupportedEventTypes() {
@@ -150,11 +163,11 @@ public class GroupDetailFragment extends Fragment implements CalendarController.
 
     @Override
     public void handleEvent(CalendarController.EventInfo event) {
-
     }
 
     @Override
     public void eventsChanged() {
-
+        rv_ghistory.invalidate();
+        rv_gdiary.invalidate();
     }
 }

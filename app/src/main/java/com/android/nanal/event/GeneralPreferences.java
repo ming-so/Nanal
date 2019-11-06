@@ -153,7 +153,7 @@ public class GeneralPreferences extends PreferenceFragment implements
     ListPreference mDefaultReminder;
     ListPreference mDefaultEventDuration;
     ListPreference mSnoozeDelay;
-    ListPreference mDefaultStart;
+    //ListPreference mDefaultStart;
 
     private String mTimeZoneId;
 
@@ -232,7 +232,7 @@ public class GeneralPreferences extends PreferenceFragment implements
         mUseHomeTZ = (CheckBoxPreference) preferenceScreen.findPreference(KEY_HOME_TZ_ENABLED);
         //mTheme = (ListPreference) preferenceScreen.findPreference(KEY_THEME_PREF);
         mColor = preferenceScreen.findPreference(KEY_COLOR_PREF);
-        mDefaultStart = (ListPreference) preferenceScreen.findPreference(KEY_DEFAULT_START);
+//        mDefaultStart = (ListPreference) preferenceScreen.findPreference(KEY_DEFAULT_START);
         mHideDeclined = (CheckBoxPreference) preferenceScreen.findPreference(KEY_HIDE_DECLINED);
         mWeekStart = (ListPreference) preferenceScreen.findPreference(KEY_WEEK_START_DAY);
         mDayWeek = (ListPreference) preferenceScreen.findPreference(KEY_DAYS_PER_WEEK);
@@ -247,7 +247,7 @@ public class GeneralPreferences extends PreferenceFragment implements
         mDayWeek.setSummary(mDayWeek.getEntry());
         mDefaultReminder.setSummary(mDefaultReminder.getEntry());
         mSnoozeDelay.setSummary(mSnoozeDelay.getEntry());
-        mDefaultStart.setSummary(mDefaultStart.getEntry());
+//        mDefaultStart.setSummary(mDefaultStart.getEntry());
 
         mColor.setOnPreferenceClickListener(new OnPreferenceClickListener() {
             @Override
@@ -375,7 +375,7 @@ public class GeneralPreferences extends PreferenceFragment implements
         mHomeTZ.setOnPreferenceChangeListener(listener);
 //        mTheme.setOnPreferenceChangeListener(listener);
         mColor.setOnPreferenceChangeListener(listener);
-        mDefaultStart.setOnPreferenceChangeListener(listener);
+//        mDefaultStart.setOnPreferenceChangeListener(listener);
         mWeekStart.setOnPreferenceChangeListener(listener);
         mDayWeek.setOnPreferenceChangeListener(listener);
         mDefaultReminder.setOnPreferenceChangeListener(listener);
@@ -473,10 +473,10 @@ public class GeneralPreferences extends PreferenceFragment implements
         } else if (preference == mVibrate) {
             mVibrate.setChecked((Boolean) newValue);
             return true;
-        } else if (preference == mDefaultStart) {
-            int i = mDefaultStart.findIndexOfValue((String) newValue);
-            mDefaultStart.setSummary(mDefaultStart.getEntries()[i]);
-            return true;
+//        } else if (preference == mDefaultStart) {
+//            int i = mDefaultStart.findIndexOfValue((String) newValue);
+//            mDefaultStart.setSummary(mDefaultStart.getEntries()[i]);
+//            return true;
         } else {
             return true;
         }

@@ -7,14 +7,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ViewSwitcher;
 
 import com.android.nanal.calendar.CalendarController;
 
 public class TodayFragment extends Fragment implements CalendarController.EventHandler {
-    protected static final String BUNDLE_KEY_RESTORE_TIME = "key_restore_time";
-    private static final int VIEW_ID = 2;
-    protected ViewSwitcher mViewSwitcher;
+    private boolean hasEvent = false;
+    private boolean hasDiary = false;
 
     public TodayFragment() {
         super();

@@ -328,22 +328,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
         openDatabase();
 
-//        if (icicle != null && icicle.containsKey(BUNDLE_KEY_CHECK_ACCOUNTS)) {
-//            mCheckForAccounts = icicle.getBoolean(BUNDLE_KEY_CHECK_ACCOUNTS);
-//        }
-//        // Launch add google account if this is first time and there are no
-//        // accounts yet
-//        // 처음이고 아직 계정이 없는 경우 google 계정 추가
-//        if (mCheckForAccounts
-//                && !Utils.getSharedPreference(this, GeneralPreferences.KEY_SKIP_SETUP, false)) {
-//
-//            mHandler = new QueryHandler(this.getContentResolver());
-//            mHandler.startQuery(0, null, Calendars.CONTENT_URI, new String[]{
-//                    Calendars._ID
-//            }, null, null /* selection args */, null /* sort order */);
-//        }
-
-
         // This needs to be created before setContentView
         // setContentView 이전에 생성해야 함
         mController = CalendarController.getInstance(this);
@@ -489,7 +473,8 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         // 컨트롤러의 나머지 핸들러가 누구인지에 영향을 미침
         mController.registerFirstEventHandler(HANDLER_KEY, this);
 
-        initFragments(timeMillis, viewType, icicle);
+        Log.i(TAG, "viewType:"+viewType);
+        initFragments(timeMillis, 4, icicle);
 
         // Listen for changes that would require this to be refreshed
         // 새로 고치는 데 필요한 변경 내용 듣기(listen)
@@ -881,6 +866,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         invalidateOptionsMenu();
 
         mCalIntentReceiver = Utils.setTimeChangesReceiver(this, mTimeChangesUpdater);
+
     }
 
 

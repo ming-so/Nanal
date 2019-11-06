@@ -17,6 +17,7 @@ package com.android.nanal.month;
  */
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.os.Handler;
 import android.os.Message;
@@ -432,6 +433,13 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
         setDayParameters(day);
         mDayDialog = new DayDialog(mContext, day);
         mDayDialog.show();
+        mDayDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                mDayDialog.refreshList();
+            }
+        });
+
 /*
         if (mShowAgendaWithMonth || mIsMiniMonth) {
             // If agenda view is visible with month view , refresh the views

@@ -8,18 +8,16 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.android.nanal.NanalDBHelper;
 import com.android.nanal.R;
 import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.calendar.CalendarController;
 import com.android.nanal.diary.Diary;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class GroupDiaryListAdapter extends RecyclerView.Adapter<GroupDiaryListAdapter.ViewHolder> {
     private List<Diary> diaryList;
@@ -45,6 +43,7 @@ public class GroupDiaryListAdapter extends RecyclerView.Adapter<GroupDiaryListAd
             diaryList = helper.getGroupDiariesList(groupid);
         } catch (Exception e) {
             Toast.makeText(mContext, "리스트를 불러오는 중 오류가 발생했습니다. 다시 시도해 주세요.", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
         }
     }
 

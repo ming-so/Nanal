@@ -391,10 +391,12 @@ public class NanalDBHelper extends SQLiteOpenHelper {
             diary.id = cursor.getInt(cursor.getColumnIndex("diary_id"));
             diary.account_id = cursor.getString(cursor.getColumnIndex("account_id"));
             String str_day = cursor.getString(cursor.getColumnIndex("day"));
+            Log.wtf("NanalDBHelper", str_day);
             try {
+                //Date d = new Date(str_day);
                 Date d = dateFormat.parse(str_day);
                 diary.day = d.getTime();
-            } catch (ParseException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             diary.content = cursor.getString(cursor.getColumnIndex("content"));

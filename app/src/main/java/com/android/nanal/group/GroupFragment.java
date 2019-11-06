@@ -54,6 +54,6 @@ public class GroupFragment extends Fragment implements CalendarController.EventH
 
     @Override
     public void eventsChanged() {
-
+        recyclerView.getAdapter().notifyDataSetChanged();
     }
 }
