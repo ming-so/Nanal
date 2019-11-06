@@ -439,6 +439,12 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
                 mDayDialog.refreshList();
             }
         });
+        mDayDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                mDayDialog.refreshList();
+            }
+        });
 
 /*
         if (mShowAgendaWithMonth || mIsMiniMonth) {

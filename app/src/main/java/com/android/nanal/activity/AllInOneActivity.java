@@ -272,7 +272,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     //    public String connectID = "test";
     SharedPreferences prefs;
     public static String connectId;
-    public String connectNick = "테스트";
 
     public int selectedMode = 1;
 
@@ -287,7 +286,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     public static int mGroupId = -1;
     public static String mGroupName = "";
 
-    private boolean permission = false;
     private static boolean isRequiredMenu = true;  // default: 캘린더
     private static boolean isInGroupDetail = false;
 
@@ -325,6 +323,9 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
         mContext = AllInOneActivity.this;
         mActivity = AllInOneActivity.this;
+
+        prefs = this.getApplicationContext().getSharedPreferences("login_setting", MODE_PRIVATE);
+        connectId = prefs.getString("loginId", null);
 
         openDatabase();
 
@@ -483,7 +484,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
         mContentResolver = getContentResolver();
 
-
         mBottomNavi.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -525,8 +525,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             }
         });
 
-        prefs = this.getApplicationContext().getSharedPreferences("login_setting", MODE_PRIVATE);
-        connectId = prefs.getString("loginId", null);
+
 
         handleDynamicLink();
     }
@@ -545,6 +544,19 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             Toast.makeText(this, "DB 이미 존재함", Toast.LENGTH_LONG).show();
             mGroups = helper.getGroupList();
             Log.i(TAG, "mGroups.size() " + mGroups.size());
+        }
+        try{
+            mGroups = helper.getGroupList();
+            Log.i(TAG, "mGroups.size() " + mGroups.size());
+            try {
+                Snackbar.make(getCurrentFocus(), "서버와 동기화를 진행합니다.", Snackbar.LENGTH_SHORT).show();
+            } catch (IllegalArgumentException e) {
+
+            }
+            GroupSync();
+            DiarySync();
+        } catch (Exception e) {
+
         }
     }
 
@@ -567,8 +579,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.WRITE_CALENDAR, Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     PERMISSIONS_REQUEST_WRITE_CALENDAR);
-        } else {
-            permission = true;
         }
     }
 
@@ -581,13 +591,12 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 // 요청이 취소되면 결과 배열이 비어 있음
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    permission = true;
                     // permission was granted, yay!
                     // 퍼미션 받음!
                     createLocalCalendar();
                 } else {
                     Toast.makeText(getApplicationContext(), R.string.user_rejected_calendar_write_permission, Toast.LENGTH_LONG).show();
-                    permission = false;
+                    checkAppPermissions();
                 }
                 return;
             }
@@ -736,8 +745,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
     private boolean createLocalCalendar() {
         checkAppPermissions();
-        if (permission) {
-            // 권한 있음
+        try{
             PrefManager prefManager = new PrefManager(getApplicationContext());
             if (!prefManager.isCalendarCreated()) {
                 // 로컬 캘린더가 만들어지지 않았다면
@@ -755,6 +763,8 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 // 로컬 캘린더가 이미 있다면
                 return true;
             }
+        } catch (Exception e) {
+
         }
         // 권한 없음, 아무것도 하지 않음
         return false;

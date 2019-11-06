@@ -1,11 +1,14 @@
 package com.android.nanal;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -21,7 +24,10 @@ import net.cryptobrewery.androidprocessingbutton.ProcessButton;
 
 import java.util.concurrent.ExecutionException;
 
+import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 public class LoginActivity extends Activity {
     ConstraintLayout ll_login;
@@ -33,6 +39,12 @@ public class LoginActivity extends Activity {
 
     boolean isSignup = false;
     boolean isPass = false;
+
+    String[] permissions = {
+            Manifest.permission.WRITE_CALENDAR,
+            Manifest.permission.READ_CALENDAR,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -48,28 +60,6 @@ public class LoginActivity extends Activity {
 
         // 자동 로그인
         final SharedPreferences loginPref = getSharedPreferences("login_setting", MODE_PRIVATE);
-//
-//        String loginId = loginPref.getString("loginId", null);
-//        String loginPw = loginPref.getString("loginPw", null);
-//
-//        if (loginId != null && loginPw != null) {
-//            LoginHelper loginHelper = new LoginHelper();
-//            String result = null;
-//            try {
-//                result = (String) loginHelper.execute(loginId, loginPw).get();
-//
-//                if (result.equals("0")) {
-//                    // 로그인 성공했을 경우
-//                    goHome();
-//                }
-//            } catch (ExecutionException e) {
-//                e.printStackTrace();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            } catch (NullPointerException e) {
-//                e.printStackTrace();
-//            }
-//        }
 
         tv_inform.setText(getString(R.string.sign));
         btn_login.setBtnText(getString(R.string.button_login));
@@ -131,8 +121,11 @@ public class LoginActivity extends Activity {
                                     editor.putString("loginId", id);
                                     editor.putString("loginPw", password);
                                     editor.commit();
-
-                                    goHome();
+                                    if(hasPermission()) {
+                                        goHome();
+                                    } else {
+                                        getPermission();
+                                    }
                                 } else if (result.equals("1")) {
                                     // 이미 존재하는 아이디인 경우
                                     Toast.makeText(LoginActivity.this, R.string.email_exist, Toast.LENGTH_LONG).show();
@@ -204,7 +197,11 @@ public class LoginActivity extends Activity {
                                     editor.putString("loginPw", password);
                                     editor.commit();
 
-                                    goHome();
+                                    if(hasPermission()) {
+                                        goHome();
+                                    } else {
+                                        getPermission();
+                                    }
                                 } else if (result.equals("1")) {
                                     // 아이디 틀린 경우
                                     Toast.makeText(LoginActivity.this, R.string.email_diff, Toast.LENGTH_LONG).show();
@@ -264,15 +261,56 @@ public class LoginActivity extends Activity {
         btn_login.stopProgress();
     }
 
+    private void getPermission() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.WRITE_CALENDAR, Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_EXTERNAL_STORAGE
+                },
+                0);
+    }
+
+    private boolean hasPermission() {
+        if (Build.VERSION.SDK_INT >= 23 && (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_CALENDAR)
+                != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.READ_CALENDAR)
+                        != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        != PackageManager.PERMISSION_GRANTED)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
+        switch (requestCode) {
+            case 0: {
+                // If request is cancelled, the result arrays are empty.
+                // 요청이 취소되면 결과 배열이 비어 있음
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission was granted, yay!
+                    // 퍼미션 받음!
+                    goHome();
+                } else {
+                    Toast.makeText(getApplicationContext(), R.string.user_rejected_calendar_write_permission, Toast.LENGTH_LONG).show();
+                }
+                return;
+            }
+        }
+    }
+
     public void goHome() {
         new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent intent = new Intent(LoginActivity.this, AllInOneActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        }, 500);
+                @Override
+                public void run() {
+                    Intent intent = new Intent(LoginActivity.this, AllInOneActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+                }, 500);
     }
 
     public void ModeSwitch(View v) {

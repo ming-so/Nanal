@@ -97,7 +97,6 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
              */
 
             OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream());
-            Log.i("GroupAsyncTask", String[0]);
             sendMsg = "&user_id=" + String[0];
             osw.write(sendMsg);
             osw.flush();

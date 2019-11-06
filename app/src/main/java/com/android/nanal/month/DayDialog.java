@@ -148,13 +148,14 @@ public class DayDialog extends Dialog {
         public class ViewHolder extends RecyclerView.ViewHolder {
             LinearLayout event_wrapper;
             ImageView event_icon;
-            TextView event_title;
+            TextView event_title, event_content;
 
             ViewHolder(View itemView) {
                 super(itemView);
                 event_wrapper = itemView.findViewById(R.id.ll_event_wrapper);
                 event_title = itemView.findViewById(R.id.tv_event_list);
                 event_icon = itemView.findViewById(R.id.iv_event_list);
+                event_content = itemView.findViewById(R.id.tv_event_list2);
             }
         }
 
@@ -174,15 +175,20 @@ public class DayDialog extends Dialog {
                 Uri uri = CalendarContract.Events.CONTENT_URI;
                 long long_date_start = mDate.getTime() + 32400000;
                 long long_date_end = next_date.getTime() + 32400000;
+                long long_date_start_notall = mDate.getTime();
+                long long_date_end_notall = next_date.getTime();
                 Log.i("DayDialog", long_date_start + ", " + long_date_end);
                 // 시작 시간이 오늘 자정보다 크고 내일 자정보다 작다
                 // OR
                 // 시작 시간이 오늘 자정보다 작고 종료 시간이 내일 자정보다 크고
                 // OR
                 // 시작 시간이 오늘 자정보다 작고 종료 시간이 내일 자정보다 작은 경우
-                String selection = "(dtstart >= " + long_date_start + " and dtstart <" + long_date_end + ") OR ";
+                String selection = "(allDay > 0 AND ((dtstart >= " + long_date_start + " and dtstart <" + long_date_end + ") OR ";
                 selection += "(dtstart <" + long_date_start + " and dtend > " + long_date_end + ") OR ";
-                selection += "(dtstart <" + long_date_start + " and dtend > "+ long_date_start +" and dtend <= " + long_date_end + ")";
+                selection += "(dtstart <" + long_date_start + " and dtend > "+ long_date_start +" and dtend < " + long_date_end + "))) OR ";
+                selection += "(allDay <= 0 AND ((dtstart >= " + long_date_start_notall + " and dtstart <" + long_date_end_notall + ") OR ";
+                selection += "(dtstart <" + long_date_start_notall + " and dtend > " + long_date_end_notall + ") OR ";
+                selection += "(dtstart <" + long_date_start_notall + " and dtend > "+ long_date_start_notall +" and dtend <= " + long_date_end_notall + ")))";
                 Cursor cur = cr.query(uri, null, selection, null, null);
 
                 while (cur.moveToNext()) {
@@ -193,6 +199,8 @@ public class DayDialog extends Dialog {
                     e.id = cur.getInt(60);
                     e.startMillis = cur.getLong(62);
                     e.endMillis = cur.getLong(106);
+                    e.allDay = cur.getInt(43) > 0;
+                    e.color = cur.getInt(37);
                     mDiaryList.add(e);
                 }
                 eventList = mDiaryList;
@@ -217,13 +225,47 @@ public class DayDialog extends Dialog {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int i) {
             final Event e = eventList.get(i);
-            viewHolder.event_title.setText(e.title);
+            if(e.title.length() > 0) {
+                viewHolder.event_title.setText(e.title);
+            } else {
+                viewHolder.event_title.setText("(제목 없음)");
+            }
+            if(e.allDay) {
+                viewHolder.event_content.setText("하루 종일");
+            } else {
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
+                Date start = new Date(e.startMillis);
+                Date end = new Date(e.endMillis);
+                String str_start = sdf.format(start);
+                String str_end = sdf.format(end);
+
+                Calendar c = Calendar.getInstance();
+                c.setTime(mDate);
+                c.add(Calendar.DATE, 1);
+                Date next_date = c.getTime();
+                String str_next = sdf2.format(next_date);
+
+                String text;
+                if(end.compareTo(next_date) >= 0) {
+                    // 이벤트 끝나는 시간이 오늘 23시 59분을 넘어갈 때, 날짜 표시
+                    text = str_start + " ~ " + str_next + " " + str_end;
+                    //todo:if문 구조 수정! += 연산자 이용해서 처리 가능하게끔
+                    //todo:case 추가, 이벤트 시작하는 시간이 오늘 전일 때, 전날 날짜 표시
+                } else {
+                    text = str_start + " ~ " + str_end;
+                }
+
+
+                viewHolder.event_content.setText(text);
+            }
             viewHolder.event_icon.setImageResource(R.drawable.ic_check_black_24dp);
 //            if (helper.getDiaryIsInGroup(d)) {
 //                viewHolder.diary_icon.setImageResource(R.drawable.ic_bookmark_border_black_24dp);
 //            } else {
 //                viewHolder.diary_icon.setImageResource(R.drawable.ic_bookmark_black_24dp);
 //            }
+            Log.wtf("DayDialog", "e.color: "+e.color);
             viewHolder.event_icon.setColorFilter(e.color);
 /*
             String hexColor = String.format("#%06X", (0xFFFFFF & e.color));
