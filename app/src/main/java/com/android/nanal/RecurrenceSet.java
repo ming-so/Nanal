@@ -1,5 +1,19 @@
 package com.android.nanal;
-
+/*
+ * Copyright (C) 2007 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.provider.CalendarContract;
@@ -19,6 +33,8 @@ import java.util.regex.Pattern;
  * Basic information about a recurrence, following RFC 2445 Section 4.8.5.
  * Contains the RRULEs, RDATE, EXRULEs, and EXDATE properties.
  */
+// 반복에 대한 기본 정보. https://www.kanzaki.com/docs/ical/rrule.html 참고
+
 public class RecurrenceSet {
 
     private final static String TAG = "RecurrenceSet";
@@ -36,6 +52,9 @@ public class RecurrenceSet {
      * Creates a new RecurrenceSet from information stored in the
      * events table in the CalendarProvider.
      * @param values The values retrieved from the Events table.
+     *
+     * CalenderProvider의 이벤트 테이블에 저장된 정보에서 새 RecurrenceSet 생성
+     * values -> 이벤트 테이블에서 검색된 값
      */
     public RecurrenceSet(ContentValues values)
             throws EventRecurrence.InvalidFormatException {
@@ -54,6 +73,13 @@ public class RecurrenceSet {
      *
      * @param cursor The cursor containing the RRULE, RDATE, EXRULE, and EXDATE
      * columns.
+     *
+     * 데이터베이스에 저장된 정보로부터 새 RecurrenceSet 생성
+     *
+     * Cursor -> CalendarProvider에서 이벤트 테이블을 가리킴.
+     * 커서는 RRULE, RDATE, EXRULE, EXDATE 열을 포함해야 함.
+     *
+     * cursor -> RRULE, RDATE, EXRULE, EXDATE 열이 포함된 커서
      */
     public RecurrenceSet(Cursor cursor)
             throws EventRecurrence.InvalidFormatException {
@@ -120,6 +146,8 @@ public class RecurrenceSet {
     /**
      * Returns whether or not a recurrence is defined in this RecurrenceSet.
      * @return Whether or not a recurrence is defined in this RecurrenceSet.
+     *
+     * return -> 해당 RecurrenceSet에 반복이 정의되는지 여부
      */
     public boolean hasRecurrence() {
         return (rrules != null || rdates != null);
@@ -130,6 +158,10 @@ public class RecurrenceSet {
      * representing each date/time in the recurrence.
      * @param recurrence The recurrence to be parsed.
      * @return The list of date/times.
+     *
+     * 제공된 RDATE 또는 EXDATE 문자열을 반복에서 각 날짜/시간을 나타내는 일련의 긴 행으로 파싱
+     * recurrence -> 파싱하기 위한 반복
+     * return -> 날짜/시간의 리스트
      */
     public static long[] parseRecurrenceDates(String recurrence)
             throws EventRecurrence.InvalidFormatException{
@@ -171,6 +203,13 @@ public class RecurrenceSet {
      * to specify a recurrence.  The required fields are DTSTART,
      * one of DTEND/DURATION, and one of RRULE/RDATE.  Returns false if
      * there was an error, including if the date is out of range.
+     *
+     * 파싱된 iCalendar 컴포넌트에서 추출한 적절한 RRULE, RDATE, EXRULE 및 EXDATE 값으로 값의 데이터베이스 맵을 채움
+     * component -> 원하는 반복 규격을 포함하는 iCalendar 컴포넌트
+     * values -> 업데이트할 db 값
+     * return -> 컴포넌트가 반복을 명시하는 데 필요한 정보를 포함하고 있는 경우 true 반환
+     *           필수 필드는 DTSTART, DTEND/DURATION 중 하나, RRULE/RDATE 중 하나
+     *           오류가 있는 경우 (날짜가 범위를 벗어난 경우 포함) false 반환
      */
     public static boolean populateContentValues(ICalendar.Component component,
                                                 ContentValues values) {
@@ -181,6 +220,7 @@ public class RecurrenceSet {
             ICalendar.Parameter tzidParam =
                     dtstartProperty.getFirstParameter("TZID");
             // NOTE: the timezone may be null, if this is a floating time.
+            // 시간대가 부동 시간 (floating time)일 경우 null 일 수 있음
             String tzid = tzidParam == null ? null : tzidParam.value;
             Time start = new Time(tzidParam == null ? Time.TIMEZONE_UTC : tzid);
             boolean inUtc = start.parse(dtstart);
@@ -188,6 +228,7 @@ public class RecurrenceSet {
 
             // We force TimeZone to UTC for "all day recurring events" as the server is sending no
             // TimeZone in DTSTART for them
+            // 서버가 DTSTART에 TimeZone을 보내지 않으므로 "하루종일 반복되는 이벤트"에 대해 TimeZone을 UTC에 강제 적용
             if (inUtc || allDay) {
                 tzid = Time.TIMEZONE_UTC;
             }
@@ -232,12 +273,14 @@ public class RecurrenceSet {
             return true;
         } catch (TimeFormatException e) {
             // Something is wrong with the format of this event
+            // 이벤트의 형식이 잘못되었을 경우
             Log.i(TAG,"Failed to parse event: " + component.toString());
             return false;
         }
     }
 
     // This can be removed when the old CalendarSyncAdapter is removed.
+    // 이전 CalendarSyncAdapter을 제거하면 이 기능을 제거할 수 있음
     public static boolean populateComponent(Cursor cursor,
                                             ICalendar.Component component) {
 
@@ -285,6 +328,7 @@ public class RecurrenceSet {
 
         dtstartTime.set(dtstart);
         // make sure the time is printed just as a date, if all day.
+        // 하루 종일인 경우 시간을 날짜로만 프린트
         // TODO: android.pim.Time really should take care of this for us.
         if (allDay) {
             dtstartProp.addParameter(new ICalendar.Parameter("VALUE", "DATE"));
@@ -344,6 +388,7 @@ public class RecurrenceSet {
 
         dtstartTime.set(dtstart);
         // make sure the time is printed just as a date, if all day.
+        // 하루 종일인 경우 시간을 날짜로만 프린트
         // TODO: android.pim.Time really should take care of this for us.
         if (allDay) {
             dtstartProp.addParameter(new ICalendar.Parameter("VALUE", "DATE"));
@@ -416,6 +461,14 @@ public class RecurrenceSet {
      * decimal 32 or HTAB, US-ASCII decimal 9). Any sequence of CRLF followed
      * immediately by a single linear white space character is ignored (i.e.,
      * removed) when processing the content type.
+     *
+     * iCalendar 객체는 컨텐츠 라인이라고 하는 개별 텍스트 행으로 구성.
+     * 컨텐츠 라인은 CRLF 시퀀스인 줄바꿈에 의해 구분.
+     *
+     * 줄바꿈을 제외하고 텍스트 줄은 75옥텟보다 길지 않아야 함.
+     * 긴 컨텐츠 라인은 라인 "접기" 기법을 사용해 다중 라인 표현으로 분할되어야 함.
+     * 즉, CRLF를 즉시 삽입하고 하나의 선형 화이트 스페이스 문자를 삽입해 두 문자 간에 긴 선을 분할
+     * 컨텐츠 유형을 처리할 때 단일 선형 화이트 스페이스 문자로 즉시 이어지는 CRLF 시퀀스는 무시됨 (즉, 제거됨)
      */
     public static String fold(String unfoldedIcalContent) {
         return FOLD_RE.matcher(unfoldedIcalContent).replaceAll("$0\r\n ");
