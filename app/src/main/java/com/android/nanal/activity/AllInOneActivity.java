@@ -89,6 +89,7 @@ import com.android.nanal.group.GroupFragment;
 import com.android.nanal.interfaces.AllInOneMenuExtensionsInterface;
 import com.android.nanal.month.MonthByWeekFragment;
 import com.android.nanal.query.DiaryAsyncTask;
+import com.android.nanal.query.EventAsyncTask;
 import com.android.nanal.query.GroupAsyncTask;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
@@ -1164,6 +1165,10 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     public void DiarySync() {
         DiaryAsyncTask mTask = new DiaryAsyncTask(AllInOneActivity.this, AllInOneActivity.this);
         mTask.execute(connectId);
+    }
+
+    public void EventSync() {
+        EventAsyncTask mTask = new EventAsyncTask(AllInOneActivity.this, AllInOneActivity.this);
     }
 
     @Override

@@ -448,8 +448,6 @@ public class CalendarViewAdapter extends BaseAdapter {
         return date;
     }
     private String buildWeekDate() {
-
-
         // Calculate the start of the week, taking into account the "first day of the week"
         // setting.
         // "첫 번째 요일" 설정을 고려하여 주 계산을 시작함

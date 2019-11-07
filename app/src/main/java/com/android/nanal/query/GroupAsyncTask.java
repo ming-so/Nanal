@@ -1,12 +1,15 @@
 package com.android.nanal.query;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.CalendarContract;
 import android.provider.CalendarContract.Attendees;
 import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Colors;
@@ -205,7 +208,15 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
                     Log.i("GroupAsyncTask: ","그룹 없음, 테이블 생성 group_id="+group_id);
                     // 그룹이 없다면 생성해야 함
                     AllInOneActivity.helper.addGroup(group_id, group_name, group_color, str_sync_time, account_id);
-                    CreateNanalCalendar.CreateCalendar(mContext, group_name, account_id, true);
+
+                    ContentResolver cr = mContext.getContentResolver();
+                    Uri uri = CalendarContract.Calendars.CONTENT_URI;
+
+                    String selection = "(ownerAccount = '+"+account_id+"' AND account_name = '"+group_name+"')";
+                    Cursor cur = cr.query(uri, null, selection, null, null);
+                    if(!cur.moveToFirst()) {
+                        CreateNanalCalendar.CreateCalendar(mContext, group_name, account_id, true);
+                    }
                 }
                 // 그룹이 존재하지 않거나 버전이 옳지 않은 경우에는 받아온 다이어리와 이벤트를 모두 저장한다
                 // 다이어리

@@ -283,6 +283,27 @@ public class LoginActivity extends Activity {
         return true;
     }
 
+    private void createLocalCalendar() {
+        try{
+            PrefManager prefManager = new PrefManager(getApplicationContext());
+            if (!prefManager.isCalendarCreated()) {
+                // 로컬 캘린더가 만들어지지 않았다면
+                try {
+                    CreateNanalCalendar.CreateCalendar(this.getApplicationContext(), "나날", getApplicationContext().getSharedPreferences("login_setting", MODE_PRIVATE).getString("loginId", null), false);
+                    Toast.makeText(this.getApplicationContext(), "캘린더를 생성했습니다.", Toast.LENGTH_LONG).show();
+                    prefManager.setCalendarCreated(true);
+                } catch (IllegalArgumentException e) {
+                    Toast.makeText(this.getApplicationContext(), "로컬 캘린더 생성에 문제가 발생했습니다.", Toast.LENGTH_LONG).show();
+                    prefManager.setCalendarCreated(false);
+                }
+            } else {
+                // 로컬 캘린더가 이미 있다면
+            }
+        } catch (Exception e) {
+
+        }
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
         switch (requestCode) {
@@ -293,6 +314,7 @@ public class LoginActivity extends Activity {
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission was granted, yay!
                     // 퍼미션 받음!
+                    createLocalCalendar();
                     goHome();
                 } else {
                     Toast.makeText(getApplicationContext(), R.string.user_rejected_calendar_write_permission, Toast.LENGTH_LONG).show();

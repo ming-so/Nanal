@@ -346,11 +346,11 @@ public class EditEventHelper {
             // 현재 반복 이벤트 인스턴스의 내용 수정
             // 반복 예외 생성
             long begin = model.mOriginalStart;
-            values.put(Events.ORIGINAL_SYNC_ID, originalModel.mSyncId);
             values.put(Events.ORIGINAL_INSTANCE_TIME, begin);
             boolean allDay = originalModel.mAllDay;
             values.put(Events.ORIGINAL_ALL_DAY, allDay ? 1 : 0);
             values.put(Events.STATUS, originalModel.mEventStatus);
+            //todo:뭔가 여기서... sync 추가해야 함
 
             eventIdIndex = ops.size();
             ContentProviderOperation.Builder b = ContentProviderOperation.newInsert(
