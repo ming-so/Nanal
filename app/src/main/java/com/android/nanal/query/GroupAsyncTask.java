@@ -81,7 +81,7 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
     protected String doInBackground(String... String) {
         try {
             String str;
-            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/android/GroupAsync.jsp");
+            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/GroupAsync.jsp");
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");

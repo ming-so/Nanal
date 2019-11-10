@@ -25,6 +25,7 @@ import com.android.nanal.RecurrenceProcessor;
 import com.android.nanal.RecurrenceSet;
 import com.android.nanal.Rfc822Validator;
 import com.android.nanal.activity.AbstractCalendarActivity;
+import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.calendar.CalendarEventModel;
 import com.android.nanal.calendar.CalendarEventModel.Attendee;
 import com.android.nanal.calendar.CalendarEventModel.ReminderEntry;
@@ -36,6 +37,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.TimeZone;
+import java.util.concurrent.ExecutionException;
 
 public class EditEventHelper {
     private static final String TAG = "EditEventHelper";
@@ -333,33 +335,29 @@ public class EditEventHelper {
             // 반복되지 않는 이벤트에 대한 간단한 업데이트
             checkTimeDependentFields(originalModel, model, values, modifyWhich);
             ops.add(ContentProviderOperation.newUpdate(uri).withValues(values).build());
-
         } else if (TextUtils.isEmpty(originalModel.mRrule)) {
             // This event was changed from a non-repeating event to a
             // repeating event.
             // 이 이벤트는 반복되지 않는 이벤트에서 반복 이벤트로 변경됨
             ops.add(ContentProviderOperation.newUpdate(uri).withValues(values).build());
-
         } else if (modifyWhich == MODIFY_SELECTED) {
             // Modify contents of the current instance of repeating event
             // Create a recurrence exception
             // 현재 반복 이벤트 인스턴스의 내용 수정
             // 반복 예외 생성
+
             long begin = model.mOriginalStart;
             values.put(Events.ORIGINAL_INSTANCE_TIME, begin);
             boolean allDay = originalModel.mAllDay;
             values.put(Events.ORIGINAL_ALL_DAY, allDay ? 1 : 0);
             values.put(Events.STATUS, originalModel.mEventStatus);
-            //todo:뭔가 여기서... sync 추가해야 함
 
             eventIdIndex = ops.size();
             ContentProviderOperation.Builder b = ContentProviderOperation.newInsert(
                     Events.CONTENT_URI).withValues(values);
             ops.add(b.build());
             forceSaveReminders = true;
-
         } else if (modifyWhich == MODIFY_ALL_FOLLOWING) {
-
             if (TextUtils.isEmpty(model.mRrule)) {
                 // We've changed a recurring event to a non-recurring event.
                 // If the event we are editing is the first in the series,
@@ -412,9 +410,7 @@ public class EditEventHelper {
                 }
             }
             forceSaveReminders = true;
-
         } else if (modifyWhich == MODIFY_ALL) {
-
             // Modify all instances of repeating event
             // 이벤트의 모든 인스턴스 수정
             if (TextUtils.isEmpty(model.mRrule)) {
@@ -439,6 +435,7 @@ public class EditEventHelper {
         // 기존 이벤트에 대한 새 이벤트 또는 새 예외
         boolean newEvent = (eventIdIndex != -1);
         ArrayList<ReminderEntry> originalReminders;
+        String[] result = submit(model);
         if (originalModel != null) {
             originalReminders = originalModel.mReminders;
         } else {
@@ -523,6 +520,7 @@ public class EditEventHelper {
                 // eventId는 eventIndex가 -1인 경우에만 사용됨
                 // TODO: clean up this code.
                 long eventId = uri != null ? ContentUris.parseId(uri) : -1;
+                Log.i(TAG, "eventId: " + eventId);
 
                 // only compute deltas if this is an existing event.
                 // new events (being inserted into the Events table) won't
@@ -594,8 +592,41 @@ public class EditEventHelper {
         }
         mService.startBatch(mService.getNextToken(), null, android.provider.CalendarContract.AUTHORITY, ops,
                 Utils.UNDO_DELAY);
-
+        Log.i(TAG, "title: " +model.mTitle+", mStart:"+model.mStart+", mEnd: "+model.mEnd);
+        AllInOneActivity.helper.addEventSync(model.mTitle, model.mStart, model.mEnd, result[0], result[1]);
         return true;
+    }
+
+
+    public String[] submit(CalendarEventModel model) {
+        CreateNewEvent mCreateEventTask = new CreateNewEvent();
+        String receiveMsg;
+        String event_id = "", sync_time = "";
+
+        try {
+            Log.d(TAG, "서버 DB에 데이터 전송하여 insert하고 sync_time, event_id 받아오기");
+            receiveMsg = mCreateEventTask.execute(model.mTitle, model.mOwnerAccount,
+                    model.mCalendarDisplayName, model.mCalendarAccountName, Integer.toString(model.getEventColor()), model.mLocation, model.mDescription,
+                    Long.toString(model.mStart), Long.toString(model.mEnd), Boolean.toString(model.mAllDay), Boolean.toString(model.mHasAlarm), model.mRrule).get();
+            Log.i(TAG, "receiveMsg: "+receiveMsg);
+            String[] arr_msg = receiveMsg.trim().split("!!");
+            event_id = arr_msg[0];
+            sync_time = arr_msg[1];
+            Log.i(TAG, "event_id: "+event_id + ", sync_time: "+sync_time+", model.Id: "+model.mId);
+
+        } catch (InterruptedException e) {
+            Log.e(TAG, e.getMessage());
+        } catch (ExecutionException e) {
+            Log.e(TAG, e.getMessage());
+        } catch (NumberFormatException e) {
+            Log.e(TAG, e.getMessage());
+        }
+
+        return new String[]{event_id, sync_time};
+    }
+
+    public void saveAtDb(int event_id, String server_id, String sync_time) {
+
     }
 
     public static LinkedHashSet<Rfc822Token> getAddressesFromList(String list, Rfc822Validator validator) {

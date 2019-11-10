@@ -1,10 +1,13 @@
 package com.android.nanal;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.net.Uri;
+import android.provider.CalendarContract;
 import android.util.Log;
 
 import com.android.nanal.activity.AllInOneActivity;
@@ -48,6 +51,12 @@ public class NanalDBHelper extends SQLiteOpenHelper {
                 "'account_id' VARCHAR(320) NOT NULL" +
                 ")";
         db.execSQL(CREATE_TABLE_COMMUNITY);
+        String CREATE_TABLE_EVENT_SYNC = "CREATE TABLE IF NOT EXISTS event_sync (" +
+                "'event_id' INTEGER PRIMARY KEY NOT NULL, " +
+                "'server_id' INTEGER NOT NULL, " +
+                "'sync_time' TIMESTAMP NOT NULL" +
+                ")";
+        db.execSQL(CREATE_TABLE_EVENT_SYNC);
     }
 
     @Override
@@ -56,6 +65,8 @@ public class NanalDBHelper extends SQLiteOpenHelper {
         db.execSQL(sql);
         String sql2 = "DROP TABLE IF EXISTS community";
         db.execSQL(sql2);
+        String sql3 = "DROP TABLE IF EXISTS event_sync";
+        db.execSQL(sql3);
 
         onCreate(db);
     }
@@ -119,6 +130,37 @@ public class NanalDBHelper extends SQLiteOpenHelper {
         groupAsyncTask.execute(account_id);
     }
 
+    public void addEventSync(int event_id, int server_id, String time) {
+        Log.i("NanalDBHelper", "일정 추가 시도 "+event_id+", "+server_id+", "+time);
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("event_id", event_id);
+        values.put("server_id", server_id);
+        values.put("sync_time", time);
+        db.insert("event_sync", null, values);
+        db.close();
+        //todo:EventAsyncTask 갱신
+    }
+
+    public void addEventSync(String title, long start, long end, String server_id, String time) {
+        Log.i("NanalDBHelper", "일정 추가 시도 "+title+", "+start+", "+end);
+        Uri uri = CalendarContract.Events.CONTENT_URI;
+        ContentResolver cr = mContext.getContentResolver();
+
+        String selection = "title = '" + title +"' AND dtstart = " + start + " AND dtend = " + end;
+        Cursor cur = cr.query(uri, null, selection, null, null);
+
+        if (cur.moveToNext()) {
+            SQLiteDatabase db = getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("event_id", cur.getInt(60));
+            values.put("server_id", Integer.parseInt(server_id.trim()));
+            values.put("sync_time", time);
+            db.insert("event_sync", null, values);
+            db.close();
+        }
+    }
+
     public boolean checkGroup(int group_id) {
         Log.i("NanalDBHelper", "그룹 확인 "+group_id);
         SQLiteDatabase db = getReadableDatabase();
@@ -133,6 +175,19 @@ public class NanalDBHelper extends SQLiteOpenHelper {
         return false;
     }
 
+    public void updateDiary(int diary_id, int color, String location, String title, String content, String weather, String image) {
+        SQLiteDatabase db = getWritableDatabase();
+        String sql = "UPDATE diary set color = '"+color+"'"
+                + ", location = '"+location+"'"
+                + ", title = '"+title+"'"
+                + ", content = '"+content+"'"
+                + ", weather = '"+weather+"'"
+                + ", image = '"+image+"' "
+                + "WHERE diary_id = '"+diary_id+"';";
+        db.execSQL(sql);
+        Log.i("NanalDBHelper","updateDiary 완료");
+    }
+
     public void updateGroup(int group_id, String group_name, int group_color, String sync_time, String account_id) {
         SQLiteDatabase db = getWritableDatabase();
         String sql = "UPDATE community set group_name = '"+group_name+"'"
@@ -142,6 +197,15 @@ public class NanalDBHelper extends SQLiteOpenHelper {
                 + "WHERE group_id = '"+group_id+"';";
         db.execSQL(sql);
         Log.i("NanalDBHelper", "updateGroup 완료");
+    }
+
+    public void updateEventSync(int event_id, int server_id, String time) {
+        SQLiteDatabase db = getWritableDatabase();
+        String sql = "UPDATE event_sync set event_id = '"+event_id+"'"
+                + ", server_id = '"+server_id+"'"
+                + ", sync_time = '"+time+"' "
+                + "WHERE event_id = '"+event_id+"';";
+        db.execSQL(sql);
     }
 
     public void deleteGroup(int group_id) {
@@ -158,6 +222,16 @@ public class NanalDBHelper extends SQLiteOpenHelper {
     public String getGroupSync(int group_id) {
         SQLiteDatabase db = getReadableDatabase();
         String sql = "SELECT * FROM community WHERE group_id='"+group_id+"'";
+        Cursor cursor = db.rawQuery(sql, null);
+        if(cursor.moveToNext()) {
+            return cursor.getString(cursor.getColumnIndex("sync_time"));
+        }
+        return "";
+    }
+
+    public String getEventSync(int event_id) {
+        SQLiteDatabase db = getReadableDatabase();
+        String sql = "SELECT * FROM event_sync WHERE event_id='"+event_id+"'";
         Cursor cursor = db.rawQuery(sql, null);
         if(cursor.moveToNext()) {
             return cursor.getString(cursor.getColumnIndex("sync_time"));
@@ -372,8 +446,35 @@ public class NanalDBHelper extends SQLiteOpenHelper {
                 Log.i("NanalDBHelper", "diary_id=" + cursor.getInt(cursor.getColumnIndex("diary_id"))
                         + ", account_id=" + cursor.getString(cursor.getColumnIndex("account_id")) +
                         ", day=" + cursor.getString(cursor.getColumnIndex("day")) + ", content=" +
-                        cursor.getString(cursor.getColumnIndex("content")));
+                        cursor.getString(cursor.getColumnIndex("content")) + ", group_id=" +
+                        cursor.getInt(cursor.getColumnIndex("group_id")));
             }
+    }
+
+    public Diary getTodayDiary(Date today) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String str_today = dateFormat.format(today);
+
+        SQLiteDatabase db = getReadableDatabase();
+        String sql = "SELECT * FROM diary WHERE day='"+str_today+"'";
+        Log.i("NanalDBHelper", sql);
+        Cursor cursor = db.rawQuery(sql, null);
+        while (cursor.moveToNext()) {
+            Log.i("NanalDBHelper", "있음! diary_id=" + cursor.getInt(cursor.getColumnIndex("diary_id"))
+                    + ", account_id=" + cursor.getString(cursor.getColumnIndex("account_id")) +
+                    ", day=" + cursor.getString(cursor.getColumnIndex("day")) + ", content=" +
+                    cursor.getString(cursor.getColumnIndex("content"))+", group_id="+cursor.getInt(cursor.getColumnIndex("group_id")));
+            if(cursor.getInt(cursor.getColumnIndex("group_id")) > 0) continue;
+            Diary d = new Diary();
+            d.id = cursor.getInt(cursor.getColumnIndex("diary_id"));
+            d.account_id = cursor.getString(cursor.getColumnIndex("account_id"));
+            d.day = today.getTime();
+            d.title = cursor.getString(cursor.getColumnIndex("title"));
+            d.content = cursor.getString(cursor.getColumnIndex("content"));
+            d.color = cursor.getInt(cursor.getColumnIndex("color"));
+            return d;
+        }
+        return null;
     }
 
     public ArrayList<Diary> getGroupDiariesList(int groupid) {

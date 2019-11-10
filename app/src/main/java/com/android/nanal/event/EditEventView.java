@@ -1521,6 +1521,7 @@ public class EditEventView implements View.OnClickListener, DialogInterface.OnCa
 
         mModel.mCalendarId = calendarId;
         mModel.setCalendarColor(displayColor);
+        mModel.mCalendarDisplayName = c.getString(EditEventHelper.CALENDARS_INDEX_DISPLAY_NAME);
         mModel.mCalendarAccountName = c.getString(EditEventHelper.CALENDARS_INDEX_ACCOUNT_NAME);
         mModel.mCalendarAccountType = c.getString(EditEventHelper.CALENDARS_INDEX_ACCOUNT_TYPE);
         mModel.setEventColor(mModel.getCalendarColor());

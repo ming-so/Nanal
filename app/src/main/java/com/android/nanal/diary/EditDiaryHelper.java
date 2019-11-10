@@ -77,7 +77,7 @@ public class EditDiaryHelper {
     static final int CALENDARS_INDEX_ACCOUNT_NAME = 11;
     static final int CALENDARS_INDEX_ACCOUNT_TYPE = 12;
 
-    static final String[] GROUP_PROJECTION = new String[] {
+    static final String[] GROUP_PROJECTION = new String[]{
             "group_id",
             "group_name",
             "group_color",
@@ -154,21 +154,29 @@ public class EditDiaryHelper {
         String diary_id = "";
         try {
             Log.d(TAG, "서버 DB에 데이터 전송하여 insert하고 그룹 아이디 받아오기");
-            String group_id = "";
-            if(model.mDiaryGroupId > 0) {
+            String group_id = "-1";
+            if (model.mDiaryGroupId > 0) {
                 group_id = Integer.toString(model.mDiaryGroupId);
+                Log.i(TAG, "그룹 일기: "+model.mDiaryGroupId+", "+model.mDiaryId);
             }
-            Log.i("EditDiaryHelper", model.mDiaryUserId + ", " + Integer.toString(model.mDiaryColor)+ ", " +
+            Log.i("EditDiaryHelper", model.mDiaryUserId + ", " + Integer.toString(model.mDiaryColor) + ", " +
                     model.mDiaryLocation + ", " + Long.toString(model.mDiaryDay) + ", " + model.mDiaryTitle + ", " +
-                    model.mDiaryContent + ", " + model.mDiaryWeather + ", " +model.mDiaryImg + ", " +group_id);
+                    model.mDiaryContent + ", " + model.mDiaryWeather + ", " + model.mDiaryImg + ", " + group_id+", "+model.mDiaryId);
             receiveMsg = mCreateDiaryTask.execute(model.mDiaryUserId, Integer.toString(model.mDiaryColor),
                     model.mDiaryLocation, Long.toString(model.mDiaryDay), model.mDiaryTitle,
-                    model.mDiaryContent, model.mDiaryWeather, model.mDiaryImg, group_id).get();
+                    model.mDiaryContent, model.mDiaryWeather, model.mDiaryImg, group_id, Integer.toString(model.mDiaryId)).get();
             diary_id = receiveMsg.trim();
-            AllInOneActivity.helper.addDiary(Integer.parseInt(diary_id), model.mDiaryUserId, model.mDiaryColor,
-                    model.mDiaryLocation, model.mDiaryDay, model.mDiaryTitle,
-                    model.mDiaryContent, model.mDiaryWeather, model.mDiaryImg, group_id);
-            Log.d(TAG, "DB에 일기 추가! diary_id="+diary_id+", user_id="+model.mDiaryUserId+", group_id="+model.mDiaryGroupId);
+            if(model.mDiaryId > 0) {
+                // 일기 수정
+                AllInOneActivity.helper.updateDiary(model.mDiaryId, model.mDiaryColor, model.mDiaryLocation, model.mDiaryTitle, model.mDiaryContent, model.mDiaryWeather, model.mDiaryImg);
+                Log.d(TAG, "DB에 일기 수정! diary_id=" + model.mDiaryId + ", user_id=" + model.mDiaryUserId + ", group_id=" + model.mDiaryGroupId);
+            } else {
+                // 새 일기 추가
+                AllInOneActivity.helper.addDiary(Integer.parseInt(diary_id), model.mDiaryUserId, model.mDiaryColor,
+                        model.mDiaryLocation, model.mDiaryDay, model.mDiaryTitle,
+                        model.mDiaryContent, model.mDiaryWeather, model.mDiaryImg, group_id);
+                Log.d(TAG, "DB에 일기 추가! diary_id=" + diary_id + ", user_id=" + model.mDiaryUserId + ", group_id=" + model.mDiaryGroupId);
+            }
         } catch (InterruptedException e) {
             Log.e(TAG, e.getMessage());
         } catch (ExecutionException e) {
@@ -177,7 +185,8 @@ public class EditDiaryHelper {
             Log.e(TAG, e.getMessage());
         }
 
-        if(diary_id == "") {
+
+        if (diary_id == "") {
             Log.d(TAG, "receiveMsg 없음");
             return false;
         }

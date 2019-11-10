@@ -317,6 +317,7 @@ public class AsyncQueryService extends Handler {
      */
     public void startBatch(int token, Object cookie, String authority,
                            ArrayList<ContentProviderOperation> cpo, long delayMillis) {
+        Log.i(TAG, "startBatch - token: "+token+", cookie: "+cookie+", authority: "+authority + ", cpo.get(0): "+cpo.get(0));
         OperationInfo info = new OperationInfo();
         info.op = Operation.EVENT_ARG_BATCH;
         info.resolver = mContext.getContentResolver();
@@ -366,6 +367,7 @@ public class AsyncQueryService extends Handler {
         if (localLOGV) {
             Log.d(TAG, "########## default onInsertComplete");
         }
+        Log.i(TAG, token+", "+cookie+", "+uri);
     }
 
     /**
@@ -385,6 +387,7 @@ public class AsyncQueryService extends Handler {
         if (localLOGV) {
             Log.d(TAG, "########## default onUpdateComplete");
         }
+        Log.i(TAG, token+", "+cookie+", "+result);
     }
 
     /**
@@ -402,11 +405,12 @@ public class AsyncQueryService extends Handler {
      */
     protected void onDeleteComplete(int token, Object cookie, int result) {
 //        if(cookie.equals(1)) {
-//            //todo:그룹 일기 삭제 때 해야 할 것 있으면 이쪽에서 호출하면 될 것 같음
+//
 //        }
         if (localLOGV) {
             Log.d(TAG, "########## default onDeleteComplete");
         }
+        Log.i(TAG, token+", "+cookie+", "+result);
     }
 
     /**
@@ -428,6 +432,7 @@ public class AsyncQueryService extends Handler {
         if (localLOGV) {
             Log.d(TAG, "########## default onBatchComplete");
         }
+        Log.i(TAG, token+", "+cookie+", "+results);
     }
 
     @Override

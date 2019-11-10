@@ -239,6 +239,7 @@ public class DayDialog extends Dialog {
                 Date end = new Date(e.endMillis);
                 String str_start = sdf.format(start);
                 String str_end = sdf.format(end);
+                String str_d_start = sdf2.format(start);
 
                 Calendar c = Calendar.getInstance();
                 c.setTime(mDate);
@@ -250,8 +251,9 @@ public class DayDialog extends Dialog {
                 if(end.compareTo(next_date) >= 0) {
                     // 이벤트 끝나는 시간이 오늘 23시 59분을 넘어갈 때, 날짜 표시
                     text = str_start + " ~ " + str_next + " " + str_end;
-                    //todo:if문 구조 수정! += 연산자 이용해서 처리 가능하게끔
-                    //todo:case 추가, 이벤트 시작하는 시간이 오늘 전일 때, 전날 날짜 표시
+                } else if(start.compareTo(mDate) < 0) {
+                    // 이벤트 시작하는 시간이 오늘 0시 0분 전일 때, 날짜 표시
+                    text = str_d_start + " " + str_start + " ~ " + str_end;
                 } else {
                     text = str_start + " ~ " + str_end;
                 }

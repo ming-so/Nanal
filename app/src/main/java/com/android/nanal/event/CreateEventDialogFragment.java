@@ -14,6 +14,7 @@ package com.android.nanal.event;
      limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -86,6 +87,7 @@ public class CreateEventDialogFragment extends DialogFragment implements TextWat
         // Empty constructor required for DialogFragment.
     }
 
+    @SuppressLint("ValidFragment")
     public CreateEventDialogFragment(Time day) {
         setDay(day);
     }
@@ -194,6 +196,7 @@ public class CreateEventDialogFragment extends DialogFragment implements TextWat
         mModel.mOwnerAccount = mCalendarOwner;
 
         if (mEditEventHelper.saveEvent(mModel, null, 0)) {
+            Log.i(TAG, "mModel.uri: "+mModel.mUri+", id: "+mModel.mId);
             Toast.makeText(getActivity(), R.string.creating_event, Toast.LENGTH_SHORT).show();
         }
     }

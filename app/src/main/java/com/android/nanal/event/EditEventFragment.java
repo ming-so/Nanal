@@ -19,14 +19,10 @@ import android.database.MatrixCursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import android.provider.CalendarContract.Events;
+import android.provider.CalendarContract.Attendees;
 import android.provider.CalendarContract.Calendars;
 import android.provider.CalendarContract.Colors;
-import android.provider.CalendarContract.Attendees;
+import android.provider.CalendarContract.Events;
 import android.provider.CalendarContract.Reminders;
 import android.text.TextUtils;
 import android.text.format.Time;
@@ -47,8 +43,8 @@ import com.android.nanal.calendar.CalendarController.EventHandler;
 import com.android.nanal.calendar.CalendarController.EventInfo;
 import com.android.nanal.calendar.CalendarController.EventType;
 import com.android.nanal.calendar.CalendarEventModel;
-import com.android.nanal.calendar.CalendarEventModel.ReminderEntry;
 import com.android.nanal.calendar.CalendarEventModel.Attendee;
+import com.android.nanal.calendar.CalendarEventModel.ReminderEntry;
 import com.android.nanal.color.ColorPickerSwatch.OnColorSelectedListener;
 import com.android.nanal.color.HsvColorComparator;
 import com.android.nanal.query.AsyncQueryService;
@@ -56,6 +52,11 @@ import com.android.nanal.query.AsyncQueryService;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 public class EditEventFragment extends Fragment implements EventHandler, OnColorSelectedListener {
         private static final String TAG = "EditEventActivity";
@@ -72,7 +73,7 @@ public class EditEventFragment extends Fragment implements EventHandler, OnColor
 
         private static final String BUNDLE_KEY_DATE_BUTTON_CLICKED = "date_button_clicked";
 
-        private static final boolean DEBUG = false;
+        private static final boolean DEBUG = true;
 
         private static final int TOKEN_EVENT = 1;
         private static final int TOKEN_ATTENDEES = 1 << 1;
@@ -277,6 +278,7 @@ public class EditEventFragment extends Fragment implements EventHandler, OnColor
                         mModification = Utils.MODIFY_ALL;
                         mView.setModification(mModification);
                 }
+                Log.i(TAG, "id: " + mModel.mId);
         }
 
         @Override
@@ -658,7 +660,8 @@ public class EditEventFragment extends Fragment implements EventHandler, OnColor
                                 cursor.close();
                                 return;
                         }
-                        long eventId;
+                        //long eventId;
+                        long eventId = -1;
                         switch (token) {
                                 case TOKEN_EVENT:
                                         if (cursor.getCount() == 0) {
@@ -871,6 +874,7 @@ public class EditEventFragment extends Fragment implements EventHandler, OnColor
                                         cursor.close();
                                         break;
                         }
+                        Log.i(TAG, "mModel.uri: "+mModel.mUri+", id: "+mModel.mId+", eventId: "+eventId);
                 }
         }
 
@@ -915,6 +919,7 @@ public class EditEventFragment extends Fragment implements EventHandler, OnColor
                                         }
                                 }
                                 Toast.makeText(mContext, stringResource, Toast.LENGTH_SHORT).show();
+                                Log.i(TAG, "mModel.uri: "+mModel.mUri+", id: "+mModel.mId);
                         } else if ((mCode & Utils.DONE_SAVE) != 0 && mModel != null && isEmptyNewEvent()) {
                                 Toast.makeText(mContext, R.string.empty_event, Toast.LENGTH_SHORT).show();
                         }

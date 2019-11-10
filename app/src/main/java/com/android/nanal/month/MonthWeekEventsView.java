@@ -275,7 +275,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
             Log.wtf(TAG, "setDiaries, sortedDiaries == null!!");
             return;
         }
-        Log.i(TAG, "setDiaries, mDiaries.size="+mDiaries.size());
+        //Log.i(TAG, "setDiaries, mDiaries.size="+mDiaries.size());
         if(sortedDiaries.size() != mNumDays) {
             if(Log.isLoggable(TAG, Log.ERROR)) {
                 Log.wtf(TAG, "Diaries size must be same as days displayed: size="
@@ -1156,7 +1156,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
         }
 
         public ArrayList<DayDiaryFormatter> prepareFormattedDiaries() {
-            Log.i(TAG, "prepareFormattedDiaries 실행");
+            //Log.i(TAG, "prepareFormattedDiaries 실행");
             prepareFormattedDiariesWithDiaryDaySpan();
             ViewDetailsPreferences.Preferences preferences =
                     ViewDetailsPreferences.getPreferences(getContext());
@@ -1212,17 +1212,17 @@ public class MonthWeekEventsView extends SimpleWeekView {
         protected ArrayList<FormattedDiaryBase> prepareFormattedDiaryDay(ArrayList<Diary> dayDiaries,
                                                                          int day,
                                                                          int daysInWeek) {
-            Log.i(TAG, "prepareFormattedDiaryDay 실행, day="+day);
+            //Log.i(TAG, "prepareFormattedDiaryDay 실행, day="+day);
             final int diaryCount = (dayDiaries == null) ? 0 : dayDiaries.size();
             ArrayList<FormattedDiaryBase> formattedDayDiaries = new ArrayList<>(diaryCount);
             if(diaryCount == 0) {
-                Log.i(TAG, "prepareFormattedDiaryDay, diary 없음");
+                //Log.i(TAG, "prepareFormattedDiaryDay, diary 없음");
                 return formattedDayDiaries;
             }
-            Log.i(TAG, "prepareFormattedDiaryDay, diary 있음");
+            //Log.i(TAG, "prepareFormattedDiaryDay, diary 있음");
             for(Diary diary : dayDiaries) {
                 if (diary == null) {
-                    Log.i(TAG, "prepareFormattedDiaryDay, diary == null");
+                    //Log.i(TAG, "prepareFormattedDiaryDay, diary == null");
                     DiaryFormat format = new DiaryFormat(day, daysInWeek);
                     format.hide(day);
                     formattedDayDiaries.add(new NullFormattedDiary(format, mDiaryBoundaries));
@@ -1251,9 +1251,9 @@ public class MonthWeekEventsView extends SimpleWeekView {
             int day = 0;
             final int daysInWeek = mDiaries.size();
             for (ArrayList<Diary> dayDiaries : mDiaries) {
-                Log.i(TAG, "prepareFormattedDiariesWithDiaryDaySpan, dayDiaries 추가");
+                //Log.i(TAG, "prepareFormattedDiariesWithDiaryDaySpan, dayDiaries 추가");
                 if(!dayDiaries.isEmpty()) Log.i(TAG, "dayDiaries="+dayDiaries.get(0).content);
-                else Log.i(TAG, "dayDiaries == null");
+                //else Log.i(TAG, "dayDiaries == null");
                 mFormattedDiaries.add(prepareFormattedDiaryDay(dayDiaries, day, daysInWeek));
                 day++;
             }
@@ -1578,13 +1578,13 @@ public class MonthWeekEventsView extends SimpleWeekView {
         }
 
         protected void init() {
-            Log.i(TAG, "init 실행");
+            //Log.i(TAG, "init 실행");
             mMaxNumberOfLines = mMaxLinesInDiary;
             mDiariesByWidth = new ArrayList<>(mMaxLinesInDiary + 1);
             for (int i = 0; i < mMaxNumberOfLines + 1; i++) {
                 mDiariesByWidth.add(new ArrayList<FormattedDiaryBase>());
             }
-            Log.i(TAG, "init, mMaxNumberOfLines="+mMaxNumberOfLines+", mDiariesByWidth.size="+mDiariesByWidth.size());
+            //Log.i(TAG, "init, mMaxNumberOfLines="+mMaxNumberOfLines+", mDiariesByWidth.size="+mDiariesByWidth.size());
             ListIterator<FormattedDiaryBase> iterator = mDiaryDay.listIterator();
             while(iterator.hasNext()) {
                 FormattedDiaryBase diary = iterator.next();
@@ -1601,13 +1601,13 @@ public class MonthWeekEventsView extends SimpleWeekView {
         }
 
         public void drawDay(Canvas canvas, DayBoxBoundaries boxBoundaries) {
-            Log.i(TAG, "drawDay 실행, mDiaryDay.size="+mDiaryDay.size());
+            //Log.i(TAG, "drawDay 실행, mDiaryDay.size="+mDiaryDay.size());
             for (FormattedDiaryBase diary : mDiaryDay) {
                 if (diaryShouldBeSkipped(diary)) {
-                    Log.i(TAG, "drawDay, 스킵");
+                    //Log.i(TAG, "drawDay, 스킵");
                     diary.skip(mViewPreferences);
                 } else {
-                    Log.i(TAG, "drawDay, 그림");
+                    //Log.i(TAG, "drawDay, 그림");
                     diary.draw(canvas, mViewPreferences, mDay);
                 }
             }

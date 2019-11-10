@@ -25,7 +25,11 @@ public class CreateNanalCalendar {
         ContentValues values = new ContentValues();
         values.put(Calendars.ACCOUNT_NAME, accountName);
         values.put(Calendars.ACCOUNT_TYPE, "com.android.calendar");
-        values.put(Calendars.NAME, accountName);
+        if(isGroup) {
+            values.put(Calendars.NAME, name);
+        } else {
+            values.put(Calendars.NAME, accountName);
+        }
         values.put(Calendars.CALENDAR_DISPLAY_NAME, name);
         values.put(Calendars.CALENDAR_ACCESS_LEVEL, Calendars.CAL_ACCESS_OWNER);
         values.put(Calendars.OWNER_ACCOUNT, accountName);

@@ -101,6 +101,7 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
     private int mModification = EditDiaryHelper.MODIFY_UNINITIALIZED;
 
     boolean moveSave = false;
+    boolean modeModify = false;
 
     List<String> mGroupsName;
 
@@ -136,7 +137,9 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
                 if(position == 0) {
                     mLlColor.setVisibility(View.VISIBLE);
                     mLlColor.setEnabled(true);
-                    if(false) {
+                    final Diary d = AllInOneActivity.helper.getTodayDiary(mDay);
+                    modeModify = !(d == null);
+                    if(modeModify) {
                         // 만약 오늘의 개인 일기가 존재한다면
                         mModel.mDiaryGroupId = -1;
                         AlertDialog.Builder dialog = new AlertDialog.Builder(mActivity, android.R.style.Theme_DeviceDefault_Light_Dialog);
@@ -144,7 +147,13 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
                                 .setPositiveButton("수정", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        // todo:해당 일기 불러와서 ui에 붙여야 함
+                                        mModel.mDiaryId = d.id;
+                                        mModel.mDiaryColor = d.color;
+                                        mEtTitle.setText(null);
+                                        mEtContent.setText(null);   // 지우기
+                                        mEtTitle.setText(d.title);
+                                        mEtContent.setText(d.content);
+                                        mIvColor.setColorFilter(d.color);
                                     }
                                 })
                                 .setNegativeButton("취소", new DialogInterface.OnClickListener() {
@@ -160,8 +169,8 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
                         mModel.mDiaryGroupId = -1;
                     }
                 } else {
-                    Snackbar.make(view, "작성하신 일기가 [" + item + "] 그룹에 저장됩니다.", Snackbar.LENGTH_LONG).show();
                     mModel.mDiaryGroupId = AllInOneActivity.mGroups.get(position-1).getGroup_id();
+                    Snackbar.make(view, "작성하신 일기가 [" + item + "] 그룹에 저장됩니다. > "+mModel.mDiaryGroupId, Snackbar.LENGTH_LONG).show();
                     mModel.setDiaryColor(AllInOneActivity.helper.getGroupColor(mModel.mDiaryGroupId));
                     mLlColor.setVisibility(View.GONE);
                     mLlColor.setEnabled(false);

@@ -54,12 +54,6 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds;
 import android.provider.ContactsContract.Intents;
 import android.provider.ContactsContract.QuickContact;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.FileProvider;
-//import android.support.v7.app.AppCompatActivity;
-//import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -124,10 +118,17 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
+
 import static android.provider.CalendarContract.EXTRA_EVENT_ALL_DAY;
 import static android.provider.CalendarContract.EXTRA_EVENT_BEGIN_TIME;
 import static android.provider.CalendarContract.EXTRA_EVENT_END_TIME;
 import static com.android.nanal.calendar.CalendarController.EVENT_EDIT_ON_LAUNCH;
+
+//import android.support.v7.app.AppCompatActivity;
+//import android.support.v7.widget.Toolbar;
 
 public class EventInfoFragment extends DialogFragment implements OnCheckedChangeListener,
         CalendarController.EventHandler, OnClickListener, DeleteEventHelper.DeleteNotifyListener,
@@ -240,7 +241,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
             Events.CUSTOM_APP_URI,       // 19
             Events.DTEND,                // 20
             Events.DURATION,             // 21
-            Events.ORIGINAL_SYNC_ID      // 22 do not remove; used in DeleteEventHelper
+            Events.ORIGINAL_SYNC_ID,      // 22 do not remove; used in DeleteEventHelper
     };
     private static final int EVENT_INDEX_ID = 0;
     private static final int EVENT_INDEX_TITLE = 1;
@@ -487,6 +488,7 @@ public class EventInfoFragment extends DialogFragment implements OnCheckedChange
         this(context, ContentUris.withAppendedId(Events.CONTENT_URI, eventId), startMillis,
                 endMillis, attendeeResponse, isDialog, windowStyle, reminders);
         mEventId = eventId;
+        Log.i(TAG, "mEventId: "+mEventId);
     }
 
     public static int getResponseFromButtonId(int buttonId) {

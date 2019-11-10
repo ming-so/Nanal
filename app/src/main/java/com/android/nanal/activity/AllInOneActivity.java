@@ -556,6 +556,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             }
             GroupSync();
             DiarySync();
+            EventSync();
         } catch (Exception e) {
 
         }
@@ -728,6 +729,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             public void onClick(View v) {
                 GroupSync();
                 DiarySync();
+                EventSync();
                 Time t = new Time();
                 t.set(mController.getTime());
                 mController.sendEventRelatedEvent(
@@ -1169,6 +1171,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
 
     public void EventSync() {
         EventAsyncTask mTask = new EventAsyncTask(AllInOneActivity.this, AllInOneActivity.this);
+        mTask.execute(connectId);
     }
 
     @Override
@@ -1187,6 +1190,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             }
             GroupSync();
             DiarySync();
+            EventSync();
             mController.refreshCalendars();
             return true;
         } else if (itemId == R.id.action_today) {
@@ -1695,6 +1699,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
     @Override
     public void handleEvent(EventInfo event) {
         long displayTime = -1;
+        Log.i(TAG, "event.id: "+event.id);
         if (event.eventType == EventType.GO_TO) {
             if ((event.extraLong & CalendarController.EXTRA_GOTO_BACK_TO_PREVIOUS) != 0) {
                 mBackToPreviousView = true;
