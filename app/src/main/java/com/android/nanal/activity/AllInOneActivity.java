@@ -1478,7 +1478,7 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
                 isRequiredMenu = false;
                 mToolbar.setNavigationIcon(R.drawable.ic_menu_navigator);
                 mToolbar.setTitle(R.string.today_view);
-                frag = new TodayFragment(timeMillis);
+                frag = new TodayFragment(mController);
                 mFAB.setVisibility(View.GONE);
                 mFABGroup.setVisibility(View.GONE);
                 isInGroupDetail = false;

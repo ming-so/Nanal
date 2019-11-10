@@ -1,43 +1,27 @@
 package com.android.nanal.month;
 
 import android.app.Dialog;
-import android.content.ContentResolver;
 import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.CalendarContract;
-import android.provider.CalendarContract.Attendees;
 import android.provider.CalendarContract.Events;
 import android.provider.CalendarContract.Instances;
 import android.text.format.DateUtils;
 import android.text.format.Time;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.android.nanal.NanalDBHelper;
 import com.android.nanal.R;
-import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.calendar.CalendarController;
-import com.android.nanal.diary.Diary;
-import com.android.nanal.event.Event;
+import com.android.nanal.diary.DiaryListAdapter;
+import com.android.nanal.event.EventListAdapter;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -93,10 +77,10 @@ public class DayDialog extends Dialog {
         rv_event = findViewById(R.id.rv_day_event);
         rv_diary = findViewById(R.id.rv_day_diary);
 
-        rv_diary.setAdapter(new DiaryListAdapter(getContext(), mDay));
+        rv_diary.setAdapter(new DiaryListAdapter(getContext(), mDay, true));
         rv_diary.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        rv_event.setAdapter(new EventListAdapter(getContext(), mDay));
+        rv_event.setAdapter(new EventListAdapter(getContext(), mDate, true));
         rv_event.setLayoutManager(new LinearLayoutManager(getContext()));
 
         setDayTitle();
@@ -137,285 +121,5 @@ public class DayDialog extends Dialog {
             return;
         }
         tv_day.setText(mDay);
-    }
-
-    class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.ViewHolder> {
-        private List<Event> eventList;
-        private NanalDBHelper helper;
-        private Context mContext;
-        private CalendarController mController;
-
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            LinearLayout event_wrapper;
-            ImageView event_icon;
-            TextView event_title, event_content;
-
-            ViewHolder(View itemView) {
-                super(itemView);
-                event_wrapper = itemView.findViewById(R.id.ll_event_wrapper);
-                event_title = itemView.findViewById(R.id.tv_event_list);
-                event_icon = itemView.findViewById(R.id.iv_event_list);
-                event_content = itemView.findViewById(R.id.tv_event_list2);
-            }
-        }
-
-        public EventListAdapter(Context context, String day) {
-            //helper = AllInOneActivity.helper;
-            mContext = context;
-            mController = CalendarController.getInstance(context);
-            try {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                Calendar c = Calendar.getInstance();
-                c.setTime(mDate);
-                c.add(Calendar.DATE, 1);
-                Date next_date = c.getTime();
-
-                ArrayList mDiaryList = new ArrayList<>();
-                ContentResolver cr = mContext.getContentResolver();
-                Uri uri = CalendarContract.Events.CONTENT_URI;
-                long long_date_start = mDate.getTime() + 32400000;
-                long long_date_end = next_date.getTime() + 32400000;
-                long long_date_start_notall = mDate.getTime();
-                long long_date_end_notall = next_date.getTime();
-                Log.i("DayDialog", long_date_start + ", " + long_date_end);
-                // 시작 시간이 오늘 자정보다 크고 내일 자정보다 작다
-                // OR
-                // 시작 시간이 오늘 자정보다 작고 종료 시간이 내일 자정보다 크고
-                // OR
-                // 시작 시간이 오늘 자정보다 작고 종료 시간이 내일 자정보다 작은 경우
-                String selection = "(allDay > 0 AND ((dtstart >= " + long_date_start + " and dtstart <" + long_date_end + ") OR ";
-                selection += "(dtstart <" + long_date_start + " and dtend > " + long_date_end + ") OR ";
-                selection += "(dtstart <" + long_date_start + " and dtend > "+ long_date_start +" and dtend < " + long_date_end + "))) OR ";
-                selection += "(allDay <= 0 AND ((dtstart >= " + long_date_start_notall + " and dtstart <" + long_date_end_notall + ") OR ";
-                selection += "(dtstart <" + long_date_start_notall + " and dtend > " + long_date_end_notall + ") OR ";
-                selection += "(dtstart <" + long_date_start_notall + " and dtend > "+ long_date_start_notall +" and dtend <= " + long_date_end_notall + ")))";
-                Cursor cur = cr.query(uri, null, selection, null, null);
-
-                while (cur.moveToNext()) {
-                    Log.i("DayDialog", cur.getString(73) + ", 시작: " + cur.getString(62) + ", 끝: " + cur.getString(106));
-                    Log.i("DayDialog", "rdate: "+ cur.getString(22) + ", rrule: "+cur.getString(7));
-                    Event e = new Event();
-                    e.title = cur.getString(73);
-                    e.id = cur.getInt(60);
-                    e.startMillis = cur.getLong(62);
-                    e.endMillis = cur.getLong(106);
-                    e.allDay = cur.getInt(43) > 0;
-                    e.color = cur.getInt(37);
-                    mDiaryList.add(e);
-                }
-                eventList = mDiaryList;
-            } catch (Exception e) {
-                Log.wtf("DayDialog", e.getMessage());
-                e.printStackTrace();
-                Toast.makeText(mContext, "일정을 불러오는 데 오류가 발생했습니다. 다시 시도하세요.", Toast.LENGTH_LONG).show();
-            }
-        }
-
-        @Override
-        public EventListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-            Context context = viewGroup.getContext();
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-            View v = inflater.inflate(R.layout.eventlist_item, viewGroup, false);
-            EventListAdapter.ViewHolder vh = new EventListAdapter.ViewHolder(v);
-            return vh;
-        }
-
-
-        @Override
-        public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int i) {
-            final Event e = eventList.get(i);
-            if(e.title.length() > 0) {
-                viewHolder.event_title.setText(e.title);
-            } else {
-                viewHolder.event_title.setText("(제목 없음)");
-            }
-            if(e.allDay) {
-                viewHolder.event_content.setText("하루 종일");
-            } else {
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-                SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd");
-                Date start = new Date(e.startMillis);
-                Date end = new Date(e.endMillis);
-                String str_start = sdf.format(start);
-                String str_end = sdf.format(end);
-                String str_d_start = sdf2.format(start);
-
-                Calendar c = Calendar.getInstance();
-                c.setTime(mDate);
-                c.add(Calendar.DATE, 1);
-                Date next_date = c.getTime();
-                String str_next = sdf2.format(next_date);
-
-                String text;
-                if(end.compareTo(next_date) >= 0) {
-                    // 이벤트 끝나는 시간이 오늘 23시 59분을 넘어갈 때, 날짜 표시
-                    text = str_start + " ~ " + str_next + " " + str_end;
-                } else if(start.compareTo(mDate) < 0) {
-                    // 이벤트 시작하는 시간이 오늘 0시 0분 전일 때, 날짜 표시
-                    text = str_d_start + " " + str_start + " ~ " + str_end;
-                } else {
-                    text = str_start + " ~ " + str_end;
-                }
-
-
-                viewHolder.event_content.setText(text);
-            }
-            viewHolder.event_icon.setImageResource(R.drawable.ic_check_black_24dp);
-//            if (helper.getDiaryIsInGroup(d)) {
-//                viewHolder.diary_icon.setImageResource(R.drawable.ic_bookmark_border_black_24dp);
-//            } else {
-//                viewHolder.diary_icon.setImageResource(R.drawable.ic_bookmark_black_24dp);
-//            }
-            Log.wtf("DayDialog", "e.color: "+e.color);
-            viewHolder.event_icon.setColorFilter(e.color);
-/*
-            String hexColor = String.format("#%06X", (0xFFFFFF & e.color));
-            Log.i("DayDialog", hexColor);
-            switch (hexColor) {
-                case "#41C3B1":
-                default:
-                    viewHolder.event_icon.setColorFilter(ContextCompat.getColor(
-                            viewHolder.event_icon.getContext(), R.color.colorPrimary));
-                    break;
-                case "#F1922D":
-                    viewHolder.event_icon.setColorFilter(ContextCompat.getColor(
-                            viewHolder.event_icon.getContext(), R.color.colorOrangeAccent));
-                    break;
-                case "#4B7BEA":
-                    viewHolder.diary_icon.setColorFilter(ContextCompat.getColor(
-                            viewHolder.diary_icon.getContext(), R.color.colorBluePrimary));
-                    break;
-                case "#3ABE3F":
-                    viewHolder.diary_icon.setColorFilter(ContextCompat.getColor(
-                            viewHolder.diary_icon.getContext(), R.color.colorGreenAccent));
-                    break;
-                case "#C72C14":
-                    viewHolder.diary_icon.setColorFilter(ContextCompat.getColor(
-                            viewHolder.diary_icon.getContext(), R.color.colorRedAccent));
-                    break;
-                case "#9C27B0":
-                    viewHolder.diary_icon.setColorFilter(ContextCompat.getColor(
-                            viewHolder.diary_icon.getContext(), R.color.colorPurpleAccent));
-                    break;
-            }*/
-            viewHolder.event_wrapper.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //String hexColor = String.format("#%06X", (0xFFFFFF & d.color));
-                    Context context = v.getContext();
-                    Toast.makeText(context, "선택 > " + e.id, Toast.LENGTH_LONG).show();
-                    mController.launchViewEvent(e.id, e.startMillis, e.endMillis, Attendees.ATTENDEE_STATUS_NONE);
-                    DayDialog.this.dismiss();
-                }
-            });
-        }
-
-        @Override
-        public int getItemCount() {
-            if(eventList != null) {
-                return eventList.size();
-            }
-            return 0;
-        }
-    }
-}
-
-class DiaryListAdapter extends RecyclerView.Adapter<DiaryListAdapter.ViewHolder> {
-    private List<Diary> diaryList;
-    private NanalDBHelper helper;
-    private Context mContext;
-    private CalendarController mController;
-
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        LinearLayout diary_wrapper;
-        ImageView diary_icon;
-        TextView diary_title, diary_content;
-
-        ViewHolder(View itemView) {
-            super(itemView);
-            diary_wrapper = itemView.findViewById(R.id.ll_diary_wrapper);
-            diary_title = itemView.findViewById(R.id.tv_diary_list);
-            diary_icon = itemView.findViewById(R.id.iv_diary_list);
-            diary_content = itemView.findViewById(R.id.tv_diary_list2);
-        }
-    }
-
-    public DiaryListAdapter(Context context, String day) {
-        mContext = context;
-        mController = CalendarController.getInstance(context);
-        try {
-            helper = AllInOneActivity.helper;
-            diaryList = helper.getDiariesList(day);
-        } catch (Exception e) {
-            Toast.makeText(mContext, "일기를 불러오는 데 오류가 발생했습니다. 다시 시도하세요.", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    @Override
-    public DiaryListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        Context context = viewGroup.getContext();
-        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        View v = inflater.inflate(R.layout.diarylist_item, viewGroup, false);
-        DiaryListAdapter.ViewHolder vh = new DiaryListAdapter.ViewHolder(v);
-        return vh;
-    }
-
-
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int i) {
-        final Diary d = diaryList.get(i);
-        viewHolder.diary_title.setText(d.title);
-        viewHolder.diary_content.setText(d.content);
-        if (helper.getDiaryIsInGroup(d)) {
-            viewHolder.diary_icon.setImageResource(R.drawable.ic_bookmark_border_black_24dp);
-        } else {
-            viewHolder.diary_icon.setImageResource(R.drawable.ic_bookmark_black_24dp);
-        }
-
-        String hexColor = String.format("#%06X", (0xFFFFFF & d.color));
-        Log.i("DayDialog", hexColor);
-        switch (hexColor) {
-            case "#41C3B1":
-            default:
-                viewHolder.diary_icon.setColorFilter(ContextCompat.getColor(
-                        viewHolder.diary_icon.getContext(), R.color.colorPrimary));
-                break;
-            case "#F1922D":
-                viewHolder.diary_icon.setColorFilter(ContextCompat.getColor(
-                        viewHolder.diary_icon.getContext(), R.color.colorOrangeAccent));
-                break;
-            case "#4B7BEA":
-                viewHolder.diary_icon.setColorFilter(ContextCompat.getColor(
-                        viewHolder.diary_icon.getContext(), R.color.colorBluePrimary));
-                break;
-            case "#3ABE3F":
-                viewHolder.diary_icon.setColorFilter(ContextCompat.getColor(
-                        viewHolder.diary_icon.getContext(), R.color.colorGreenAccent));
-                break;
-            case "#C72C14":
-                viewHolder.diary_icon.setColorFilter(ContextCompat.getColor(
-                        viewHolder.diary_icon.getContext(), R.color.colorRedAccent));
-                break;
-            case "#9C27B0":
-                viewHolder.diary_icon.setColorFilter(ContextCompat.getColor(
-                        viewHolder.diary_icon.getContext(), R.color.colorPurpleAccent));
-                break;
-        }
-        viewHolder.diary_wrapper.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String hexColor = String.format("#%06X", (0xFFFFFF & d.color));
-                Context context = v.getContext();
-//                    mController.sendEvent(this, CalendarController.EventType.GO_TO, null, null, group.group_id, CalendarController.ViewType.GROUP_DETAIL);
-                Toast.makeText(context, "선택 > " + d.id, Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    @Override
-    public int getItemCount() {
-        return diaryList.size();
     }
 }

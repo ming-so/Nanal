@@ -616,7 +616,6 @@
     <!-- No maps found in phone -->
     <string name="event_color_set_to_default">기본 일정 색상으로 설정</string>
     <!-- Notification label for calling a phone number in the location. -->
-    <string name="choose_diary_color_label">일기 색상 선택</string>
 
     <!-- Title of the quick response item in Settings [CHAR LIMIT=18]-->
     <string name="diary_color_picker_dialog_title">일기 색상</string>
