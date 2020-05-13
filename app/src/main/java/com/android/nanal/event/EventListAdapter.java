@@ -205,7 +205,7 @@ public class EventListAdapter extends RecyclerView.Adapter<EventListAdapter.View
             public void onClick(View v) {
                 //String hexColor = String.format("#%06X", (0xFFFFFF & d.color));
                 Context context = v.getContext();
-                Toast.makeText(context, "선택 > " + e.id, Toast.LENGTH_LONG).show();
+                //Toast.makeText(context, "선택 > " + e.id, Toast.LENGTH_LONG).show();
                 mController.launchViewEvent(e.id, e.startMillis, e.endMillis, CalendarContract.Attendees.ATTENDEE_STATUS_NONE);
 //                mContext.dismiss();
             }

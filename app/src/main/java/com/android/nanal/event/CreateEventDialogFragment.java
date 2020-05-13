@@ -81,8 +81,6 @@ public class CreateEventDialogFragment extends DialogFragment implements TextWat
     private long mCalendarId = -1;
     private String mCalendarOwner;
 
-    public String connectID = "test";
-
     public CreateEventDialogFragment() {
         // Empty constructor required for DialogFragment.
     }

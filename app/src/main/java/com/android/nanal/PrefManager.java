@@ -1,6 +1,6 @@
 package com.android.nanal;
-import android.content.Context;
-import android.content.SharedPreferences;
+        import android.content.Context;
+        import android.content.SharedPreferences;
 
 /**
  * Created by Lincoln on 05/05/16.

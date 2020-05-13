@@ -16,7 +16,6 @@ import java.util.concurrent.ExecutionException;
 
 public class EditDiaryHelper {
     private static final String TAG = "EditDiaryHelper";
-    private static final String NO_DIARY_COLOR = "";
 
     public static final String[] DIARY_PROJECTION = new String[]{
             "diary_id",

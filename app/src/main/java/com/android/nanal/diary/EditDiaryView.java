@@ -4,12 +4,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.Service;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
-import android.provider.CalendarContract;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.format.Time;
@@ -27,7 +25,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.ResourceCursorAdapter;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -149,6 +146,7 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
                                     public void onClick(DialogInterface dialog, int which) {
                                         mModel.mDiaryId = d.id;
                                         mModel.mDiaryColor = d.color;
+                                        mModel.mDiaryGroupId = -1;
                                         mEtTitle.setText(null);
                                         mEtContent.setText(null);   // 지우기
                                         mEtTitle.setText(d.title);
@@ -170,8 +168,12 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
                     }
                 } else {
                     mModel.mDiaryGroupId = AllInOneActivity.mGroups.get(position-1).getGroup_id();
-                    Snackbar.make(view, "작성하신 일기가 [" + item + "] 그룹에 저장됩니다. > "+mModel.mDiaryGroupId, Snackbar.LENGTH_LONG).show();
+                    mModel.mDiaryId = -1;
+                    mModel.mDiaryColor = AllInOneActivity.mGroups.get(position-1).getGroup_color();
+                    Snackbar.make(view, "작성하신 일기가 [" + item + "] 그룹에 저장됩니다. "/*+mModel.mDiaryGroupId*/, Snackbar.LENGTH_LONG).show();
                     mModel.setDiaryColor(AllInOneActivity.helper.getGroupColor(mModel.mDiaryGroupId));
+                    mEtTitle.setText("");
+                    mEtContent.setText("");
                     mLlColor.setVisibility(View.GONE);
                     mLlColor.setEnabled(false);
                 }
@@ -310,18 +312,6 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
             mEtContent.setTextKeepState(model.mDiaryContent);
         }
 
-        if (model.mDiaryGroupId == -1) {
-            // This is an existing event so hide the calendar spinner
-            // since we can't change the calendar.
-//            View calendarGroup = mView.findViewById(R.id.sp_edit_diary_group);
-//            calendarGroup.setVisibility(View.GONE);
-//            TextView tv = (TextView) mView.findViewById(R.id.calendar_textview);
-//            tv.setText(model.mCalendarDisplayName);
-//            tv = (TextView) mView.findViewById(R.id.calendar_textview_secondary);
-        } else {
-//            View calendarGroup = mView.findViewById(R.id.sp_edit_diary_group);
-//            calendarGroup.setVisibility(View.GONE);
-        }
         if (model.mDiaryColorInitialized) {
             updateHeadlineColor(model, model.getDiaryColor());
         }
@@ -393,43 +383,6 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
             }
         }
     }
-    /**
-     * Configures the Calendars spinner.  This is only done for new events, because only new
-     * events allow you to select a calendar while editing an event.
-     * <p>
-     * We tuck a reference to a Cursor with calendar database data into the spinner, so that
-     * we can easily extract calendar-specific values when the value changes (the spinner's
-     * onItemSelected callback is configured).
-     */
-    public void setGroupsCursor(Cursor cursor, boolean userVisible, int selectedGroupId) {
-        mGroupsCursor = cursor;
-        if(cursor == null || cursor.getCount() == 0) {
-            if(mSaveAfterQueryComplete) {
-                mLoadingCalendarsDialog.cancel();
-            }
-            if(!userVisible) {
-                return;
-            }
-        }
-
-        int selection = findSelectedGroupPosition(cursor, selectedGroupId);
-
-        if (mSaveAfterQueryComplete) {
-            mLoadingCalendarsDialog.cancel();
-
-            if (prepareForSave() && fillModelFromUI()) {
-                int exit = userVisible ? Utils.DONE_EXIT : 0;
-                mDone.setDoneCode(Utils.DONE_SAVE | exit);
-                mDone.run();
-            } else if (userVisible) {
-                mDone.setDoneCode(Utils.DONE_EXIT);
-                mDone.run();
-            } else if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "SetCalendarsCursor:Save failed and unable to exit view");
-            }
-            return;
-        }
-    }
 
     /**
      * Updates the view based on {@link #mModification} and {@link #mModel}
@@ -471,13 +424,6 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
                             mOriginalPadding[3]);
                 }
             }
-            if (mModel.mUri == null) {
-//                mCalendarSelectorGroup.setVisibility(View.VISIBLE);
-            } else {
-//                mCalendarSelectorGroup.setVisibility(View.GONE);
-            }
-//            mTvLocation.setVisibility(View.VISIBLE);
-//            mEtContent.setVisibility(View.VISIBLE);
         }
     }
 
@@ -502,20 +448,6 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
         return 0;
     }
 
-//    public void setColorPickerButtonStates(int[] colorArray) {
-//        setColorPickerButtonStates(colorArray != null && colorArray.length > 0);
-//    }
-//
-//    public void setColorPickerButtonStates(boolean showColorPalette) {
-//        if (showColorPalette) {
-//            mColorPickerNewEvent.setVisibility(View.VISIBLE);
-//            mColorPickerExistingEvent.setVisibility(View.VISIBLE);
-//        } else {
-//            mColorPickerNewEvent.setVisibility(View.INVISIBLE);
-//            mColorPickerExistingEvent.setVisibility(View.GONE);
-//        }
-//    }
-
     public boolean isColorPaletteVisible() {
         return (mModel.mDiaryGroupId != -1);
     }
@@ -537,58 +469,4 @@ public class EditDiaryView implements DialogInterface.OnCancelListener,
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
     }
-
-    public static class GroupsAdapter extends  ResourceCursorAdapter {
-        public GroupsAdapter(Context context, int resourceId, Cursor c) {
-            super(context, resourceId, c);
-            setDropDownViewResource(R.layout.calendars_dropdown_item);
-        }
-
-        @Override
-        public void bindView(View view, Context context, Cursor cursor) {
-            View colorBar = view.findViewById(R.id.color);
-            int nameColumn = cursor.getColumnIndexOrThrow("group_name");
-            int colorColumn = cursor.getColumnIndexOrThrow("group_color");
-            if(colorBar != null) {
-                colorBar.setBackgroundColor(Utils.getDisplayColorFromColor(cursor.getInt(colorColumn)));
-            }
-            TextView name = (TextView) view.findViewById(R.id.calendar_name);
-            if (name != null) {
-                String displayName = cursor.getString(nameColumn);
-                name.setText(displayName);
-            }
-        }
-    }
-
-    public static class CalendarsAdapter extends ResourceCursorAdapter {
-        public CalendarsAdapter(Context context, int resourceId, Cursor c) {
-            super(context, resourceId, c);
-            setDropDownViewResource(R.layout.calendars_dropdown_item);
-        }
-
-        @Override
-        public void bindView(View view, Context context, Cursor cursor) {
-            View colorBar = view.findViewById(R.id.color);
-            int colorColumn = cursor.getColumnIndexOrThrow(CalendarContract.Calendars.CALENDAR_COLOR);
-            int nameColumn = cursor.getColumnIndexOrThrow(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME);
-            int ownerColumn = cursor.getColumnIndexOrThrow(CalendarContract.Calendars.OWNER_ACCOUNT);
-            if (colorBar != null) {
-                colorBar.setBackgroundColor(Utils.getDisplayColorFromColor(cursor
-                        .getInt(colorColumn)));
-            }
-
-            TextView name = (TextView) view.findViewById(R.id.calendar_name);
-            if (name != null) {
-                String displayName = cursor.getString(nameColumn);
-                name.setText(displayName);
-
-                TextView accountName = (TextView) view.findViewById(R.id.account_name);
-                if (accountName != null) {
-                    accountName.setText(cursor.getString(ownerColumn));
-                    accountName.setVisibility(TextView.VISIBLE);
-                }
-            }
-        }
-    }
-
 }

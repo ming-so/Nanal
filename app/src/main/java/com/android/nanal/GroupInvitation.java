@@ -1,7 +1,5 @@
 package com.android.nanal;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +10,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.concurrent.ExecutionException;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class GroupInvitation extends AppCompatActivity {
     TextView tvGroupName;
@@ -45,6 +45,7 @@ public class GroupInvitation extends AppCompatActivity {
                     if(result.equals("1")) {
                         // 그룹 가입 성공했을 경우
                         Toast.makeText(GroupInvitation.this, R.string.join_success, Toast.LENGTH_LONG).show();
+                        finish();
                     } else {
                         // 그룹 가입 실패했을 경우
                         Toast.makeText(GroupInvitation.this, R.string.join_fail, Toast.LENGTH_LONG).show();

@@ -5,20 +5,39 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".GroupInvitation">
+    tools:context=".GroupInvitation"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
+    android:gravity="center">
 
     <TextView
         android:id="@+id/tvGroupName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:gravity="center"
-        android:text="TextView" />
+        android:text=" "
+        android:textSize="18sp"
+        android:textStyle="bold"
+
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="그룹 초대장이 도착했습니다. \n가입하려면 하단 버튼을 눌러 주세요."
+        android:textSize="16sp"
+        android:layout_marginBottom="20dp"
+        />
 
     <Button
         android:id="@+id/btnJoin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Button" />
+        android:text="가입하기"
+        android:layout_marginBottom="20dp"
+        android:background="?attr/colorPrimary"/>
 
 </LinearLayout>

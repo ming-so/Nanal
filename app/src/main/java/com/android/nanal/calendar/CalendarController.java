@@ -23,6 +23,7 @@ import android.util.Pair;
 import com.android.nanal.activity.AlertActivity;
 import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.activity.CalendarSettingsActivity;
+import com.android.nanal.activity.DiaryInfoActivity;
 import com.android.nanal.activity.EditDiaryActivity;
 import com.android.nanal.activity.EditEventActivity;
 import com.android.nanal.activity.EditGroupActivity;
@@ -39,6 +40,7 @@ import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 import static android.provider.CalendarContract.Attendees.ATTENDEE_STATUS;
 import static android.provider.CalendarContract.EXTRA_EVENT_ALL_DAY;
 import static android.provider.CalendarContract.EXTRA_EVENT_BEGIN_TIME;
@@ -484,6 +486,8 @@ public class CalendarController {
                 launchViewEvent(event.id, event.startTime.toMillis(false), endTime,
                         event.getResponse());
                 return;
+            } else if (event.eventType == EventType.VIEW_DIARY) {
+                launchViewDiary(event.id, event.startTime.toMillis(false));
             } else if (event.eventType == EventType.EDIT_EVENT) {
                 launchEditEvent(event.id, event.startTime.toMillis(false), endTime, true);
                 return;
@@ -701,17 +705,26 @@ public class CalendarController {
         intent.putExtra(EXTRA_EVENT_END_TIME, endMillis);
         intent.putExtra(ATTENDEE_STATUS, response);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        mContext.startActivity(intent);
+        try {
+            mContext.startActivity(intent);
+        } catch(Exception e) {
+
+        }
     }
 
-    public void launchViewDiary(long eventId, long day, int response) {
+    public void launchViewDiary(long diaryId, long day) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        Uri diaryUri = ContentUris.withAppendedId(DUri, eventId);
-        intent.setData(diaryUri);
-        intent.setClass(mContext, AllInOneActivity.class);
+        Uri eventUri = ContentUris.withAppendedId(Events.CONTENT_URI, diaryId);
+        intent.setData(eventUri);
+        intent.setClass(mContext, DiaryInfoActivity.class);
+        intent.putExtra("diary_id", diaryId);
         intent.putExtra("day", day);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        mContext.startActivity(intent);
+        try {
+            mContext.startActivity(intent);
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void launchEditEvent(long eventId, long startMillis, long endMillis, boolean edit) {
@@ -739,7 +752,7 @@ public class CalendarController {
     private void launchAlerts() {
         Intent intent = new Intent();
         intent.setClass(mContext, AlertActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(FLAG_ACTIVITY_NEW_TASK);
         mContext.startActivity(intent);
     }
 

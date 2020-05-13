@@ -414,7 +414,7 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
             v.setDiaries(null, null);
             return;
         }
-        Log.i(TAG, "setDiaries 실행 시도, start="+start+", end="+end+", mDiaries.size="+mDiaries.size());
+        //Log.i(TAG, "setDiaries 실행 시도, start="+start+", end="+end+", mDiaries.size="+mDiaries.size());
         v.setDiaries(mDiaryDayList.subList(start, end), mDiaries);
     }
 
@@ -445,23 +445,6 @@ public class MonthByWeekAdapter extends SimpleWeeksAdapter {
                 mDayDialog.refreshList();
             }
         });
-
-/*
-        if (mShowAgendaWithMonth || mIsMiniMonth) {
-            // If agenda view is visible with month view , refresh the views
-            // with the selected day's info
-            // 월별 뷰로 agenda 뷰를 볼 수 있는 경우, 선택한 요일 정보를 사용해서 뷰를 새로 고침
-            mController.sendEvent(mContext, EventType.GO_TO, day, day, -1,
-                    ViewType.CURRENT, CalendarController.EXTRA_GOTO_DATE, null, null);
-        } else {
-            // Else , switch to the detailed view
-            // 아니라면 상세 보기로 전환
-            mController.sendEvent(mContext, EventType.GO_TO, day, day, -1,
-                    ViewType.DETAIL,
-                    CalendarController.EXTRA_GOTO_DATE
-                            | CalendarController.EXTRA_GOTO_BACK_TO_PREVIOUS, null, null);
-        }
-        */
     }
 
     private void setDayParameters(Time day) {

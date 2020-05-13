@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.android.nanal.NanalDBHelper;
 import com.android.nanal.R;
+import com.android.nanal.TodayFragment;
 import com.android.nanal.activity.AllInOneActivity;
 import com.android.nanal.calendar.CalendarController;
 
@@ -27,6 +28,7 @@ public class DiaryListAdapter extends RecyclerView.Adapter<DiaryListAdapter.View
     private Context mContext;
     private CalendarController mController;
     private boolean mNeedIcon;
+    private TodayFragment mFragment;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         LinearLayout diary_wrapper;
@@ -42,10 +44,16 @@ public class DiaryListAdapter extends RecyclerView.Adapter<DiaryListAdapter.View
         }
     }
 
+    public DiaryListAdapter(Context context, String day, boolean needIcon, TodayFragment f) {
+        this(context, day, needIcon);
+        mFragment = f;
+    }
+
     public DiaryListAdapter(Context context, String day, boolean needIcon) {
         mContext = context;
         mController = CalendarController.getInstance(context);
         mNeedIcon = needIcon;
+
         try {
             helper = AllInOneActivity.helper;
             diaryList = helper.getDiariesList(day);
@@ -120,13 +128,18 @@ public class DiaryListAdapter extends RecyclerView.Adapter<DiaryListAdapter.View
                 String hexColor = String.format("#%06X", (0xFFFFFF & d.color));
                 Context context = v.getContext();
 //                    mController.sendEvent(this, CalendarController.EventType.GO_TO, null, null, group.group_id, CalendarController.ViewType.GROUP_DETAIL);
-                Toast.makeText(context, "선택 > " + d.id, Toast.LENGTH_LONG).show();
+                //Toast.makeText(context, "선택 > " + d.id, Toast.LENGTH_LONG).show();
+                if(mFragment == null) return;
+                //mFragment.goDiaryEdit(d.id, d.day);
             }
         });
     }
 
     @Override
     public int getItemCount() {
+        if(diaryList == null) {
+            return 0;
+        }
         return diaryList.size();
     }
 }

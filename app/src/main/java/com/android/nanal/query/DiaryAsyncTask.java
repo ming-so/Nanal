@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.nanal.activity.AbstractCalendarActivity;
 import com.android.nanal.activity.AllInOneActivity;
@@ -49,17 +48,6 @@ public class DiaryAsyncTask extends AsyncTask<String, String, String> {
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             conn.setRequestMethod("POST");//데이터를 POST 방식으로 전송합니다.
-
-            /*
-            유저 ID를 보내면 서버에 저장돼 있는 일기 목록을 받음
-
-            유저 ID를 보내면 가입되어 있는 그룹 목록을 받음(jsp 파일 수정 필요함!!)
-            그룹 아이디, 그룹 이름, 그룹 색상, 그룹장 아이디, 일정 전체, 일기 전체
-            그룹 일정은 ContentValues로 따로 캘린더 생성(??) / 그룹 정보, 그룹 일기 SQLiteㅊ
-            일기 목록이랑 일정 목록 둘 다 반환해 줄 수가 없으니까/반환해도 또 따로 처리해야 하니까
-            return 값은 OK ERROR 정도만 알려 주고 json 파싱하는 메소드 만들어서
-            onPostExecute에서 직접 갱신해 주면 될 것 같음
-             */
 
             OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream());
             Log.i("DiaryAsyncTask", String[0]);
@@ -139,7 +127,7 @@ public class DiaryAsyncTask extends AsyncTask<String, String, String> {
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(mContext, "동기화 중 문제가 발생했습니다.", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(mContext, "동기화 중 문제가 발생했습니다.", Toast.LENGTH_LONG).show();
                 }
             }, 0);
             e.printStackTrace();

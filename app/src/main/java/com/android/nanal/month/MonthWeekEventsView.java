@@ -1165,7 +1165,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
         }
 
         protected ArrayList<DayDiaryFormatter> formatDays(int availableSpace, ViewDetailsPreferences.Preferences preferences) {
-            Log.i(TAG, "formatDays 실행");
+            //Log.i(TAG, "formatDays 실행");
             int dayIndex = 0;
             ArrayList<DayDiaryFormatter> dayDiaryFormatters = new ArrayList<>(mFormattedDiaries.size());
             // mFormattedDiaries.size() : 7
@@ -1571,7 +1571,7 @@ public class MonthWeekEventsView extends SimpleWeekView {
                                  int day,
                                  ViewDetailsPreferences.Preferences viewPreferences) {
             mDiaryDay = diaryDay;
-            Log.i(TAG, "DayDiaryFormatter, mDiaryDay.size="+mDiaryDay.size());
+            //Log.i(TAG, "DayDiaryFormatter, mDiaryDay.size="+mDiaryDay.size());
             mDay = day;
             mViewPreferences = viewPreferences;
             init();

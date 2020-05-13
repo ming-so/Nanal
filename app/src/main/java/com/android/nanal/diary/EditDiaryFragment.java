@@ -430,12 +430,12 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
     @Override
     public void onColorSelected(int color) {
         if (mModel.isInGroup()) {
-            Toast.makeText(getActivity(), "그룹에 있음", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getActivity(), "그룹에 있음", Toast.LENGTH_LONG).show();
             mModel.setDiaryColor(AllInOneActivity.helper.getGroupColor(mModel.mDiaryGroupId));
             return;
         }
         if (mModel.getDiaryColor() != color) {
-            Toast.makeText(getActivity(), "색상 선택="+color , Toast.LENGTH_LONG).show();
+            //Toast.makeText(getActivity(), "색상 선택="+color , Toast.LENGTH_LONG).show();
             mModel.setDiaryColor(color);
             mDiaryColor = color;
             mView.updateHeadlineColor(mModel, color);
@@ -452,7 +452,7 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
 
     // TODO turn this into a helper function in EditEventHelper for building the
     // model
-    private class QueryHandler extends AsyncQueryHandler {
+    class QueryHandler extends AsyncQueryHandler {
         public QueryHandler(ContentResolver cr) {
             super(cr);
         }
@@ -591,7 +591,7 @@ public class EditDiaryFragment extends Fragment implements CalendarController.Di
                 if ((mCode & Utils.DONE_SAVE) != 0) {
                     if (mContext != null) {
                         long day = mModel.mDiaryDay;
-                        CalendarController.getInstance(mContext).launchViewDiary(-1, day, 0);
+                                CalendarController.getInstance(mContext).launchViewDiary(-1, day);
                     }
                 }
                 Activity a = EditDiaryFragment.this.getActivity();

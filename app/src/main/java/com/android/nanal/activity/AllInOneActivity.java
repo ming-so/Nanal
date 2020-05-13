@@ -526,8 +526,6 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             }
         });
 
-
-
         handleDynamicLink();
     }
 
@@ -540,9 +538,9 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             // DB가 만들어지지 않았다면 새로 생성하기
             nanalDB = helper.getWritableDatabase();
             prefManager.setDBCreated(true);
-            Toast.makeText(this, "DB 생성 완료", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "DB 생성 완료", Toast.LENGTH_LONG).show();
         } else {
-            Toast.makeText(this, "DB 이미 존재함", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "DB 이미 존재함", Toast.LENGTH_LONG).show();
             mGroups = helper.getGroupList();
             Log.i(TAG, "mGroups.size() " + mGroups.size());
         }
@@ -879,7 +877,9 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
         invalidateOptionsMenu();
 
         mCalIntentReceiver = Utils.setTimeChangesReceiver(this, mTimeChangesUpdater);
-
+        GroupSync();
+        DiarySync();
+        EventSync();
     }
 
 
@@ -1839,6 +1839,11 @@ public class AllInOneActivity extends AbstractCalendarActivity implements EventH
             if (!mIsTabletConfig) {
                 refreshActionbarTitle(mController.getTime());
             }
+        } else if (event.eventType == EventType.VIEW_DIARY) {
+            Time t = new Time();
+            t.set(mController.getTime());
+            mController.sendEventRelatedEvent(
+                    this, EventType.CREATE_DIARY, -1, t.toMillis(true), 0, 0, 0, -1);
         }
         updateSecondaryTitleFields(displayTime);
     }

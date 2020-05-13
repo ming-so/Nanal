@@ -29,7 +29,7 @@ public class GroupHistoryAsyncTask extends AsyncTask<String, String, ArrayList<S
         ArrayList<String[]> a = new ArrayList<>();
         try {
             String str;
-            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/android/GroupHistoryAsync.jsp");
+            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/GroupHistoryAsync.jsp");
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");

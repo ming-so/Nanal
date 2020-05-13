@@ -69,4 +69,23 @@
                 android:textColor="@color/event_info_headline_color" />
         </LinearLayout>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/when_datetime"
+        style="?android:attr/textAppearanceLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dip"
+        android:textColor="@color/event_info_headline_color"
+        android:textIsSelectable="true"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/content"
+        style="?android:attr/textAppearanceLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-3dip"
+        android:textColor="@color/event_info_headline_transparent_color"
+        android:textSize="14sp" />
 </LinearLayout>

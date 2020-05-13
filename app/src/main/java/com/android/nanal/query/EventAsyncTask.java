@@ -11,7 +11,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.provider.CalendarContract;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.android.nanal.activity.AbstractCalendarActivity;
 import com.android.nanal.diary.EditDiaryHelper;
@@ -48,7 +47,7 @@ public class EventAsyncTask extends AsyncTask<String, String, String> {
     protected String doInBackground(String... String) {
         try {
             String str;
-            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/android/EventAsync.jsp");
+            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/EventAsync.jsp");
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -158,7 +157,7 @@ public class EventAsyncTask extends AsyncTask<String, String, String> {
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(mContext, "동기화 중 문제가 발생했습니다.", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(mContext, "동기화 중 문제가 발생했습니다.", Toast.LENGTH_LONG).show();
                 }
             }, 0);
             e.printStackTrace();

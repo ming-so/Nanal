@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
@@ -89,11 +90,19 @@ public class NanalDBHelper extends SQLiteOpenHelper {
         if(weather != null) values.put("weather", weather);
         if(image != null) values.put("image", image);
         if(group_id != null || group_id == "") values.put("group_id", group_id);
-        db.insert("diary", null, values);
-        db.close();
+        try {
+            db.insert("diary", null, values);
+        } catch (SQLiteConstraintException e) {
+            Log.wtf("NanalDBHelper", "addDiary 실패! "+e.getMessage());
+            return;
+        }
     }
 
     public void addDiary(Diary d) {
+        if(getDiary(d.id) != null) {
+            updateDiary(d);
+            return;
+        }
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("diary_id", d.id);
@@ -107,10 +116,12 @@ public class NanalDBHelper extends SQLiteOpenHelper {
         if(d.weather != null) values.put("weather", d.weather);
         if(d.img != null) values.put("image", d.img);
         if(d.group_id != -1) values.put("group_id", d.group_id);
+        try {
         db.insert("diary", null, values);
-        db.close();
-
-
+        } catch (SQLiteConstraintException e) {
+            Log.wtf("NanalDBHelper", "addDiary 실패! "+e.getMessage());
+            return;
+        }
     }
 
     public void addGroup(int group_id, String group_name, int group_color, String sync_time, String account_id) {
@@ -123,7 +134,6 @@ public class NanalDBHelper extends SQLiteOpenHelper {
         values.put("sync_time", sync_time);
         values.put("account_id", account_id);
         db.insert("community", null, values);
-        db.close();
 
         Log.i("NanalDBHelper", "AllInOneActivity Groups 갱신 시도");
         GroupAsyncTask groupAsyncTask = new GroupAsyncTask(AllInOneActivity.mContext, AllInOneActivity.mActivity);
@@ -138,7 +148,6 @@ public class NanalDBHelper extends SQLiteOpenHelper {
         values.put("server_id", server_id);
         values.put("sync_time", time);
         db.insert("event_sync", null, values);
-        db.close();
         //todo:EventAsyncTask 갱신
     }
 
@@ -157,7 +166,6 @@ public class NanalDBHelper extends SQLiteOpenHelper {
             values.put("server_id", Integer.parseInt(server_id.trim()));
             values.put("sync_time", time);
             db.insert("event_sync", null, values);
-            db.close();
         }
     }
 
@@ -168,10 +176,8 @@ public class NanalDBHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(sql,null);
         if(cursor.getCount() > 0 && cursor.moveToFirst()) {
             Log.i("NanalDBHelper", cursor.getString(1));
-            db.close();
             return true;
         }
-        db.close();
         return false;
     }
 
@@ -184,6 +190,19 @@ public class NanalDBHelper extends SQLiteOpenHelper {
                 + ", weather = '"+weather+"'"
                 + ", image = '"+image+"' "
                 + "WHERE diary_id = '"+diary_id+"';";
+        db.execSQL(sql);
+        Log.i("NanalDBHelper","updateDiary 완료");
+    }
+
+    public void updateDiary(Diary d) {
+        SQLiteDatabase db = getWritableDatabase();
+        String sql = "UPDATE diary set color = '"+d.color+"'"
+                + ", location = '"+d.location+"'"
+                + ", title = '"+d.title+"'"
+                + ", content = '"+d.content+"'"
+                + ", weather = '"+d.weather+"'"
+                + ", image = '"+d.img+"' "
+                + "WHERE diary_id = '"+d.id+"';";
         db.execSQL(sql);
         Log.i("NanalDBHelper","updateDiary 완료");
     }
@@ -208,6 +227,13 @@ public class NanalDBHelper extends SQLiteOpenHelper {
         db.execSQL(sql);
     }
 
+    public void deleteDiary(int diary_id) {
+        SQLiteDatabase db = getWritableDatabase();
+        String sql = "DELETE FROM diary WHERE diary_id="+diary_id;
+        db.execSQL(sql);
+        Log.i("NanalDBHelper", "deleteDiary 완료");
+    }
+
     public void deleteGroup(int group_id) {
         SQLiteDatabase db = getWritableDatabase();
         String sql = "DELETE FROM community WHERE group_id="+group_id;
@@ -216,7 +242,10 @@ public class NanalDBHelper extends SQLiteOpenHelper {
     }
 
     public void setGroupSync(int group_id, String time) {
-
+        SQLiteDatabase db = getWritableDatabase();
+        String sql = "UPDATE community set sync_time = '"+time+"' "
+                + "WHERE group_id = " +group_id;
+        db.execSQL(sql);
     }
 
     public String getGroupSync(int group_id) {
@@ -274,12 +303,24 @@ public class NanalDBHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<Diary> getDiariesList(String day) {
+        getAllDiaries();
+        Log.i("NanalDBHelper", "getDiariesList, " + day);
         ArrayList<Diary> diaryList = new ArrayList<>();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date dd = new Date();
+        long ld = 0;
+        try {
+            dd = dateFormat.parse(day);
+            ld = dd.getTime() + 32400000;
+            Log.i("NanalDBHelper", ld+"");
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
 
         SQLiteDatabase db = getReadableDatabase();
-        String sql = "SELECT * FROM diary WHERE day = '"+day+"'";
+        String sql = "SELECT * FROM diary WHERE day = '"+day+"' OR day = '"+ld+"'";
         Cursor cursor = db.rawQuery(sql, null);
 
         while(cursor.moveToNext()) {
@@ -291,8 +332,8 @@ public class NanalDBHelper extends SQLiteOpenHelper {
             try {
                 Date d = dateFormat.parse(str_day);
                 diary.day = d.getTime();
-            } catch (ParseException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                diary.day = Long.parseLong(str_day);
             }
             diary.content = cursor.getString(cursor.getColumnIndex("content"));
 
@@ -336,8 +377,26 @@ public class NanalDBHelper extends SQLiteOpenHelper {
         String str_start = convertJulian(startDay);
         String str_end = convertJulian(endDay);
 
+        Date dds = new Date();
+        Date dde = new Date();
+        long lds = 0;
+        long lde = 0;
+
+        try {
+            dds = dateFormat.parse(str_start);
+            lds = dds.getTime() + 32400000;
+            dde = dateFormat.parse(str_end);
+            lde = dde.getTime() + 32400000;
+            Log.i("NanalDBHelper", lds+", " +lde);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        Log.i("NanalDBHelper", lds+", "+lde);
+
         SQLiteDatabase db = getReadableDatabase();
-        String sql = "SELECT * FROM diary WHERE day BETWEEN '"+str_start+"' AND '"+str_end+"';";
+        String sql = "SELECT * FROM diary WHERE (day BETWEEN '"+str_start+"' AND '"+str_end+"') OR (" +
+                "day BETWEEN '"+lds+"' AND '" + lde+ "');";
         Cursor cursor = db.rawQuery(sql, null);
         while(cursor.moveToNext()) {
             Log.i("NanalDBHelper", "커서 있음");
@@ -348,8 +407,8 @@ public class NanalDBHelper extends SQLiteOpenHelper {
             try {
                 Date d = dateFormat.parse(str_day);
                 diary.day = d.getTime();
-            } catch (ParseException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                diary.day = Long.parseLong(str_day);
             }
             diary.content = cursor.getString(cursor.getColumnIndex("content"));
 
@@ -454,9 +513,11 @@ public class NanalDBHelper extends SQLiteOpenHelper {
     public Diary getTodayDiary(Date today) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String str_today = dateFormat.format(today);
+        long l_today = today.getTime();
+        Log.i("NanalDBHelper", "str_today="+str_today+", l_today="+l_today);
 
         SQLiteDatabase db = getReadableDatabase();
-        String sql = "SELECT * FROM diary WHERE day='"+str_today+"'";
+        String sql = "SELECT * FROM diary WHERE day='"+str_today+"' OR day='"+l_today+"'";
         Log.i("NanalDBHelper", sql);
         Cursor cursor = db.rawQuery(sql, null);
         while (cursor.moveToNext()) {
@@ -472,9 +533,43 @@ public class NanalDBHelper extends SQLiteOpenHelper {
             d.title = cursor.getString(cursor.getColumnIndex("title"));
             d.content = cursor.getString(cursor.getColumnIndex("content"));
             d.color = cursor.getInt(cursor.getColumnIndex("color"));
+            d.group_id = cursor.getInt(cursor.getColumnIndex("group_id"));
             return d;
         }
         return null;
+    }
+
+    public Diary getDiary(int diary_id) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SQLiteDatabase db = getReadableDatabase();
+        String sql = "SELECT * FROM diary WHERE diary_id='"+diary_id+"'";
+        Log.i("NanalDBHelper", sql);
+        Cursor cursor = db.rawQuery(sql, null);
+        if (cursor.moveToNext()) {
+            Log.i("NanalDBHelper", "있음! diary_id=" + cursor.getInt(cursor.getColumnIndex("diary_id"))
+                    + ", account_id=" + cursor.getString(cursor.getColumnIndex("account_id")) +
+                    ", day=" + cursor.getString(cursor.getColumnIndex("day")) + ", content=" +
+                    cursor.getString(cursor.getColumnIndex("content"))+", group_id="+cursor.getInt(cursor.getColumnIndex("group_id")));
+            Diary d = new Diary();
+            d.id = cursor.getInt(cursor.getColumnIndex("diary_id"));
+            d.account_id = cursor.getString(cursor.getColumnIndex("account_id"));
+            String str_day = cursor.getString(cursor.getColumnIndex("day"));
+            try {
+                Date dd = dateFormat.parse(str_day);
+                d.day = dd.getTime();
+            } catch (Exception e) {
+                d.day = Long.parseLong(str_day);
+            }
+            d.title = cursor.getString(cursor.getColumnIndex("title"));
+            d.content = cursor.getString(cursor.getColumnIndex("content"));
+            d.color = cursor.getInt(cursor.getColumnIndex("color"));
+            return d;
+        }
+        return null;
+    }
+
+    public void setDiaryColor(int diary_id, int color) {
+
     }
 
     public ArrayList<Diary> getGroupDiariesList(int groupid) {
@@ -494,11 +589,10 @@ public class NanalDBHelper extends SQLiteOpenHelper {
             String str_day = cursor.getString(cursor.getColumnIndex("day"));
             Log.wtf("NanalDBHelper", str_day);
             try {
-                //Date d = new Date(str_day);
                 Date d = dateFormat.parse(str_day);
                 diary.day = d.getTime();
             } catch (Exception e) {
-                e.printStackTrace();
+                diary.day = Long.parseLong(str_day);
             }
             diary.content = cursor.getString(cursor.getColumnIndex("content"));
 

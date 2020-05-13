@@ -565,7 +565,7 @@ public class EditGroupFragment extends Fragment implements CalendarController.Gr
                 if ((mCode & Utils.DONE_SAVE) != 0) {
                     if (mContext != null) {
 //                        CalendarController.getInstance(mContext).launchViewDiary(-1, day, 0);
-                        Toast.makeText(mContext, "테스트", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(mContext, "테스트", Toast.LENGTH_LONG).show();
                     }
                 }
                 Activity a = EditGroupFragment.this.getActivity();

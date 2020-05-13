@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toolbar;
 
@@ -32,14 +33,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class GroupDetailFragment extends Fragment implements CalendarController.EventHandler {
     private static final int VIEW_ID = 3;
-    private int mGroupId;
-
+    private int mGroupId, mGroupColor;
+    private String mGroupName;
     private NanalDBHelper helper;
 
     private Toolbar mToolbar;
     private ImageButton btn_join;
     private RecyclerView rv_gevent, rv_gdiary, rv_ghistory;
-    private TextView tv_gname, tv_gemail, tv_allgevent, tv_allgdiary, tv_allghistory;
+    private TextView tv_gname, tv_gemail, tv_allgevent, tv_allgdiary, tv_allghistory , tv_title1, tv_title2, tv_title3;
+    private LinearLayout ll1;
 
     private GroupHistoryListAdapter mHistoryAdapter;
 
@@ -77,6 +79,10 @@ public class GroupDetailFragment extends Fragment implements CalendarController.
         tv_allgevent = (TextView) v.findViewById(R.id.tv_allgevent);
         tv_allgdiary = (TextView) v.findViewById(R.id.tv_allgdiary);
         tv_allghistory = (TextView) v.findViewById(R.id.tv_allghistory);
+        tv_title1 = v.findViewById(R.id.textView3);
+        tv_title2 = v.findViewById(R.id.textView4);
+        tv_title3 = v.findViewById(R.id.textView7);
+        ll1 = v.findViewById(R.id.linearLayout2);
 
         btn_join.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,10 +93,16 @@ public class GroupDetailFragment extends Fragment implements CalendarController.
 
         helper = AllInOneActivity.helper;
         groupName = helper.getGroupName(groupId);
+        mGroupName = helper.getGroupName(groupId);
         groupEmail = helper.getGroupEmail(groupId);
+        mGroupColor = helper.getGroupColor(groupId);
 
         tv_gname.setText(groupName);
         tv_gemail.setText(groupEmail);
+        ll1.setBackgroundColor(mGroupColor);
+        tv_title1.setTextColor(mGroupColor);
+        tv_title2.setTextColor(mGroupColor);
+        tv_title3.setTextColor(mGroupColor);
 
         mHistoryAdapter = new GroupHistoryListAdapter(v.getContext(), GroupDetailFragment.this, groupId);
 

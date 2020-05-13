@@ -102,7 +102,7 @@ public class TodayFragment extends Fragment implements CalendarController.EventH
             }
         });
 
-        rv_diary.setAdapter(new DiaryListAdapter(getActivity().getApplicationContext(), str_date, false));
+        rv_diary.setAdapter(new DiaryListAdapter(getActivity().getApplicationContext(), str_date, false, this));
         rv_diary.setLayoutManager(new LinearLayoutManager(getActivity().getApplicationContext()));
 
         rv_event.setAdapter(new EventListAdapter(getActivity().getApplicationContext(), mDate, false));
@@ -115,6 +115,10 @@ public class TodayFragment extends Fragment implements CalendarController.EventH
             tv_add_diary.setVisibility(View.VISIBLE);
         }
         return v;
+    }
+
+    public void goDiaryEdit(long diary_id, long day) {
+        mController.launchViewDiary(diary_id, day);
     }
 
     public void refreshList() {

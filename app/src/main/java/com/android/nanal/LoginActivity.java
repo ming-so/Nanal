@@ -35,8 +35,6 @@ public class LoginActivity extends Activity {
     EditText et_email, et_pw;
     ProcessButton btn_login;
 
-    private int mMorphCounter = 1;
-
     boolean isSignup = false;
     boolean isPass = false;
 

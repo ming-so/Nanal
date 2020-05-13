@@ -100,7 +100,8 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
              */
 
             OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream());
-            sendMsg = "&user_id=" + String[0];
+            sendMsg = "user_id=" + String[0];
+            Log.i("GroupAsyncTask", "user_id=" + String[0]);
             osw.write(sendMsg);
             osw.flush();
             osw.close();
@@ -124,7 +125,7 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
             Log.i("통신 결과", e.getMessage() + "에러");
         } catch (IOException e) {
             Log.i("통신 결과", e.getMessage() + "에러");
-        } catch(ArrayIndexOutOfBoundsException e) {
+        } catch (ArrayIndexOutOfBoundsException e) {
             Log.i("통신 결과", e.getMessage() + "에러");
         }
         return receiveMsg;
@@ -137,12 +138,12 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
     }
 
     protected void parseJSON(String msg) {
-        int cnt = 0;
         try {
             JSONObject jsonObject = new JSONObject(msg);
             String group = jsonObject.getString("GROUP");
             JSONArray jsonArray = new JSONArray(group);
             for (int i = 0; i < jsonArray.length(); i++) {
+                Log.i("GroupAsyncTask", "jsonArray.length(): " + jsonArray.length());
                 JSONObject subObject = jsonArray.getJSONObject(i);
                 String group_name = subObject.getString("group_name");
                 int group_color = subObject.getInt("group_color");
@@ -155,7 +156,7 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
                     if (AllInOneActivity.helper.getGroupSync(group_id) != null &&
                             !AllInOneActivity.helper.getGroupSync(group_id).isEmpty()) {
                         // 버전이 옳게 들어간 경우에만 업데이트 후 return
-                        Log.i("GroupAsyncTask: ","그룹 존재, 업데이트 진행");
+                        Log.i("GroupAsyncTask: ", "그룹 존재, 업데이트 진행");
                         try {
                             /*
                             각각
@@ -164,15 +165,15 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
                             쿼리타입이 delete인 경우 delete 메소드로 전송
                              */
                             String str;
-                            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/android/GroupAsyncUpdate.jsp");
+                            URL url = new URL("http://ci2019nanal.dongyangmirae.kr/GroupAsyncUpdate.jsp");
 
                             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                             conn.setRequestMethod("POST");//데이터를 POST 방식으로 전송합니다.
 
                             OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream());
-                            Log.i("GroupAsyncTask Update Group", Integer.toString(group_id).trim()+", "+AllInOneActivity.helper.getGroupSync(group_id));
-                            sendMsg = "&group_id=" + Integer.toString(group_id).trim()+"&sync_time="+AllInOneActivity.helper.getGroupSync(group_id)+"";
+                            Log.i("GroupAsyncTask Update Group", Integer.toString(group_id).trim() + ", " + AllInOneActivity.helper.getGroupSync(group_id));
+                            sendMsg = "&group_id=" + Integer.toString(group_id).trim() + "&sync_time=" + AllInOneActivity.helper.getGroupSync(group_id) + "";
                             osw.write(sendMsg);
                             osw.flush();
                             osw.close();
@@ -186,35 +187,35 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
                                 }
                                 receiveMsg = buffer.toString();
                                 Log.i("GroupAsyncTask Update Group", receiveMsg);
-                                //parseJSONUpdate(receiveMsg);
+                                parseJSONUpdate(receiveMsg);
                                 tmp.close();
                                 reader.close();
                             } else {
                                 Log.i("GroupAsyncTask 통신 결과: ", conn.getResponseCode() + "에러");
                             }
                         } catch (MalformedURLException e) {
-                            Log.i("GroupAsyncTask: ","에러! "+ e.getMessage());
+                            Log.i("GroupAsyncTask: ", "에러! " + e.getMessage());
                         } catch (IOException e) {
-                            Log.i("GroupAsyncTask: ","에러! "+ e.getMessage());
+                            Log.i("GroupAsyncTask: ", "에러! " + e.getMessage());
                         }
-                        return;
+                        continue;
                     } else {
                         // 버전이 이상한 경우 그냥 싹 밀고 다 저장하기
-                        Log.i("GroupAsyncTask: ","그룹 존재, 버전 오류");
+                        Log.i("GroupAsyncTask: ", "그룹 존재, 버전 오류");
                         AllInOneActivity.helper.onUpgrade(AllInOneActivity.helper.getWritableDatabase(),
                                 AllInOneActivity.helper.DB_VERSION, AllInOneActivity.helper.DB_VERSION + 1);
                     }
                 } else {
-                    Log.i("GroupAsyncTask: ","그룹 없음, 테이블 생성 group_id="+group_id);
+                    Log.i("GroupAsyncTask: ", "그룹 없음, 테이블 생성 group_id=" + group_id);
                     // 그룹이 없다면 생성해야 함
                     AllInOneActivity.helper.addGroup(group_id, group_name, group_color, str_sync_time, account_id);
 
                     ContentResolver cr = mContext.getContentResolver();
                     Uri uri = CalendarContract.Calendars.CONTENT_URI;
 
-                    String selection = "(ownerAccount = '+"+account_id+"' AND account_name = '"+group_name+"')";
+                    String selection = "(ownerAccount = '+" + account_id + "' AND account_name = '" + group_name + "')";
                     Cursor cur = cr.query(uri, null, selection, null, null);
-                    if(!cur.moveToFirst()) {
+                    if (!cur.moveToFirst()) {
                         CreateNanalCalendar.CreateCalendar(mContext, group_name, account_id, true);
                     }
                 }
@@ -237,7 +238,7 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
                     String day = diaryObject.getString("day"); // 아마도 1999-09-09 이런 형식인 듯?
                     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                     Date dateDay = dateFormat.parse(day, new ParsePosition(0));
-                    diary.day = dateDay.getTime();
+                    diary.day = dateDay.getTime() + 32400000;
                     if (diaryObject.has("title")) {
                         diary.title = diaryObject.getString("title");
                     }
@@ -249,9 +250,9 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
                         diary.img = diaryObject.getString("image");
                     }
                     AllInOneActivity.helper.addDiary(diary);
-                    Log.i("GroupAsyncTask: ","다이어리 추가 완료 diary_id="+diary.id);
+                    Log.i("GroupAsyncTask: ", "다이어리 추가 완료 diary_id=" + diary.id);
                 }
-                Log.i("GroupAsyncTask: ",diaryArray.length()+"개의 다이어리 작업 완료");
+                Log.i("GroupAsyncTask: ", diaryArray.length() + "개의 다이어리 작업 완료");
                 // 이벤트
                 String event_formatting = subObject.getString("group_event");
                 JSONArray eventArray = new JSONArray(event_formatting);
@@ -272,11 +273,11 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
                 } catch (RuntimeException ex) {
 
                 }
-                Log.i("GroupAsyncTask: ",eventArray.length()+"개의 다이어리 작업 완료");
+                Log.i("GroupAsyncTask: ", eventArray.length() + "개의 이벤트 작업 완료");
             }
         } catch (JSONException e) {
             try {
-                Toast.makeText(mContext, "동기화 중 문제가 발생했습니다.", Toast.LENGTH_LONG).show();
+                //Toast.makeText(mContext, "동기화 중 문제가 발생했습니다.", Toast.LENGTH_LONG).show();
             } catch (RuntimeException ex) {
 
             }
@@ -288,12 +289,67 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
         try {
             JSONObject jsonObject = new JSONObject(msg);
             String group = jsonObject.getString("GROUP");
-            String diary = jsonObject.getString("EVENT");
-            String event = jsonObject.getString("DIARY");
+            String diary = jsonObject.getString("DIARY");
+            String event = jsonObject.getString("EVENT");
             String sync = jsonObject.getString("SYNC_TIME");
             JSONArray groupArray = new JSONArray(group);
             JSONArray diaryArray = new JSONArray(diary);
             JSONArray eventArray = new JSONArray(event);
+
+            for (int i = 0; i < diaryArray.length(); i++) {
+                JSONObject subObject = diaryArray.getJSONObject(i);
+                Diary d = new Diary();
+                d.id = subObject.getInt("diary_id");
+                d.group_id = subObject.getInt("group_id");
+                d.account_id = subObject.getString("query_account_id");
+                if (subObject.has("color")) {
+                    d.color = subObject.getInt("color");
+                }
+                if (subObject.has("location")) {
+                    d.location = subObject.getString("location");
+                }
+                String day = subObject.getString("day");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                Date dateDay = dateFormat.parse(day, new ParsePosition(0));
+                d.day = dateDay.getTime() + 32400000;
+                if (subObject.has("title")) {
+                    d.title = subObject.getString("title");
+                }
+                d.content = subObject.getString("content");
+                if (subObject.has("weather")) {
+                    d.weather = subObject.getString("weather");
+                }
+                if (subObject.has("image")) {
+                    d.img = subObject.getString("image");
+                }
+
+                String query_type = subObject.getString("query_type");
+
+                switch (query_type) {
+                    case "I":
+                    case "i":
+                        AllInOneActivity.helper.addDiary(d);
+                        break;
+                    case "U":
+                    case "u":
+                        AllInOneActivity.helper.updateDiary(d);
+                        break;
+                    case "D":
+                    case "d":
+                        AllInOneActivity.helper.deleteDiary(d.id);
+                        break;
+                    default:
+                        Log.wtf("GroupAsyncTask", "query_type 문제! > " + query_type);
+                        return;
+                }
+                AllInOneActivity.helper.addDiary(d);
+                Log.i("GroupAsyncTask Update: ", "다이어리 추가 완료 diary_id=" + d.id);
+            }
+
+            for (int i = 0; i < eventArray.length(); i++) {
+
+            }
+
             for (int i = 0; i < groupArray.length(); i++) {
                 JSONObject subObject = groupArray.getJSONObject(i);
                 String group_name = subObject.getString("group_name");
@@ -304,24 +360,27 @@ public class GroupAsyncTask extends AsyncTask<String, String, String> {
                 String query_type = subObject.getString("query_type");
 
                 switch (query_type) {
-                    case "I": case "i":
+                    case "I":
+                    case "i":
                         AllInOneActivity.helper.addGroup(group_id, group_name, group_color, str_sync_time, account_id);
                         break;
-                    case "U": case "u":
-                        AllInOneActivity.helper.updateGroup(group_id, group_name,group_color, str_sync_time, account_id);
+                    case "U":
+                    case "u":
+                        AllInOneActivity.helper.updateGroup(group_id, group_name, group_color, str_sync_time, account_id);
                         break;
-                    case "D": case "d":
+                    case "D":
+                    case "d":
                         AllInOneActivity.helper.deleteGroup(group_id);
                         break;
                     default:
-                        Log.wtf("GroupAsyncTask", "query_type 문제! > "+query_type);
+                        Log.wtf("GroupAsyncTask", "query_type 문제! > " + query_type);
                         return;
                 }
                 AllInOneActivity.helper.setGroupSync(group_id, sync);
             }
 
         } catch (JSONException e) {
-
+            e.printStackTrace();
         }
     }
 
