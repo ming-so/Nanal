@@ -1,3 +1,4 @@
+
 <img src="https://github.com/Knabin/Nanal-Calendar/blob/master/image/nanal_logo_only.png?raw=true" style="zoom:35%;" />
 
 
@@ -16,6 +17,3 @@
 - 그룹에 가입하여 작성한 일정, 일기를 지인과 공유할 수 있음
 - 앱에서 작성한 정보를 웹에서도 확인 가능
 - 서버 자동 저장!
-
-
-
