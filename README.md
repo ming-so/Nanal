@@ -1,5 +1,5 @@
 
-<img src="https://github.com/Knabin/Nanal-Calendar/blob/master/image/nanal_logo_only.png?raw=true" style="zoom:35%;" />
+<img src="https://github.com/Knabin/Nanal-Calendar/blob/master/image/nanal_logo_only.png?raw=true" width="300px" />
 
 
 
